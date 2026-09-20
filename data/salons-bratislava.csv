@@ -1,11 +1,11 @@
 name,address,district,phone,email,website,animals,source_url,observed_at,notes
-Psí salón Veselá Labka - Ružinov,"Ružinovská 1/4814, 821 02 Bratislava",,+421 903 494 000,info@veselalabka.sk,https://veselalabka.sk/sk/salony/bratislava-ruzinov,dog,https://veselalabka.sk/sk/salony/bratislava-ruzinov,2026-09-20,
-Psí salón Veselá Labka - Petržalka,"Mánesovo námestie 7, 851 01 Bratislava",,+421 220 512 097,info@veselalabka.sk,https://veselalabka.sk/sk/salony/bratislava-petrzalka,dog,https://veselalabka.sk/sk/salony/bratislava-petrzalka,2026-09-20,"Vstup z Farského ulice; v priestoroch kliniky EasyVet"
-Dog Culture,"Prievozská 32, 821 05 Bratislava",,+421 903 511 410,info@dogculture.sk,https://dogculture.sk,dog,https://dogculture.sk,2026-09-20,
-Psí salón Zuzana,"Rezedová 5, 821 01 Bratislava",,+421 905 556 451,zuzana10jassova@gmail.com,https://salon-pre-psov.sk,dog,https://salon-pre-psov.sk,2026-09-20,
-Psí salón My Champ,"Jurigovo námestie 5, 841 04 Bratislava",,+421 944 342 284,,https://mychamp.sk,dog,https://mychamp.sk,2026-09-20,"E-mail na webe neuvedený; kontakt telefonicky"
-Psí salón Trim štúdio,"Trhová 50, 841 01 Bratislava",,+421 910 990 313,askrzekova@gmail.com,https://trimstudio.sk,dog;cat,https://trimstudio.sk/kontakt/,2026-09-20,"Salón ponúka úpravu psov aj mačiek"
-Salón pre psov Terra,"Hany Meličkovej 43, 841 05 Bratislava",,+421 950 873 641,,https://www.salonterra.sk,dog,https://www.salonterra.sk,2026-09-20,"E-mail na webe neuvedený; kontakt telefonicky alebo WhatsApp"
-Laura - salón pre psov,"Námestie Hraničiarov 18, 851 01 Bratislava",,+421 944 240 116,,https://laurasalon.sk,dog,https://laurasalon.sk,2026-09-20,"E-mail na webe neuvedený; objekt TS-618 za č. 18 (navigácia Osuského 7); objednávky telefonicky alebo osobne"
-Salón pre psov Labku na to,"Čiernovodská 6, 821 07 Bratislava",,+421 904 666 181,,https://labkunato.sk,dog,https://labkunato.sk,2026-09-20,"E-mail na webe neuvedený; kontakt telefonicky alebo cez Facebook"
-Dog's Beauty & Wellness,"Mánesovo námestie 1230/1, 851 01 Bratislava",,+421 948 995 901,andrea@dogsbeauty.sk,https://dogsbeauty.sk,dog,https://dogsbeauty.sk,2026-09-20,
+Psí salón Veselá Labka - Ružinov,"Ružinovská 1/4814, 821 02 Bratislava",ruzinov,+421 903 494 000,info@veselalabka.sk,https://veselalabka.sk/sk/salony/bratislava-ruzinov,dog,https://veselalabka.sk/sk/salony/bratislava-ruzinov,2026-09-20,
+Psí salón Veselá Labka - Petržalka,"Mánesovo námestie 7, 851 01 Bratislava",petrzalka,+421 220 512 097,info@veselalabka.sk,https://veselalabka.sk/sk/salony/bratislava-petrzalka,dog,https://veselalabka.sk/sk/salony/bratislava-petrzalka,2026-09-20,Vstup z Farského ulice; v priestoroch kliniky EasyVet
+Dog Culture,"Prievozská 32, 821 05 Bratislava",ruzinov,+421 903 511 410,info@dogculture.sk,https://dogculture.sk,dog,https://dogculture.sk,2026-09-20,
+Psí salón Zuzana,"Rezedová 5, 821 01 Bratislava",ruzinov,+421 905 556 451,zuzana10jassova@gmail.com,https://salon-pre-psov.sk,dog,https://salon-pre-psov.sk,2026-09-20,
+Psí salón My Champ,"Jurigovo námestie 5, 841 04 Bratislava",karlova-ves,+421 944 342 284,,https://mychamp.sk,dog,https://mychamp.sk,2026-09-20,E-mail na webe neuvedený; kontakt telefonicky
+Psí salón Trim štúdio,"Trhová 50, 841 01 Bratislava",dubravka,+421 910 990 313,askrzekova@gmail.com,https://trimstudio.sk,dog;cat,https://trimstudio.sk/kontakt/,2026-09-20,Salón ponúka úpravu psov aj mačiek
+Salón pre psov Terra,"Hany Meličkovej 43, 841 05 Bratislava",karlova-ves,+421 950 873 641,,https://www.salonterra.sk,dog,https://www.salonterra.sk,2026-09-20,E-mail na webe neuvedený; kontakt telefonicky alebo WhatsApp
+Laura - salón pre psov,"Námestie Hraničiarov 18, 851 01 Bratislava",petrzalka,+421 944 240 116,,https://laurasalon.sk,dog,https://laurasalon.sk,2026-09-20,E-mail na webe neuvedený; objekt TS-618 za č. 18 (navigácia Osuského 7); objednávky telefonicky alebo osobne
+Salón pre psov Labku na to,"Čiernovodská 6, 821 07 Bratislava",vrakuna,+421 904 666 181,,https://labkunato.sk,dog,https://labkunato.sk,2026-09-20,E-mail na webe neuvedený; kontakt telefonicky alebo cez Facebook
+Dog's Beauty & Wellness,"Mánesovo námestie 1230/1, 851 01 Bratislava",petrzalka,+421 948 995 901,andrea@dogsbeauty.sk,https://dogsbeauty.sk,dog,https://dogsbeauty.sk,2026-09-20,
