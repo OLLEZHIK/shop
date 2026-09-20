@@ -1,0 +1,119 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Core entities
+model City {
+  id        Int        @id @default(autoincrement())
+  name      String
+  slug      String     @unique
+  districts District[]
+}
+
+model District {
+  id     Int    @id @default(autoincrement())
+  cityId Int
+  name   String
+  slug   String @unique
+  city   City   @relation(fields: [cityId], references: [id])
+  salons Salon[]
+}
+
+model Breed {
+  id         Int        @id @default(autoincrement())
+  name       String
+  slug       String     @unique
+  sizeClass  SizeClass
+  coatNotes  String?
+  priceItems PriceItem[]
+}
+
+enum SizeClass {
+  MINI
+  SMALL
+  MEDIUM
+  LARGE
+  XL
+}
+
+// Salon model
+model Salon {
+  id           Int          @id @default(autoincrement())
+  name         String
+  slug         String       @unique
+  address      String
+  districtId   Int
+  lat          Float?
+  lng          Float?
+  phone        String?
+  email        String?
+  website      String?
+  openingHours Json?
+  animals      String[]
+  specialties  String[]
+  status       SalonStatus @default(DRAFT)
+  featured     Boolean     @default(false)
+  verifiedAt   DateTime?
+  sourceUrls   String[]
+  notes        String?
+  district     District    @relation(fields: [districtId], references: [id])
+  priceItems   PriceItem[]
+  clickEvents  ClickEvent[]
+}
+
+enum SalonStatus {
+  DRAFT
+  PUBLISHED
+  REMOVED
+}
+
+// Services and pricing
+model Service {
+  id         Int         @id @default(autoincrement())
+  name       String
+  slug       String      @unique
+  priceItems PriceItem[]
+}
+
+model PriceItem {
+  id         Int        @id @default(autoincrement())
+  salonId    Int
+  serviceId  Int
+  sizeClass  SizeClass?
+  breedId    Int?
+  priceFrom  Decimal
+  priceTo    Decimal?
+  currency   String     @default("EUR")
+  sourceUrl  String
+  observedAt DateTime
+  salon      Salon      @relation(fields: [salonId], references: [id])
+  service    Service    @relation(fields: [serviceId], references: [id])
+  breed      Breed?     @relation(fields: [breedId], references: [id])
+}
+
+// Analytics
+model ClickEvent {
+  id           Int       @id @default(autoincrement())
+  salonId      Int
+  type         ClickType
+  page         String
+  referrerHost String?
+  createdAt    DateTime  @default(now())
+  salon        Salon     @relation(fields: [salonId], references: [id])
+}
+
+enum ClickType {
+  CALL
+  WEB
+  ROUTE
+  EMAIL
+}
