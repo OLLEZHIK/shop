@@ -81,7 +81,7 @@ In accordance with the General Data Protection Regulation (Regulation (EU) 2016/
 
 We do not transfer your personal information to third parties, except for technical service providers (data processors) strictly necessary for hosting and delivering the platform:
 - **Hosting and Cloud Infrastructure:** Platform hosting and CDN edge delivery (e.g., Vercel / Cloudflare).
-- **Database Infrastructure:** Managed PostgreSQL cloud database provider (e.g., Supabase / Neon).
+- **Database Infrastructure:** Managed PostgreSQL database via Prisma Postgres (see `docs/database.md`).
 - **Analytics Provider:** Cookieless analytics provider operating under GDPR-compliant EU data processing agreements.
 
 All service providers process data strictly on our behalf under compliant Data Processing Agreements (DPAs).
