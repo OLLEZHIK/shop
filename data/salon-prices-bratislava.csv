@@ -1,0 +1,77 @@
+salon_name,service,size_class,price_from,price_to,currency,source_url,observed_at,notes
+Psí salón Veselá Labka - Ružinov,complete_care,MINI,40.00,40.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava pes do 5 kg (od 40 €)
+Psí salón Veselá Labka - Ružinov,complete_care,SMALL,50.00,50.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava pes od 5-15 kg (od 50 €)
+Psí salón Veselá Labka - Ružinov,complete_care,MEDIUM,60.00,60.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava pes od 15-25 kg (od 60 €)
+Psí salón Veselá Labka - Ružinov,bathing,MINI,27.00,27.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie malý pes do 5 kg (od 27 € / 60 min)
+Psí salón Veselá Labka - Ružinov,bathing,SMALL,35.00,35.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie stredný pes 5-15 kg (od 35 € / 90 min)
+Psí salón Veselá Labka - Ružinov,bathing,MEDIUM,45.00,45.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie veľký pes 15-25 kg (od 45 € / 120 min)
+Psí salón Veselá Labka - Ružinov,trimming,,25.00,25.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Trimovanie: každá začatá hodina 25 €
+Psí salón Veselá Labka - Petržalka,complete_care,MINI,40.00,40.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava malý pes (od 40 €)
+Psí salón Veselá Labka - Petržalka,complete_care,SMALL,50.00,50.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava stredný pes (od 50 €)
+Psí salón Veselá Labka - Petržalka,complete_care,MEDIUM,60.00,60.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava veľký pes (od 60 €)
+Psí salón Veselá Labka - Petržalka,grooming,MINI,27.00,27.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Strihanie malý pes do 5 kg (od 27 €)
+Psí salón Veselá Labka - Petržalka,grooming,SMALL,35.00,35.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Strihanie stredný pes 5-15 kg (od 35 €)
+Psí salón Veselá Labka - Petržalka,grooming,MEDIUM,40.00,40.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Strihanie veľký pes 15 a viac kg (od 40 €)
+Psí salón Veselá Labka - Petržalka,bathing,MINI,20.00,20.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie malý pes (od 20 €)
+Psí salón Veselá Labka - Petržalka,bathing,SMALL,25.00,25.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie stredný pes (od 25 €)
+Psí salón Veselá Labka - Petržalka,bathing,MEDIUM,30.00,30.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie veľký pes (od 30 €)
+Psí salón Veselá Labka - Petržalka,trimming,,25.00,25.00,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Trimovanie: 25 € za hodinu
+Dog Culture,bathing,SMALL,34.00,34.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Kúpanie & česanie (veľkosť S)
+Dog Culture,grooming,SMALL,54.00,54.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Strihanie & kúpanie (veľkosť S)
+Dog Culture,trimming,SMALL,64.00,64.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Trímovanie & kúpanie (veľkosť S)
+Dog Culture,bathing,MEDIUM,44.00,44.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Kúpanie & česanie (veľkosť M)
+Dog Culture,grooming,MEDIUM,64.00,64.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Strihanie & kúpanie (veľkosť M)
+Dog Culture,trimming,MEDIUM,74.00,74.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Trímovanie & kúpanie (veľkosť M)
+Dog Culture,bathing,LARGE,54.00,54.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Kúpanie & česanie (veľkosť L)
+Dog Culture,grooming,LARGE,74.00,74.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Strihanie & kúpanie (veľkosť L)
+Dog Culture,trimming,LARGE,94.00,94.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Trímovanie & kúpanie (veľkosť L)
+Dog Culture,bathing,XL,74.00,74.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Kúpanie & česanie (veľkosť XL)
+Dog Culture,grooming,XL,94.00,94.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Strihanie & kúpanie (veľkosť XL)
+Dog Culture,trimming,XL,104.00,104.00,EUR,https://dogculture.sk/#cennik,2026-09-20,Trímovanie & kúpanie (veľkosť XL)
+Psí salón Zuzana,complete_care,SMALL,43.00,43.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kompletná úprava: malý pes do 8 kg (od 43 €)
+Psí salón Zuzana,complete_care,MEDIUM,48.00,48.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kompletná úprava: stredný pes do 20 kg (od 48 €)
+Psí salón Zuzana,complete_care,LARGE,65.00,65.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kompletná úprava: veľký pes nad 20 kg (od 65 €)
+Psí salón Zuzana,grooming,SMALL,38.00,38.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Strihanie: malý pes do 8 kg (od 38 €)
+Psí salón Zuzana,grooming,MEDIUM,43.00,43.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Strihanie: stredný pes do 20 kg (od 43 €)
+Psí salón Zuzana,grooming,LARGE,55.00,55.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Strihanie: veľký pes nad 20 kg (od 55 €)
+Psí salón Zuzana,bathing,SMALL,25.00,25.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kúpanie a sušenie: malý pes do 8 kg (od 25 €)
+Psí salón Zuzana,bathing,MEDIUM,35.00,35.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kúpanie a sušenie: stredný pes do 20 kg (od 35 €)
+Psí salón Zuzana,bathing,LARGE,55.00,55.00,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kúpanie a sušenie: veľký pes nad 20 kg (od 55 €)
+Psí salón My Champ,complete_care,MINI,45.00,45.00,EUR,https://mychamp.sk/#cennik,2026-09-20,"Luxusný kompletný balíček: MINI do 5 kg (kúpanie, balzam, fénovanie, strih, hygiena)"
+Psí salón My Champ,complete_care,SMALL,55.00,55.00,EUR,https://mychamp.sk/#cennik,2026-09-20,Luxusný kompletný balíček: MALÝ do 10 kg (kompletný strih & úprava)
+Psí salón My Champ,complete_care,MEDIUM,60.00,60.00,EUR,https://mychamp.sk/#cennik,2026-09-20,Luxusný kompletný balíček: STREDNÝ do 20 kg (hĺbkové vyčesávanie & strih)
+Psí salón My Champ,complete_care,LARGE,75.00,75.00,EUR,https://mychamp.sk/#cennik,2026-09-20,Luxusný kompletný balíček: VEĽKÝ nad 20 kg (náročná profesionálna úprava)
+Psí salón My Champ,bathing,SMALL,20.00,20.00,EUR,https://mychamp.sk/#cennik,2026-09-20,Kúpanie + fénovanie: malý pes do 10 kg
+Psí salón My Champ,bathing,MEDIUM,25.00,25.00,EUR,https://mychamp.sk/#cennik,2026-09-20,Kúpanie + fénovanie: stredný pes do 20 kg
+Psí salón My Champ,bathing,LARGE,35.00,35.00,EUR,https://mychamp.sk/#cennik,2026-09-20,Kúpanie + fénovanie: veľký pes do 30 kg
+Psí salón My Champ,bathing,XL,45.00,45.00,EUR,https://mychamp.sk/#cennik,2026-09-20,Kúpanie + fénovanie: obrí pes nad 30 kg
+Psí salón Trim štúdio,grooming,,40.00,40.00,EUR,https://trimstudio.sk/cennik/,2026-09-20,1 človek na 1 psíka: od 40 € / hodina
+Psí salón Trim štúdio,grooming,,55.00,55.00,EUR,https://trimstudio.sk/cennik/,2026-09-20,2 ľudia na 1 psíka: od 55 € / hodina (väčšinou veľké a staršie psy)
+Salón pre psov Terra,complete_care,MINI,50.00,50.00,EUR,https://www.salonterra.sk/#price,2026-09-20,Kompletná úprava: malý pes do 5 kg (od 50 €)
+Salón pre psov Terra,complete_care,SMALL,60.00,60.00,EUR,https://www.salonterra.sk/#price,2026-09-20,Kompletná úprava: malý pes do 10 kg (od 60 €)
+Salón pre psov Terra,complete_care,MEDIUM,60.00,60.00,EUR,https://www.salonterra.sk/#price,2026-09-20,Kompletná úprava: stredný pes do 20 kg (od 60 €)
+Salón pre psov Terra,complete_care,LARGE,70.00,70.00,EUR,https://www.salonterra.sk/#price,2026-09-20,Kompletná úprava: veľký pes od 20 kg (od 70 €)
+Salón pre psov Terra,bathing,SMALL,30.00,30.00,EUR,https://www.salonterra.sk/#price,2026-09-20,Kúpanie + česanie: malý pes (od 30 €)
+Salón pre psov Terra,bathing,MEDIUM,40.00,40.00,EUR,https://www.salonterra.sk/#price,2026-09-20,Kúpanie + česanie: stredný pes (od 40 €)
+Salón pre psov Terra,bathing,LARGE,50.00,60.00,EUR,https://www.salonterra.sk/#price,2026-09-20,Kúpanie + česanie: veľký pes (od 50 € - 60 €)
+Salón pre psov Terra,bathing,XL,80.00,80.00,EUR,https://www.salonterra.sk/#price,2026-09-20,Kúpanie + česanie: XXL pes (od 80 €)
+Laura - salón pre psov,grooming,,25.00,25.00,EUR,https://laurasalon.sk/#cennik,2026-09-20,"Strih, kúpeľ, trimovanie a vyčesávanie: od 25 € / hod."
+Salón pre psov Labku na to,complete_care,MINI,25.00,25.00,EUR,https://labkunato.sk/#cennik,2026-09-20,"Kúpanie, fénovanie, strihanie, uši, pazúriky, žľazy: Čivava (25 €)"
+Salón pre psov Labku na to,complete_care,SMALL,29.00,29.00,EUR,https://labkunato.sk/#cennik,2026-09-20,"Kúpanie, fénovanie, strihanie, uši, pazúriky, žľazy: Malý pes do 8 kg (29 €)"
+Salón pre psov Labku na to,complete_care,MEDIUM,34.00,34.00,EUR,https://labkunato.sk/#cennik,2026-09-20,"Kúpanie, fénovanie, strihanie, uši, pazúriky, žľazy: Stredný pes do 18 kg (34 €)"
+Salón pre psov Labku na to,grooming,SMALL,40.00,40.00,EUR,https://labkunato.sk/#cennik,2026-09-20,Strihanie + kúpanie: Malý pes (40 €)
+Salón pre psov Labku na to,grooming,MEDIUM,45.00,45.00,EUR,https://labkunato.sk/#cennik,2026-09-20,Strihanie + kúpanie: Stredný pes (45 €)
+Salón pre psov Labku na to,bathing,SMALL,25.00,25.00,EUR,https://labkunato.sk/#cennik,2026-09-20,"Kúpanie, fénovanie, vyčesávanie: Malý pes (25 €)"
+Salón pre psov Labku na to,bathing,MEDIUM,35.00,35.00,EUR,https://labkunato.sk/#cennik,2026-09-20,"Kúpanie, fénovanie, vyčesávanie: Stredný pes (35 €)"
+Salón pre psov Labku na to,bathing,LARGE,46.00,46.00,EUR,https://labkunato.sk/#cennik,2026-09-20,"Kúpanie, fénovanie, vyčesávanie: Veľký pes do 30 kg (46 €)"
+Dog's Beauty & Wellness,grooming,MINI,53.00,53.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,"Strihanie psov: XS pes (vyčesávanie, kúpanie, pazúry, strih)"
+Dog's Beauty & Wellness,grooming,SMALL,68.00,68.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Strihanie psov: S pes
+Dog's Beauty & Wellness,grooming,MEDIUM,78.00,78.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Strihanie psov: M pes
+Dog's Beauty & Wellness,grooming,LARGE,92.00,92.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Strihanie psov: L pes
+Dog's Beauty & Wellness,grooming,XL,110.00,110.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Strihanie psov: XL pes
+Dog's Beauty & Wellness,trimming,,40.00,40.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Trimovanie: za každú 1 hodinu 40 €
+Dog's Beauty & Wellness,bathing,MINI,32.00,32.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Kúpanie a wellness (krátkosrsté psy): XS pes
+Dog's Beauty & Wellness,bathing,SMALL,44.00,44.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Kúpanie a wellness (krátkosrsté psy): S pes
+Dog's Beauty & Wellness,bathing,MEDIUM,48.00,48.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Kúpanie a wellness (krátkosrsté psy): M pes
+Dog's Beauty & Wellness,bathing,LARGE,56.00,56.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Kúpanie a wellness (krátkosrsté psy): L pes
+Dog's Beauty & Wellness,bathing,XL,72.00,72.00,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Kúpanie a wellness (krátkosrsté psy): XL pes
