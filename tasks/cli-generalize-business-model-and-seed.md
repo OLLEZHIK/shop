@@ -36,6 +36,22 @@ seed-скрипте: `parseCSV` там делает `line.split(',')`, что л
    - Сделать `districtId` nullable (`Int?`) — район заполнен не у всех строк, пока не завершена `tasks/cli-backfill-districts-all-datasets.md` (если она уже смёржена к моменту твоей работы — тем лучше, но код не должен требовать district обязательным).
    - `lat`/`lng` — уже nullable в текущей схеме, оставить как есть (заполнит `tasks/antigravity-geocode-listings.md` отдельно).
    - Остальные поля (`address`, `phone`, `email`, `website`, `animals`, `specialties`/`notes`, `status`, `featured`, `verifiedAt`, `sourceUrls`) переносятся как есть с `Salon` на `Business`.
+   - Добавить `photoUrls String[] @default([])` в `Business` — владелец решил включить фото в основной флоу (см. `docs/design-plan.md` раздел 2.1), но реальных фото ещё нет ни у одной записи (правило проекта — не использовать чужие фото без разрешения), поэтому поле нужно уже сейчас, данные появятся позже отдельной задачей.
+   - Добавить новую модель `Review`:
+     ```prisma
+     model Review {
+       id         Int          @id @default(autoincrement())
+       businessId Int
+       authorName String
+       rating     Int          // 1-5
+       comment    String
+       status     ReviewStatus @default(PENDING)
+       createdAt  DateTime     @default(now())
+       business   Business     @relation(fields: [businessId], references: [id])
+     }
+     enum ReviewStatus { PENDING PUBLISHED REJECTED }
+     ```
+     Это тоже решение владельца — отзывы переносятся из P1 в MVP, подробности и обоснование (почему `PENDING` по умолчанию, почему без выдуманных данных) — `docs/design-plan.md` раздел 2.1. В этой задаче только схема, без реальных отзывов — таблица создаётся пустой, отзывы появятся через форму на сайте (задача `cli-build-listing-and-detail-pages`).
    - `PriceItem.salonId` → `PriceItem.businessId`, `ClickEvent.salonId` → `ClickEvent.businessId`, соответствующие связи.
 2. Написать seed-скрипт (`website/prisma/seed.ts`, добавить `npm run db:seed` в `package.json`):
    - Читает все 4 файла из `data/` (не из `website/data/` — это дублирующая копия, см. открытый вопрос ниже).
@@ -68,7 +84,7 @@ Client, `website/data/` станет неиспользуемым дублем. 
 
 ## Критерии готовности (Definition of Done)
 
-- `website/prisma/schema.prisma` обновлена (Business + BusinessCategory), `prisma migrate dev` проходит на реальной БД.
+- `website/prisma/schema.prisma` обновлена (Business + BusinessCategory + Review + photoUrls), `prisma migrate dev` проходит на реальной БД.
 - Seed-скрипт существует, идемпотентен, реально прогнан (не только написан) — в PR приложить вывод (сколько записей по каждой категории загружено).
 - CSV парсится библиотекой, а не самописным `split(',')`.
 - `npm run build` и `npm run lint` (если настроен) проходят.

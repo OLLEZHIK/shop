@@ -17,9 +17,10 @@
 
 ## Что сделать
 
-1. **Header/Footer** (`website/components/Header.tsx`, `Footer.tsx` или где принято в проекте): ссылки на все 6 категорий (`/grooming/bratislava/`, `/vet-clinics/bratislava/`, `/pet-hotels/bratislava/`, `/pet-training/bratislava/`, `/pet-shops/bratislava/`, `/pet-sitting/bratislava/`), ссылка на `/how-it-works/`, в футере — доп. ссылки на Privacy/Terms.
+1. **Header/Footer** (`website/components/Header.tsx`, `Footer.tsx` или где принято в проекте): ссылки на все 6 категорий (`/grooming/bratislava/`, `/vet-clinics/bratislava/`, `/pet-hotels/bratislava/`, `/dog-training/bratislava/`, `/pet-shops/bratislava/`, `/pet-sitting/bratislava/`), ссылка на `/how-it-works/`, в футере — доп. ссылки на Privacy/Terms.
 2. **Главная страница** (`website/app/page.tsx`):
    - Подключить реальный сабмит поиска: и мобильные карточки-шаги, и десктопная строка при выборе/сабмите должны редиректить на `/{category}/bratislava/?district=...&animal=...` (конкретную реализацию — client-side `useRouter().push(...)` или обычная форма с `GET` — на усмотрение исполнителя).
+   - Мобильные шаги 2-3 (услуга/район) — по явному запросу владельца открывать как полноэкранный оверлей с фокусом на выборе и списком популярных вариантов (референс Zocdoc mobile, разобран в `docs/design-plan.md` раздел 4.1 и `docs/research/interface-references.md` раздел 1.1), а не просто разворачивать плоский список карточек на месте, как сейчас.
    - Счётчики (`getBusinessCount`) — после того как `lib/data.ts` переведён на Prisma Client (см. соседнюю задачу `cli-build-listing-and-detail-pages` — если она уже смёржена, использовать её версию `lib/data.ts`; если ещё нет, не дублировать работу — согласовать порядок, или временно оставить CSV-версию и explicitly отметить в PR, что счётчики будут актуализированы после мерджа той задачи).
    - Добавить блок «как это работает» (короткий тизер + ссылка на `/how-it-works/`).
 3. **Статические страницы:**
