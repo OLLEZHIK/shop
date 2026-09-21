@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type { Business, Salon, VetClinic, PetHotel, OtherService, SearchFilters } from './types';
+import type { AnimalType, Business, Salon, VetClinic, PetHotel, OtherService, SearchFilters } from './types';
 
 // CSV parsing helper
 function parseCSV(content: string): Record<string, string>[] {
@@ -29,7 +29,7 @@ function loadData(): Business[] {
     businesses.push({
       ...row,
       category: 'salon',
-      animals: row.animals as any,
+      animals: row.animals as AnimalType,
     } as Salon);
   });
 
@@ -50,7 +50,7 @@ function loadData(): Business[] {
     businesses.push({
       ...row,
       category: 'hotel',
-      animals: row.animals as any,
+      animals: row.animals as AnimalType,
     } as PetHotel);
   });
 
@@ -60,8 +60,8 @@ function loadData(): Business[] {
   othersData.forEach(row => {
     businesses.push({
       ...row,
-      category: row.category as any,
-      animals: row.animals as any,
+      category: row.category as OtherService['category'],
+      animals: row.animals as AnimalType,
     } as OtherService);
   });
 
