@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%">
+  <g transform="translate(18, 14)">
+    <path d="M14 36 C8 30 8 20 16 14 C24 8 32 18 32 18 C32 18 40 8 48 14 C56 20 56 30 50 36 C42 44 32 50 32 50 C32 50 22 44 14 36 Z" stroke="#004E89" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <!-- Accent Dots inside Loop -->
+    <circle cx="24" cy="22" r="3" fill="#FF6B35"/>
+    <circle cx="32" cy="16" r="3.2" fill="#FF6B35"/>
+    <circle cx="40" cy="22" r="3" fill="#FF6B35"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="88" y="52" font-family="system-ui, -apple-system, 'Inter', sans-serif" font-size="34" font-weight="800" fill="#004E89" letter-spacing="-0.5">Paw<tspan fill="#FF6B35">enn</tspan></text>
+</svg>

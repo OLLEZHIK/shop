@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%">
+  <g transform="translate(18, 12)">
+    <!-- Rising Sun / Base Paw -->
+    <path d="M12 44 C12 30 20 22 28 22 C36 22 44 30 44 44 Z" fill="#FF6B35"/>
+    <!-- Horizon Bar -->
+    <rect x="8" y="46" width="40" height="4" rx="2" fill="#004E89"/>
+    <!-- Sunray Toes -->
+    <ellipse cx="12" cy="14" rx="3" ry="5" transform="rotate(-30 12 14)" fill="#FF6B35"/>
+    <ellipse cx="22" cy="8" rx="3.2" ry="5.5" transform="rotate(-10 22 8)" fill="#FF6B35"/>
+    <ellipse cx="34" cy="8" rx="3.2" ry="5.5" transform="rotate(10 34 8)" fill="#FF6B35"/>
+    <ellipse cx="44" cy="14" rx="3" ry="5" transform="rotate(30 44 14)" fill="#FF6B35"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="88" y="52" font-family="system-ui, -apple-system, 'Inter', sans-serif" font-size="34" font-weight="800" fill="#004E89" letter-spacing="-0.5">Paw<tspan fill="#FF6B35">enn</tspan></text>
+</svg>
