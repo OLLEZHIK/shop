@@ -21,8 +21,8 @@ export default function RootLayout({
               pawenn
             </Link>
             <nav className="hidden md:flex gap-6 text-sm">
-              <a href="/search" className="hover:text-brand-blue transition">Browse All</a>
-              <a href="/about" className="hover:text-brand-blue transition">How it Works</a>
+              <Link href="/search" className="hover:text-brand-blue transition">Browse All</Link>
+              <Link href="/about" className="hover:text-brand-blue transition">How it Works</Link>
             </nav>
           </div>
         </header>
