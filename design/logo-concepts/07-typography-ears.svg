@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%">
+  <text x="24" y="54" font-family="system-ui, -apple-system, 'Inter', sans-serif" font-size="40" font-weight="900" fill="#004E89" letter-spacing="-0.5">Paw</text>
+  <!-- First N with Ear -->
+  <g transform="translate(118, 22)">
+    <path d="M0 32 L0 8 Q0 0 8 0 L14 0 Q22 0 22 8 L22 32" stroke="#FF6B35" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+    <path d="M18 -5 L25 5 L14 5 Z" fill="#FF6B35"/>
+  </g>
+  <!-- Second N with Ear -->
+  <g transform="translate(150, 22)">
+    <path d="M0 32 L0 8 Q0 0 8 0 L14 0 Q22 0 22 8 L22 32" stroke="#FF6B35" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+    <path d="M18 -5 L25 5 L14 5 Z" fill="#FF6B35"/>
+  </g>
+  <!-- Clean Baseline Dot -->
+  <circle cx="192" cy="48" r="4.5" fill="#06A77D"/>
+</svg>

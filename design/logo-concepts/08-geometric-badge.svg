@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%">
+  <g transform="translate(18, 12)">
+    <!-- Rounded Hexagon / Pill Badge -->
+    <rect x="2" y="2" width="52" height="52" rx="16" fill="#004E89"/>
+    <!-- Pad -->
+    <path d="M28 32 C21 32 17 36 18 41 C19 45 23 47 28 47 C33 47 37 45 38 41 C39 36 35 32 28 32 Z" fill="#FF6B35"/>
+    <!-- 4 Dots -->
+    <circle cx="18" cy="24" r="3.2" fill="#FFFFFF"/>
+    <circle cx="25" cy="18" r="3.4" fill="#FFFFFF"/>
+    <circle cx="31" cy="18" r="3.4" fill="#FFFFFF"/>
+    <circle cx="38" cy="24" r="3.2" fill="#FFFFFF"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="88" y="52" font-family="system-ui, -apple-system, 'Inter', sans-serif" font-size="34" font-weight="800" fill="#004E89" letter-spacing="-0.5">Paw<tspan fill="#FF6B35">enn</tspan></text>
+</svg>
