@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="100%" height="100%">
+  <!-- Favicon 15: Duo Muzzle Smile -->
+  <circle cx="24" cy="24" r="22" fill="#F7F9FB" stroke="#004E89" stroke-width="2.5"/>
+  <!-- Left Dog Ear -->
+  <path d="M13 11 C7 12 6 24 11 31 C14 33 17 29 16 21 C15 16 14 11 13 11 Z" fill="#004E89"/>
+  <!-- Right Cat Ear -->
+  <path d="M28 11 L38 5 L35 20 C34 23 30 22 28 16 Z" fill="#FF6B35"/>
+  <!-- Animal Nose -->
+  <path d="M19 25 C19 23 29 23 29 25 C29 27.5 25.5 31 24 31 C22.5 31 19 27.5 19 25 Z" fill="#1A202C"/>
+  <!-- Muzzle Smile -->
+  <path d="M24 31 V34 C24 37 19 38 16 36" stroke="#004E89" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  <path d="M24 34 C24 37 29 38 32 36" stroke="#004E89" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+</svg>

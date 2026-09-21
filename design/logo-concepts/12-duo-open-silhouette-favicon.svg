@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="100%" height="100%">
+  <!-- Favicon 12: Duo Open Silhouette on crisp background -->
+  <!-- Forehead arch -->
+  <path d="M14 17 C20 13 28 13 34 17" stroke="#004E89" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Left Dog Floppy Ear -->
+  <path d="M14 17 C6 15 2 27 7 37 C10 42 18 38 16 28 C15 22 14 17 14 17 Z" fill="#004E89"/>
+  <!-- Right Cat Perky Ear -->
+  <path d="M34 17 L46 5 L42 25 C41 29 36 28 34 17 Z" fill="#FF6B35"/>
+  <!-- Bold Pet Nose in Center -->
+  <path d="M19 32 C19 30 29 30 29 32 C29 34.5 25.5 38 24 38 C22.5 38 19 34.5 19 32 Z" fill="#1A202C"/>
+  <path d="M24 38 C21 41 17 41 15 40" stroke="#1A202C" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M24 38 C27 41 31 41 33 40" stroke="#1A202C" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
