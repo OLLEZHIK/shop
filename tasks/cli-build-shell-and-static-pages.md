@@ -44,6 +44,9 @@
    - `/terms-of-use/` — аналогично `docs/legal/terms-of-use-draft.md`, тоже `noindex`.
    - `/add-or-fix-listing/` — простая страница с `mailto:`-ссылкой (без формы и бэкенда в этой задаче — форма с реальной отправкой не входит в объём MVP этой задачи).
 4. **`sitemap.xml`/`robots.txt`:** использовать `website/app/sitemap.ts`/`robots.ts` (нативная поддержка Next.js App Router). Sitemap должен исключать любые страницы с `noindex` (категории/районы с < 3 бизнесами, privacy/terms).
+4a. **Видимость в LLM-ассистентах (GEO/AEO, решение владельца 2026-09-21, см. `docs/design-plan.md` раздел 8):**
+   - В `robots.ts` явно **разрешить** AI-краулеров (не блокировать): `GPTBot`, `ClaudeBot`, `anthropic-ai`, `Google-Extended`, `PerplexityBot`, `CCBot` — отдельные `User-agent` записи с `allow: '/'`, тем же правилом noindex-исключений, что и для обычных ботов.
+   - Добавить `website/public/llms.txt` (или `website/app/llms.txt/route.ts`, если нужен динамический контент) — короткое машиночитаемое описание сайта на английском (что за сервис, для кого) + ссылки на главную и все 6 категорий + `/how-it-works/`. Формат — простой Markdown-подобный текст (см. неформальный стандарт llms.txt), не заморачиваться сверх меры, это дополнительный, не критичный сигнал.
 5. **Правка `DESIGN.md`** (корень репозитория, не `website/DESIGN.md`): убрать раздел «Accessibility Baseline» (WCAG 2.1 AA) целиком — владелец проекта явно отказался от accessibility-требований (см. историю правок `PRODUCT.md`), и этот раздел ему противоречит. Не заменять его никаким другим требованием — просто убрать, это осознанное решение владельца, не наше дело компенсировать.
 
 ## Критерии готовности (Definition of Done)
@@ -53,6 +56,7 @@
 - Поиск с главной страницы реально переводит на страницу категории с примененными query-параметрами.
 - `/how-it-works/`, `/privacy-policy/`, `/terms-of-use/`, `/add-or-fix-listing/` открываются и показывают контент из соответствующих `docs/`-файлов.
 - `sitemap.xml` и `robots.txt` генерируются и не содержат `noindex`-страниц.
+- `robots.txt` явно разрешает `GPTBot`/`ClaudeBot`/`anthropic-ai`/`Google-Extended`/`PerplexityBot`/`CCBot`; `/llms.txt` открывается и перечисляет главную + 6 категорий + `/how-it-works/`.
 - `DESIGN.md` больше не содержит требования WCAG 2.1 AA.
 - `npm run build` и `npm run lint` проходят.
 - PR открыт в `main`.
