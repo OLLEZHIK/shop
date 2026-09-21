@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { getBusinessCount } from '@/lib/data';
 
-export default function HomePage() {
-  const counts = getBusinessCount();
+export default async function HomePage() {
+  const counts = await getBusinessCount();
 
   return (
     <main className="min-h-screen bg-background">
@@ -98,15 +98,15 @@ export default function HomePage() {
         {/* Stats */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
-            <div className="text-3xl font-bold text-brand-blue">{counts.byCategory.salon || 0}</div>
+            <div className="text-3xl font-bold text-brand-blue">{counts.byCategory.GROOMING || 0}</div>
             <div className="text-sm text-foreground/60">Salons</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-brand-blue">{counts.byCategory.vet || 0}</div>
+            <div className="text-3xl font-bold text-brand-blue">{counts.byCategory.VET_CLINIC || 0}</div>
             <div className="text-sm text-foreground/60">Vet Clinics</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-brand-blue">{counts.byCategory.hotel || 0}</div>
+            <div className="text-3xl font-bold text-brand-blue">{counts.byCategory.PET_HOTEL || 0}</div>
             <div className="text-sm text-foreground/60">Hotels</div>
           </div>
           <div>
