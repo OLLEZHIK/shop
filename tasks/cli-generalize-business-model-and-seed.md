@@ -4,9 +4,18 @@
 **Роль:** Builder agent.
 **Тип:** архитектурная правка + миграция БД, объём умеренный/большой.
 **Ветка:** `cli/generalize-business-model-and-seed`
-**Зависимости:** нет, можно начинать сразу. Задачи
+**Зависимости:** нет по другим задачам `tasks/`. Задачи
 `cli-build-listing-and-detail-pages` и `cli-build-shell-and-static-pages`
 зависят от результата этой задачи — начинать их после мерджа этой.
+
+**Обновление 2026-09-21 (облачный Claude Code):** прежний блокер
+(«`website/` ещё не в `main`») снят — Claude Code CLI сам обнаружил
+проблему, перебазировал `cli/initial-website` на актуальный `main`,
+поправил 5 ошибок линтера и открыл PR — смёржен в `main`
+(`4f13e098`). Каталог `website/` (Next.js 16 + Prisma, модель `Salon`,
+`npm run build`/`npm run lint` проходят) и `DESIGN.md` теперь есть в
+`main`, можно начинать эту задачу как обычно, без дополнительных шагов
+по импорту scaffold'а.
 
 ## Контекст
 
@@ -31,6 +40,16 @@ seed-скрипте: `parseCSV` там делает `line.split(',')`, что л
 ## Что сделать
 
 1. В `website/prisma/schema.prisma`:
+   - Добавить в модель `City` поля `country String` и `locale String`
+     (BCP-47) — нужно для масштабирования на новые города/страны без
+     правок кода, см. `docs/design-plan.md` раздел 2.2. `country` —
+     фактическая страна города (для Братиславы: `"SK"`). `locale` —
+     язык, на котором рендерится контент страницы этого города; сама
+     локализация текста по словарю «категория × язык» — работа
+     будущей задачи, не этой, поэтому для Братиславы на старте ставить
+     `locale: "en"` (страница пока на английском, как и весь MVP) —
+     значение можно будет сменить на `"sk"` одной правкой в БД, когда
+     появится словарь переводов, без деплоя.
    - Переименовать модель `Salon` → `Business`.
    - Добавить enum `BusinessCategory { GROOMING VET_CLINIC PET_HOTEL PET_SHOP DOG_TRAINING PET_SITTING }` и поле `category BusinessCategory` в `Business`.
    - Сделать `districtId` nullable (`Int?`) — район заполнен не у всех строк, пока не завершена `tasks/cli-backfill-districts-all-datasets.md` (если она уже смёржена к моменту твоей работы — тем лучше, но код не должен требовать district обязательным).
@@ -59,7 +78,8 @@ seed-скрипте: `parseCSV` там делает `line.split(',')`, что л
    - Маппит `category` каждого файла на `BusinessCategory`: `salons-bratislava.csv` → `GROOMING`, `vet-clinics-bratislava.csv` → `VET_CLINIC`, `pet-hotels-bratislava.csv` → `PET_HOTEL`, `other-pet-services-bratislava.csv` — берёт значение из его собственной колонки `category` (`shop`/`training`/`sitting` → `PET_SHOP`/`DOG_TRAINING`/`PET_SITTING`).
    - Генерирует `slug` из названия (kebab-case, латиница/транслитерация не нужна — большинство названий уже латиницей; при коллизии слага — добавить суффикс района или порядковый номер).
    - Сопоставляет `district` (slug) с уже существующей моделью `District` — если строка CSV не пуста и совпадает с одним из 17 slug'ов Братиславы (`docs/concept.md`, Приложение B), проставляет `districtId`; если пусто или не совпадает — `districtId: null`, без гаданий.
-   - Сидирует `City` (Bratislava) и все 17 `District`, если их ещё нет.
+   - Сидирует `City` (Bratislava, `country: "SK"`, `locale: "en"` — см.
+     пункт 1 выше) и все 17 `District`, если их ещё нет.
    - `status: PUBLISHED` для всех загруженных строк (в MVP нет модерации — все собранные данные уже прошли ручную проверку по протоколу сбора).
    - Скрипт идемпотентный — повторный запуск не создаёт дублей (upsert по `slug` или по паре `name`+`address`).
 3. Прогнать `npx prisma migrate dev --name generalize-business-model` против уже существующей БД (см. `docs/database.md` про `DATABASE_URL`/`DIRECT_URL` — их значения присланы владельцу отдельно в чате, взять из `.env.local`).
