@@ -28,8 +28,7 @@ Claude Code CLI на ветке `cli/initial-website`, ещё не смёрже�
 `DESIGN.md` → «Accessibility Baseline» требует WCAG 2.1 AA — это прямо
 противоречит явному решению владельца проекта убрать accessibility из
 требований (см. `PRODUCT.md`, история изменений). Это техдолг для
-задачи `antigravity-build-shell-and-static-pages` (переназначена с
-Claude Code CLI на Antigravity 2026-09-21) — убрать раздел, не заменяя
+задачи `cli-build-shell-and-static-pages` — убрать раздел, не заменяя
 его ничем (не наша обязанность, но и не наше дело её выдумывать).
 
 Ключевое, что использую дальше как факт:
@@ -409,7 +408,7 @@ noindex и не в sitemap» относится и к этому).
 | --- | --- | --- |
 | Обобщить модель данных (`Salon` → `Business`, 4 категории, + `Review`, `photoUrls`) + seed из CSV нормальным парсером | Claude Code CLI | `tasks/cli-generalize-business-model-and-seed.md` |
 | Страницы списка по категориям/районам + карточка бизнеса (рейтинг, отзывы, фото-галерея), JSON-LD, noindex-правило | Claude Code CLI | `tasks/cli-build-listing-and-detail-pages.md` |
-| Header/Footer (с финальным лого), реальный сабмит поиска (с полноэкранным оверлеем на мобильном), статические страницы (how-it-works/privacy/terms), sitemap/robots, убрать WCAG из DESIGN.md | Antigravity | `tasks/antigravity-build-shell-and-static-pages.md` |
+| Header/Footer (с финальным лого), реальный сабмит поиска (с полноэкранным оверлеем на мобильном), статические страницы (how-it-works/privacy/terms), sitemap/robots, убрать WCAG из DESIGN.md | Claude Code CLI | `tasks/cli-build-shell-and-static-pages.md` |
 | Координаты (lat/lng) для всех 76 записей — нужны для сортировки по расстоянию | Antigravity | `tasks/antigravity-geocode-listings.md` |
 | Цены на груминг-услуги (10 салонов) — единственная категория, где вообще есть шанс собрать цены с публичных прайс-листов | Antigravity | `tasks/antigravity-collect-grooming-prices.md` |
 | Проверка/уточнение английских URL-слагов и ключевых фраз (раздел 3 этого файла — рабочее решение, не финальное) | Antigravity | `tasks/antigravity-seo-english-keywords.md` |
@@ -418,10 +417,13 @@ noindex и не в sitemap» относится и к этому).
 Порядок для CLI: `cli-generalize-business-model-and-seed` должен
 смёржиться первым, `cli-build-listing-and-detail-pages` зависит от
 него (читает `Business`, а не `Salon`, требует, чтобы seed уже наполнил
-БД). `antigravity-build-shell-and-static-pages` переназначена с CLI на
-Antigravity 2026-09-21 (по запросу владельца — распараллелить работу
-над сайтом) и от `cli-generalize-business-model-and-seed` не зависит:
-начинается сразу, поверх уже смёрженного в `main` scaffold'а
-(`website/`), временно с CSV-версией счётчиков на главной. Остальные
-задачи для Antigravity независимы друг от друга и от задач CLI —
-можно начинать сразу, они не трогают `website/`.
+БД). `cli-build-shell-and-static-pages` от `cli-generalize-business-model-and-seed`
+формально не зависит и может начинаться сразу же, параллельно —
+поверх уже смёрженного в `main` scaffold'а (`website/`), временно с
+CSV-версией счётчиков на главной (см. `tasks/cli-build-shell-and-static-pages.md`).
+Все три страничные/шелл-задачи — только CLI: у Antigravity нет
+возможности локально поднять и визуально проверить сайт, поэтому
+весь фронтенд/внешний вид закреплён исключительно за CLI (см.
+`AGENTS.md`, раздел «Распределение задач между агентами»). Задачи для
+Antigravity независимы друг от друга и от задач CLI — можно начинать
+сразу, они не трогают `website/`.

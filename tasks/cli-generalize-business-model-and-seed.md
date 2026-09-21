@@ -6,10 +6,11 @@
 **Ветка:** `cli/generalize-business-model-and-seed`
 **Зависимости:** нет по другим задачам `tasks/`. Задача
 `cli-build-listing-and-detail-pages` зависит от результата этой задачи
-— начинать её после мерджа этой.
-`tasks/antigravity-build-shell-and-static-pages.md` (переназначена с
-CLI на Antigravity 2026-09-21) от этой задачи не зависит и может идти
-параллельно — трогает другие файлы.
+— начинать её после мерджа этой. `cli-build-shell-and-static-pages`
+формально не зависит и может идти параллельно (трогает другие файлы),
+но обе — задачи CLI, не Antigravity (см. `AGENTS.md`, раздел
+«Распределение задач между агентами» — весь фронтенд/внешний вид
+сайта закреплён за CLI).
 
 **Обновление 2026-09-21 (облачный Claude Code):** прежний блокер
 («`website/` ещё не в `main`») снят — Claude Code CLI сам обнаружил
@@ -87,7 +88,7 @@ seed-скрипте: `parseCSV` там делает `line.split(',')`, что л
    - Скрипт идемпотентный — повторный запуск не создаёт дублей (upsert по `slug` или по паре `name`+`address`).
 3. Прогнать `npx prisma migrate dev --name generalize-business-model` против уже существующей БД (см. `docs/database.md` про `DATABASE_URL`/`DIRECT_URL` — их значения присланы владельцу отдельно в чате, взять из `.env.local`).
 4. Прогнать `npm run db:seed`, убедиться что все 76 записей загрузились без ошибок (или меньше — если строка не прошла минимальную валидацию, см. ниже).
-5. **Не переписывай** `website/lib/data.ts` в этой задаче — это сделает `cli-build-listing-and-detail-pages`, которая уже будет читать из БД через Prisma Client. `website/app/page.tsx` тоже не трогай — им параллельно занимается `tasks/antigravity-build-shell-and-static-pages.md`. Здесь только схема + seed.
+5. **Не переписывай** `website/lib/data.ts` в этой задаче — это сделает `cli-build-listing-and-detail-pages`, которая уже будет читать из БД через Prisma Client. `website/app/page.tsx` тоже не трогай — им параллельно занимается `tasks/cli-build-shell-and-static-pages.md`. Здесь только схема + seed.
 
 ## Валидация при загрузке (не выдумывать, не блокировать всё из-за одной строки)
 
