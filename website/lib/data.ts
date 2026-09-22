@@ -64,8 +64,40 @@ export async function getAllCities() {
   return prisma.city.findMany();
 }
 
+// Single source for "the city to link to" across Header/Footer/homepage
+// search, instead of each caller hardcoding "bratislava" - see
+// docs/design-plan.md 2.2. With one city this is just the first row;
+// once a second city exists, this call site is where routing/geo-IP
+// logic for picking a default would go.
+export async function getDefaultCity() {
+  return prisma.city.findFirst({ orderBy: { id: "asc" } });
+}
+
 export async function getDistrictBySlug(slug: string) {
   return prisma.district.findUnique({ where: { slug }, include: { city: true } });
+}
+
+// Real listing counts per district, optionally scoped to one category -
+// used to surface genuinely popular districts (most businesses) instead of
+// a made-up "popular searches" list.
+export async function getDistrictCounts(
+  category?: BusinessCategory
+): Promise<{ slug: string; name: string; count: number }[]> {
+  const districts = await prisma.district.findMany();
+  const counts = await Promise.all(
+    districts.map((d) =>
+      prisma.business.count({
+        where: {
+          status: "PUBLISHED",
+          districtId: d.id,
+          ...(category ? { category } : {}),
+        },
+      })
+    )
+  );
+  return districts
+    .map((d, i) => ({ slug: d.slug, name: d.name, count: counts[i] }))
+    .sort((a, b) => b.count - a.count);
 }
 
 export async function getAllDistricts() {
@@ -95,6 +127,13 @@ export async function searchBusinesses(filters: BusinessFilters): Promise<Busine
   });
 
   return shuffleDeterministically(businesses) as BusinessWithRelations[];
+}
+
+export async function getAllPublishedBusinessSlugs(): Promise<{ slug: string; verifiedAt: Date | null }[]> {
+  return prisma.business.findMany({
+    where: { status: "PUBLISHED" },
+    select: { slug: true, verifiedAt: true },
+  });
 }
 
 export async function getBusinessBySlug(slug: string): Promise<BusinessWithRelations | null> {

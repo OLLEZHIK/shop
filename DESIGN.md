@@ -97,16 +97,6 @@
 - Search filter: instant (no animation, data priority)
 - Skeleton loaders: pulse for <2s loads
 
-## Accessibility Baseline
-
-- WCAG 2.1 AA minimum
-- Contrast: 4.5:1 for body text, 3:1 for large text/UI
-- Focus visible: 2px solid blue outline with 2px offset
-- Touch targets: minimum 44x44px (mobile)
-- Keyboard nav: full site navigable without mouse
-- Screen reader: semantic HTML, ARIA labels where needed
-- Lang attribute: `lang="en"` (base), support for `lang="sk"` in future
-
 ## Performance Budget
 
 - LCP: ≤ 2.5s (mobile 3G)
