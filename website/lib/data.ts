@@ -56,6 +56,23 @@ export function averageRating(reviews: { rating: number }[]): number | null {
   return Math.round((sum / reviews.length) * 10) / 10;
 }
 
+// `Business.notes` is data-collection metadata (in a mix of English and
+// Slovak - e.g. "email not listed on website, call instead"), not a
+// business description written for visitors - confirmed by inspecting
+// the actual seeded data (36/76 rows literally read "docs/concept.md
+// absent; district omitted per instructions", a leftover from the
+// district-backfill task). Filters out the unambiguous internal-artifact
+// pattern before using notes as a public short description anywhere
+// (BusinessCard, business detail page) - doesn't attempt to translate or
+// rewrite the rest, just avoids showing obvious internal boilerplate.
+const INTERNAL_NOTE_PATTERN = /docs\/concept\.md|per instructions|district omitted|district neur/i;
+
+export function publicDescription(notes: string | null): string | null {
+  if (!notes) return null;
+  if (INTERNAL_NOTE_PATTERN.test(notes)) return null;
+  return notes;
+}
+
 export async function getCityBySlug(slug: string) {
   return prisma.city.findUnique({ where: { slug } });
 }
@@ -208,4 +225,39 @@ export async function getCategoryAggregates(
     priceTo: Math.max(...tos),
     currency: priceItems[0].currency,
   };
+}
+
+// Price tier (1-5 "$" signs) per business, relative to other businesses
+// in the *same category* - quintiles of each business's cheapest
+// priceFrom, not fixed EUR thresholds (those would be made up; nothing
+// says what counts as "cheap" for pet hotels vs. grooming). Businesses
+// with no PriceItem at all are simply absent from the returned map -
+// callers render no price block for them, same as everywhere else data
+// is missing.
+export async function getPriceTierMap(category: BusinessCategory): Promise<Map<number, number>> {
+  const items = await prisma.priceItem.findMany({
+    where: { business: { category, status: "PUBLISHED" } },
+    select: { businessId: true, priceFrom: true },
+  });
+
+  const cheapestByBusiness = new Map<number, number>();
+  for (const item of items) {
+    const price = Number(item.priceFrom);
+    const current = cheapestByBusiness.get(item.businessId);
+    if (current === undefined || price < current) cheapestByBusiness.set(item.businessId, price);
+  }
+  if (cheapestByBusiness.size === 0) return new Map();
+
+  const sortedPrices = [...cheapestByBusiness.values()].sort((a, b) => a - b);
+  function tierFor(price: number): number {
+    const rank = sortedPrices.filter((p) => p <= price).length;
+    const percentile = rank / sortedPrices.length;
+    return Math.min(5, Math.max(1, Math.ceil(percentile * 5)));
+  }
+
+  const tierMap = new Map<number, number>();
+  for (const [businessId, price] of cheapestByBusiness) {
+    tierMap.set(businessId, tierFor(price));
+  }
+  return tierMap;
 }
