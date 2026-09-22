@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Dropdown } from "./Dropdown";
+import { DogIcon, CatIcon } from "./icons";
 
 interface Option {
   slug: string;
@@ -18,6 +20,11 @@ interface HomeSearchProps {
 }
 
 type Overlay = "category" | "district" | null;
+
+const ANIMAL_OPTIONS = [
+  { value: "dog", label: "Dog", icon: <DogIcon className="h-5 w-5 text-brand-orange" /> },
+  { value: "cat", label: "Cat", icon: <CatIcon className="h-5 w-5 text-brand-orange" /> },
+];
 
 export function HomeSearch({
   citySlug,
@@ -50,48 +57,50 @@ export function HomeSearch({
   return (
     <>
       {/* Mobile: 3-step vertical cards */}
-      <div className="space-y-6 md:hidden">
-        <div className="rounded-lg border-2 border-brand-blue/20 bg-white p-6 shadow-md">
+      <div className="space-y-4 md:hidden">
+        <div className="rounded-[var(--radius-card)] bg-white p-6 shadow-[var(--shadow-card)]">
           <h2 className="mb-4 text-xl font-semibold">1. Choose your pet</h2>
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
               onClick={() => setAnimal("dog")}
-              className={`rounded-lg py-8 px-4 text-center font-medium transition ${
-                animal === "dog" ? "bg-brand-orange text-white" : "bg-gray-100 text-foreground"
+              className={`flex flex-col items-center gap-2 rounded-[var(--radius-control)] py-6 font-medium transition ${
+                animal === "dog" ? "bg-brand-orange text-white" : "bg-gray-50 text-foreground hover:bg-brand-orange-muted"
               }`}
             >
-              {"🐕"} Dog
+              <DogIcon className="h-7 w-7" />
+              Dog
             </button>
             <button
               type="button"
               onClick={() => setAnimal("cat")}
-              className={`rounded-lg py-8 px-4 text-center font-medium transition ${
-                animal === "cat" ? "bg-brand-orange text-white" : "bg-gray-100 text-foreground"
+              className={`flex flex-col items-center gap-2 rounded-[var(--radius-control)] py-6 font-medium transition ${
+                animal === "cat" ? "bg-brand-orange text-white" : "bg-gray-50 text-foreground hover:bg-brand-orange-muted"
               }`}
             >
-              {"🐈"} Cat
+              <CatIcon className="h-7 w-7" />
+              Cat
             </button>
           </div>
         </div>
 
-        <div className="rounded-lg border-2 border-brand-blue/20 bg-white p-6 shadow-md">
+        <div className="rounded-[var(--radius-card)] bg-white p-6 shadow-[var(--shadow-card)]">
           <h2 className="mb-4 text-xl font-semibold">2. What do you need?</h2>
           <button
             type="button"
             onClick={() => setOverlay("category")}
-            className="block w-full rounded-lg bg-gray-100 px-4 py-4 text-left font-medium hover:bg-gray-200"
+            className="block w-full rounded-[var(--radius-control)] bg-gray-50 px-4 py-4 text-left font-medium hover:bg-brand-blue-muted"
           >
             {categoryLabel ?? "Choose a service"}
           </button>
         </div>
 
-        <div className="rounded-lg border-2 border-brand-blue/20 bg-white p-6 shadow-md">
+        <div className="rounded-[var(--radius-card)] bg-white p-6 shadow-[var(--shadow-card)]">
           <h2 className="mb-4 text-xl font-semibold">3. Where?</h2>
           <button
             type="button"
             onClick={() => setOverlay("district")}
-            className="block w-full rounded-lg bg-gray-100 px-4 py-4 text-left font-medium hover:bg-gray-200"
+            className="block w-full rounded-[var(--radius-control)] bg-gray-50 px-4 py-4 text-left font-medium hover:bg-brand-blue-muted"
           >
             {districtLabel ?? `All ${cityName}`}
           </button>
@@ -101,53 +110,44 @@ export function HomeSearch({
           type="button"
           disabled={!categorySlug}
           onClick={() => goSearch()}
-          className="block w-full rounded-lg bg-brand-orange px-6 py-4 text-center font-medium text-white transition hover:bg-brand-orange/90 disabled:opacity-40"
+          className="block w-full rounded-[var(--radius-control)] bg-brand-orange px-6 py-4 text-center font-medium text-white transition hover:bg-brand-orange/90 disabled:opacity-40"
         >
           Search
         </button>
       </div>
 
-      {/* Desktop: unified search bar */}
-      <div className="hidden rounded-lg bg-white p-6 shadow-lg md:block">
-        <div className="flex gap-4">
-          <select
-            value={animal ?? ""}
-            onChange={(e) => setAnimal((e.target.value || null) as "dog" | "cat" | null)}
-            className="flex-1 rounded-lg border-2 border-gray-200 px-4 py-3 focus:border-brand-blue focus:outline-none"
-          >
-            <option value="">Choose pet</option>
-            <option value="dog">Dog</option>
-            <option value="cat">Cat</option>
-          </select>
-          <select
-            value={categorySlug ?? ""}
-            onChange={(e) => setCategorySlug(e.target.value || null)}
-            className="flex-1 rounded-lg border-2 border-gray-200 px-4 py-3 focus:border-brand-blue focus:outline-none"
-          >
-            <option value="">Service needed</option>
-            {categories.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-          <select
-            value={districtSlug ?? ""}
-            onChange={(e) => setDistrictSlug(e.target.value || null)}
-            className="flex-1 rounded-lg border-2 border-gray-200 px-4 py-3 focus:border-brand-blue focus:outline-none"
-          >
-            <option value="">All {cityName}</option>
-            {districts.map((d) => (
-              <option key={d.slug} value={d.slug}>
-                {d.label}
-              </option>
-            ))}
-          </select>
+      {/* Desktop: single search panel with custom dropdowns */}
+      <div className="hidden rounded-[var(--radius-card)] bg-white p-4 shadow-[var(--shadow-panel)] md:block">
+        <div className="flex gap-3">
+          <Dropdown
+            ariaLabel="Choose pet"
+            placeholder="Choose pet"
+            value={animal}
+            options={ANIMAL_OPTIONS}
+            onChange={(v) => setAnimal(v as "dog" | "cat")}
+            className="flex-1"
+          />
+          <Dropdown
+            ariaLabel="Service needed"
+            placeholder="Service needed"
+            value={categorySlug}
+            options={categories.map((c) => ({ value: c.slug, label: c.label }))}
+            onChange={setCategorySlug}
+            className="flex-1"
+          />
+          <Dropdown
+            ariaLabel="Location"
+            placeholder={`All ${cityName}`}
+            value={districtSlug}
+            options={districts.map((d) => ({ value: d.slug, label: d.label }))}
+            onChange={setDistrictSlug}
+            className="flex-1"
+          />
           <button
             type="button"
             disabled={!categorySlug}
             onClick={() => goSearch()}
-            className="rounded-lg bg-brand-orange px-8 py-3 font-medium text-white transition hover:bg-brand-orange/90 disabled:opacity-40"
+            className="shrink-0 rounded-[var(--radius-control)] bg-brand-orange px-8 py-3 font-medium text-white transition hover:bg-brand-orange/90 disabled:opacity-40"
           >
             Search
           </button>
@@ -196,7 +196,7 @@ function StepOverlay({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white md:hidden">
-      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4">
+      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
         <h2 className="text-lg font-semibold">{title}</h2>
         <button
           type="button"
@@ -218,7 +218,7 @@ function StepOverlay({
                   key={o.slug}
                   type="button"
                   onClick={() => onSelect(o.slug)}
-                  className="rounded-full bg-brand-orange/10 px-4 py-2 text-sm font-medium text-brand-orange hover:bg-brand-orange/20"
+                  className="rounded-[var(--radius-pill)] bg-brand-orange-muted px-4 py-2 text-sm font-medium text-brand-orange hover:bg-brand-orange-muted-border/40"
                 >
                   {o.label}
                 </button>
