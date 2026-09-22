@@ -1,16 +1,5 @@
 @import "tailwindcss";
-
-:root {
-  /* Brand colors from DESIGN.md */
-  --brand-orange: #FF6B35;
-  --brand-blue: #004E89;
-  --brand-green: #06A77D;
-  --brand-amber: #F59E0B;
-
-  /* Backgrounds */
-  --background: #F7F9FB;
-  --foreground: #171717;
-}
+@import "./design-tokens.css";
 
 @theme inline {
   /* Colors */
@@ -32,6 +21,10 @@ body {
   font-family: var(--font-sans);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
 }
 
 /* Focus visible for accessibility */

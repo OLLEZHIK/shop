@@ -7,8 +7,8 @@ export async function Header() {
   const citySlug = city?.slug ?? "";
 
   return (
-    <header className="border-b border-gray-200 bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+    <header className="relative bg-background">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" aria-label="pawenn home" className="flex items-center">
           <svg viewBox="0 0 320 80" className="h-9 w-auto" role="img" aria-label="pawenn">
             <g transform="translate(18, 12)">
@@ -77,16 +77,20 @@ export async function Header() {
           </svg>
         </Link>
 
-        <nav className="hidden gap-5 text-sm md:flex" aria-label="Categories">
+        <nav className="hidden gap-1 text-sm md:flex" aria-label="Categories">
           {ALL_CATEGORY_SLUGS.map((slug) => {
             const category = categoryEnumFromSlug(slug)!;
             return (
-              <Link key={slug} href={`/${slug}/${citySlug}/`} className="text-foreground/80 hover:text-brand-blue">
+              <Link
+                key={slug}
+                href={`/${slug}/${citySlug}/`}
+                className="pill-hover px-3 py-1.5 text-foreground/80"
+              >
                 {CATEGORY_LABELS[category]}
               </Link>
             );
           })}
-          <Link href="/how-it-works/" className="text-foreground/80 hover:text-brand-blue">
+          <Link href="/how-it-works/" className="pill-hover px-3 py-1.5 text-foreground/80">
             How it Works
           </Link>
         </nav>

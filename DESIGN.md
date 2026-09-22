@@ -25,10 +25,21 @@
 - Verified badge: `#06A77D` with checkmark
 - Partner label: Amber `#F59E0B` outline
 
+**Muted tones (hover/active surfaces):** `color-mix()` of each brand
+color into white — `--brand-orange-muted`/`--brand-blue-muted` (~15%
+tint, backgrounds) and their `-border` counterparts (~40-45% tint,
+borders) in `website/app/design-tokens.css`. Used for the header
+nav's pill-hover and dropdown item hover, never the raw saturated
+brand color as a background.
+
 ## Typography
 
 **Fonts:**
-- Headings: Inter Bold (clean, modern, excellent legibility)
+- Headings: **Plus Jakarta Sans** (700/800), loaded via `next/font/google`
+  in `app/layout.tsx` as `--font-plus-jakarta-sans`, mapped to the
+  `--font-heading` token in `design-tokens.css`. Geometric grotesk
+  with more character than Inter for large display type; swap it by
+  editing that one file if it doesn't land.
 - Body: Inter Regular
 - UI elements: Inter Medium
 - Monospace (data): JetBrains Mono (phone numbers, addresses)
@@ -55,6 +66,12 @@
 - Mobile: single column stack
 - Tablet: 2 columns for cards
 - Desktop: 3 columns for cards, sidebar + main for detail
+
+**Radii & Shadows** (`design-tokens.css`): `--radius-card` 16px (cards),
+`--radius-control` 12px (inputs/dropdown containers), `--radius-pill`
+999px (nav/hover pills, badges). `--shadow-card`/`--shadow-card-hover`
+for listing cards, `--shadow-panel` for dropdowns/overlays - always an
+offset + soft blur, never a flat colored halo.
 
 ## Components
 
@@ -83,6 +100,20 @@
 - Verified checkmark: always visible
 - Source link: "Info verified [date]" as subtle footer link
 - Partner label: outlined badge, never hidden
+
+### Ambient Background
+`components/AmbientBackground.tsx` - 2-3 large, blurred, organic blob
+shapes (irregular `border-radius`, `filter: blur`) in brand colors at
+10-14% opacity, `pointer-events: none`, behind content
+(`z-index: -10`), `aria-hidden`. One shared component, not redrawn
+per page - used on the homepage hero and the business detail page.
+Decoration only, never a stand-in for a photographic subject.
+
+### Header
+No bottom border, sits on the page background (not a white bar). Nav
+links carry no border at rest; on hover/focus a muted-brand pill
+(`.pill-hover` in `design-tokens.css`) fades in around the link,
+200ms ease-out. Logo SVG unchanged.
 
 ## Motion & Interaction
 
