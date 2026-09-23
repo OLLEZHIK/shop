@@ -48,3 +48,15 @@ export function categoryEnumFromSlug(slug: string): BusinessCategory | null {
 }
 
 export const ALL_CATEGORY_SLUGS = Object.keys(CATEGORY_SLUG_TO_ENUM);
+
+// Visual identity per category: accent color (CSS var from
+// design-tokens.css) and a one-line, fact-free description of what the
+// service is - shown on category tiles and listing headers.
+export const CATEGORY_THEME: Record<BusinessCategory, { accent: string; blurb: string }> = {
+  GROOMING: { accent: "var(--cat-grooming)", blurb: "Baths, haircuts, trimming and nail care" },
+  VET_CLINIC: { accent: "var(--cat-vet)", blurb: "Check-ups, vaccinations and emergencies" },
+  PET_HOTEL: { accent: "var(--cat-hotel)", blurb: "Safe stays while you travel" },
+  DOG_TRAINING: { accent: "var(--cat-training)", blurb: "Puppy classes, obedience and behaviour" },
+  PET_SHOP: { accent: "var(--cat-shop)", blurb: "Food, toys and everyday supplies" },
+  PET_SITTING: { accent: "var(--cat-sitting)", blurb: "Walks, visits and care at home" },
+};

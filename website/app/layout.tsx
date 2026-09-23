@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+const bodyFont = Inter({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 const headingFont = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["700", "800"],
+  subsets: ["latin", "latin-ext"],
+  weight: ["600", "700", "800"],
   variable: "--font-plus-jakarta-sans",
   display: "swap",
 });
@@ -22,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={headingFont.variable}>
+    <html lang="en" className={`${headingFont.variable} ${bodyFont.variable}`}>
       <body>
         <Header />
         {children}

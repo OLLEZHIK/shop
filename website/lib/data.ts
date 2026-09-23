@@ -331,3 +331,49 @@ export async function getPriceTierMap(category: BusinessCategory): Promise<Map<n
   }
   return tierMap;
 }
+
+export interface DistrictSummary {
+  slug: string;
+  name: string;
+  total: number;
+  byCategory: { categorySlug: string; categoryLabel: string; category: BusinessCategory; count: number }[];
+}
+
+// Per-district, per-category listing counts for the homepage
+// "Explore by district" block - real counts only, tallied from one
+// lightweight select (a few dozen rows; groupBy doesn't type-check
+// through the Accelerate extension). Districts with no listings are
+// dropped; categories within a district are ranked by count.
+export async function getDistrictSummaries(): Promise<DistrictSummary[]> {
+  const [districts, rows] = await Promise.all([
+    prisma.district.findMany(),
+    prisma.business.findMany({
+      where: { status: "PUBLISHED", districtId: { not: null } },
+      select: { districtId: true, category: true },
+    }),
+  ]);
+
+  return districts
+    .map((d) => {
+      const tally = new Map<BusinessCategory, number>();
+      for (const row of rows) {
+        if (row.districtId === d.id) tally.set(row.category, (tally.get(row.category) ?? 0) + 1);
+      }
+      const byCategory = [...tally.entries()]
+        .map(([category, count]) => ({
+          category,
+          categorySlug: categorySlugFromEnum(category),
+          categoryLabel: CATEGORY_LABELS[category],
+          count,
+        }))
+        .sort((a, b) => b.count - a.count);
+      return {
+        slug: d.slug,
+        name: d.name,
+        total: byCategory.reduce((acc, c) => acc + c.count, 0),
+        byCategory,
+      };
+    })
+    .filter((d) => d.total > 0)
+    .sort((a, b) => b.total - a.total);
+}
