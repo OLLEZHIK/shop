@@ -98,7 +98,7 @@ export async function CategoryListing({
   return (
     <main style={{ "--accent": theme.accent } as React.CSSProperties}>
       {/* ---------- Header band ---------- */}
-      <section className="relative overflow-hidden border-b border-line">
+      <section className="under-header relative overflow-hidden border-b border-line">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full opacity-[0.14] blur-3xl"

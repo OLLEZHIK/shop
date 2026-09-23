@@ -129,7 +129,6 @@ const en = {
     metaTitle: (city: string) => `pawenn - Pet Services in ${city}`,
     metaDescription: (city: string) =>
       `Find trusted pet services in ${city} - groomers, vets, hotels, training and more`,
-    badge: (n: number, city: string) => `${n} pet services across ${city}`,
     h1Before: "Find trusted",
     h1Highlight: "pet services",
     subtitle: (city: string) =>
@@ -436,8 +435,6 @@ const sk: Dictionary = {
     metaTitle: (city: string) => `pawenn - Služby pre zvieratá v meste ${city}`,
     metaDescription: (city: string) =>
       `Overené služby pre zvieratá v meste ${city} - psie salóny, veterinári, hotely pre zvieratá, výcvik a ďalšie`,
-    badge: (n: number, city: string) =>
-      `${n} ${plural("sk", n, { one: "služba", few: "služby", other: "služieb" })} pre zvieratá v meste ${city}`,
     h1Before: "Nájdite overené",
     h1Highlight: "služby pre zvieratá",
     subtitle: (city: string) =>

@@ -6,6 +6,7 @@ import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 import { BrowseMenu, type ServiceLink } from "./BrowseMenu";
 import { FindCareButton, SearchDialog } from "./SearchDialog";
+import { HeaderShell } from "./HeaderShell";
 
 export async function Header({ locale }: { locale: Locale }) {
   const [city, cityPoints, districts] = await Promise.all([getDefaultCity(), getCityPoints(), getAllDistricts()]);
@@ -30,7 +31,7 @@ export async function Header({ locale }: { locale: Locale }) {
     .map((d) => ({ slug: d.slug, label: d.name }));
 
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+    <HeaderShell>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:py-4">
         <Link href={localePath(locale, "/")} aria-label="pawenn home" className="flex shrink-0 items-center">
           <Logo className="h-9 w-auto md:h-10" />
@@ -90,6 +91,6 @@ export async function Header({ locale }: { locale: Locale }) {
         categories={searchCategories}
         districts={searchDistricts}
       />
-    </header>
+    </HeaderShell>
   );
 }

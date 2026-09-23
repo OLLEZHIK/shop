@@ -92,19 +92,15 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   ];
 
   return (
-    <main className="relative overflow-hidden">
+    <main className="relative overflow-x-clip">
       {/* ---------- Hero ---------- */}
-      <section className="relative">
+      <section className="under-header relative">
         <AmbientBackground />
         <div className="dot-grid pointer-events-none absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" />
 
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-10 md:pt-16 lg:grid-cols-[1.6fr_1fr] lg:pb-24">
           <div className="rise-in min-w-0 text-center lg:text-left">
-            <p className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-surface px-3 py-1.5 text-sm font-medium text-foreground/70 shadow-[var(--shadow-card)]">
-              <span className="h-2 w-2 rounded-full bg-brand-green" />
-              {t.badge(counts.total, cityName)}
-            </p>
-            <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] text-foreground sm:text-5xl md:text-6xl xl:text-7xl">
+            <h1 className="text-4xl font-extrabold leading-[1.05] text-foreground sm:text-5xl md:text-6xl xl:text-7xl">
               {t.h1Before}{" "}
               <span className="relative whitespace-nowrap text-brand-orange">
                 {t.h1Highlight}
