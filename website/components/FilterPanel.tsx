@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Dropdown } from "./Dropdown";
+import { DogIcon, CatIcon } from "./icons";
 
 interface FilterPanelProps {
   categorySlug: string;
@@ -13,6 +15,12 @@ interface FilterPanelProps {
   priceTo?: number | null;
   currency?: string;
 }
+
+const ANIMAL_OPTIONS = [
+  { value: "", label: "Any animal" },
+  { value: "dog", label: "Dog", icon: <DogIcon className="h-5 w-5 text-brand-orange" /> },
+  { value: "cat", label: "Cat", icon: <CatIcon className="h-5 w-5 text-brand-orange" /> },
+];
 
 export function FilterPanel({
   categorySlug,
@@ -32,47 +40,43 @@ export function FilterPanel({
     return currentAnimal ? `${path}?animal=${currentAnimal}` : path;
   }
 
-  function handleDistrictChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-    const path = value === "all" ? `${base}/` : `${base}/${value}/`;
+  function handleDistrictChange(value: string) {
+    const path = `${base}/${value}/`;
     router.push(withAnimal(path));
   }
 
-  function handleAnimalChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
+  function handleAnimalChange(value: string) {
     const path = currentDistrictSlug ? `${base}/${currentDistrictSlug}/` : `${base}/`;
-    router.push(value === "all" ? path : `${path}?animal=${value}`);
+    router.push(value ? `${path}?animal=${value}` : path);
   }
+
+  const districtOptions = [
+    { value: "", label: "All districts" },
+    ...districts.map((d) => ({ value: d.slug, label: d.name })),
+  ];
 
   return (
     <div className="flex flex-wrap gap-3">
-      <select
-        value={currentDistrictSlug ?? "all"}
+      <Dropdown
+        ariaLabel="Filter by district"
+        placeholder="All districts"
+        value={currentDistrictSlug ?? ""}
+        options={districtOptions}
         onChange={handleDistrictChange}
-        aria-label="Filter by district"
-        className="rounded-lg border-2 border-gray-200 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none"
-      >
-        <option value="all">All districts</option>
-        {districts.map((d) => (
-          <option key={d.slug} value={d.slug}>
-            {d.name}
-          </option>
-        ))}
-      </select>
+        className="w-44"
+      />
 
-      <select
-        value={currentAnimal ?? "all"}
+      <Dropdown
+        ariaLabel="Filter by animal"
+        placeholder="Any animal"
+        value={currentAnimal ?? ""}
+        options={ANIMAL_OPTIONS}
         onChange={handleAnimalChange}
-        aria-label="Filter by animal"
-        className="rounded-lg border-2 border-gray-200 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none"
-      >
-        <option value="all">Any animal</option>
-        <option value="dog">Dog</option>
-        <option value="cat">Cat</option>
-      </select>
+        className="w-40"
+      />
 
       {hasPriceData && priceFrom !== null && priceFrom !== undefined && (
-        <span className="flex items-center rounded-lg bg-gray-100 px-3 py-2 text-sm text-foreground/70">
+        <span className="flex items-center rounded-[var(--radius-control)] bg-gray-100 px-3 py-2 text-sm text-foreground/70">
           {formatPrice(priceFrom, currency)}
           {priceTo && priceTo !== priceFrom ? ` – ${formatPrice(priceTo, currency)}` : ""}
         </span>

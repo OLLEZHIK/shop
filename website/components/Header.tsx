@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { getDefaultCity } from "@/lib/data";
 import { ALL_CATEGORY_SLUGS, CATEGORY_LABELS, categoryEnumFromSlug } from "@/lib/categories";
+import { CategoryMenu } from "./CategoryMenu";
 
 export async function Header() {
   const city = await getDefaultCity();
   const citySlug = city?.slug ?? "";
+  const categories = ALL_CATEGORY_SLUGS.map((slug) => ({
+    slug,
+    label: CATEGORY_LABELS[categoryEnumFromSlug(slug)!],
+  }));
 
   return (
     <header className="relative bg-background">
@@ -77,19 +82,8 @@ export async function Header() {
           </svg>
         </Link>
 
-        <nav className="hidden gap-1 text-sm md:flex" aria-label="Categories">
-          {ALL_CATEGORY_SLUGS.map((slug) => {
-            const category = categoryEnumFromSlug(slug)!;
-            return (
-              <Link
-                key={slug}
-                href={`/${slug}/${citySlug}/`}
-                className="pill-hover px-3 py-1.5 text-foreground/80"
-              >
-                {CATEGORY_LABELS[category]}
-              </Link>
-            );
-          })}
+        <nav className="flex items-center gap-1 text-sm" aria-label="Site">
+          <CategoryMenu citySlug={citySlug} categories={categories} />
           <Link href="/how-it-works/" className="pill-hover px-3 py-1.5 text-foreground/80">
             How it Works
           </Link>
