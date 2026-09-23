@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import type { Business, BusinessCategory, District, City } from "@prisma/client";
+import { CATEGORY_LABELS, categorySlugFromEnum } from "./categories";
 
 export type BusinessWithRelations = Business & {
   district: (District & { city: City }) | null;
@@ -100,6 +101,66 @@ export async function getDistrictCounts(
     .sort((a, b) => b.count - a.count);
 }
 
+export interface PopularNearby {
+  districtSlug: string;
+  districtName: string;
+  categorySlug: string;
+  categoryLabel: string;
+  count: number;
+}
+
+const ALL_BUSINESS_CATEGORIES: BusinessCategory[] = [
+  "GROOMING",
+  "VET_CLINIC",
+  "PET_HOTEL",
+  "PET_SHOP",
+  "DOG_TRAINING",
+  "PET_SITTING",
+];
+
+// "Popular nearby" for the homepage: real top districts by listing
+// count, each paired with its single most-listed category there - not
+// geolocation-based (see tasks/cli-redesign-homepage.md), just what
+// the data actually shows for the default city.
+export async function getPopularNearby(limit = 4): Promise<PopularNearby[]> {
+  const topDistricts = (await getDistrictCounts()).filter((d) => d.count > 0).slice(0, limit);
+
+  // Sequential, not Promise.all: each district picks its best category
+  // that a higher-ranked district hasn't already claimed, so the grid
+  // doesn't just repeat "Veterinary Clinics" four times - still real
+  // per-district counts, just diversified in the order districts are
+  // considered rather than picking the literal global max every time.
+  const usedCategories = new Set<BusinessCategory>();
+  const results: PopularNearby[] = [];
+
+  for (const district of topDistricts) {
+    const counts = await Promise.all(
+      ALL_BUSINESS_CATEGORIES.map((category) =>
+        prisma.business.count({
+          where: { status: "PUBLISHED", category, district: { is: { slug: district.slug } } },
+        })
+      )
+    );
+    const ranked = ALL_BUSINESS_CATEGORIES.map((category, i) => ({ category, count: counts[i] }))
+      .filter((c) => c.count > 0)
+      .sort((a, b) => b.count - a.count);
+
+    const pick = ranked.find((c) => !usedCategories.has(c.category)) ?? ranked[0];
+    if (!pick) continue;
+
+    usedCategories.add(pick.category);
+    results.push({
+      districtSlug: district.slug,
+      districtName: district.name,
+      categorySlug: categorySlugFromEnum(pick.category),
+      categoryLabel: CATEGORY_LABELS[pick.category],
+      count: pick.count,
+    });
+  }
+
+  return results;
+}
+
 export async function getAllDistricts() {
   return prisma.district.findMany({ orderBy: { name: "asc" } });
 }
@@ -134,6 +195,15 @@ export async function getAllPublishedBusinessSlugs(): Promise<{ slug: string; ve
     where: { status: "PUBLISHED" },
     select: { slug: true, verifiedAt: true },
   });
+}
+
+export async function getFeaturedBusinesses(limit = 4): Promise<BusinessWithRelations[]> {
+  const businesses = await prisma.business.findMany({
+    where: { status: "PUBLISHED", featured: true },
+    include: BUSINESS_INCLUDE,
+    take: limit,
+  });
+  return businesses as BusinessWithRelations[];
 }
 
 export async function getBusinessBySlug(slug: string): Promise<BusinessWithRelations | null> {
