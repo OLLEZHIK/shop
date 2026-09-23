@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowRightIcon, MailIcon, ShieldCheckIcon, SparkleIcon, TagIcon } from "@/components/icons";
 
@@ -12,7 +13,13 @@ const WHAT_TO_INCLUDE = [
   { icon: ShieldCheckIcon, title: "What to change", body: "For a fix, what's wrong and a link that shows the correct info." },
 ];
 
-export default function AddOrFixListingPage() {
+// English only for now - the Slovak site links here with an "(EN)" hint.
+export function generateStaticParams() {
+  return [{ lang: "en" }];
+}
+
+export default async function AddOrFixListingPage({ params }: { params: Promise<{ lang: string }> }) {
+  if ((await params).lang !== "en") notFound();
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 md:py-16">
       <section className="relative overflow-hidden rounded-[28px] bg-ink px-6 py-12 text-white md:px-12 md:py-16">

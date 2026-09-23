@@ -100,8 +100,8 @@ async function main() {
   console.log("Seeding City + Districts (Bratislava)...");
   const city = await prisma.city.upsert({
     where: { slug: "bratislava" },
-    update: { name: "Bratislava", country: "SK", locale: "en" },
-    create: { name: "Bratislava", slug: "bratislava", country: "SK", locale: "en" },
+    update: { name: "Bratislava", country: "SK", locale: "sk" },
+    create: { name: "Bratislava", slug: "bratislava", country: "SK", locale: "sk" },
   });
 
   const districtIdBySlug = new Map<string, number>();

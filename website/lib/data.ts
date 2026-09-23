@@ -207,11 +207,22 @@ export async function searchBusinesses(filters: BusinessFilters): Promise<Busine
   return shuffleDeterministically(businesses) as BusinessWithRelations[];
 }
 
-export async function getAllPublishedBusinessSlugs(): Promise<{ slug: string; verifiedAt: Date | null }[]> {
-  return prisma.business.findMany({
-    where: { status: "PUBLISHED" },
-    select: { slug: true, verifiedAt: true },
-  });
+export async function getAllPublishedBusinessSlugs(): Promise<
+  { slug: string; verifiedAt: Date | null; country: string | null }[]
+> {
+  const [rows, districts] = await Promise.all([
+    prisma.business.findMany({
+      where: { status: "PUBLISHED" },
+      select: { slug: true, verifiedAt: true, districtId: true },
+    }),
+    prisma.district.findMany({ include: { city: true } }),
+  ]);
+  const countryOf = new Map(districts.map((d) => [d.id, d.city.country]));
+  return rows.map((r) => ({
+    slug: r.slug,
+    verifiedAt: r.verifiedAt,
+    country: r.districtId !== null ? countryOf.get(r.districtId) ?? null : null,
+  }));
 }
 
 export async function getFeaturedBusinesses(limit = 4): Promise<BusinessWithRelations[]> {
@@ -376,4 +387,50 @@ export async function getDistrictSummaries(): Promise<DistrictSummary[]> {
     })
     .filter((d) => d.total > 0)
     .sort((a, b) => b.total - a.total);
+}
+
+export interface CityPoint {
+  slug: string;
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+// City "centre" for the Browse menu's geolocation shortcut: the mean of
+// its geocoded businesses (City has no coordinates of its own, and this
+// keeps a new city data-only). Cities without geocoded businesses are
+// left out.
+export async function getCityPoints(): Promise<CityPoint[]> {
+  const [cities, districts, rows] = await Promise.all([
+    prisma.city.findMany(),
+    prisma.district.findMany({ select: { id: true, cityId: true } }),
+    prisma.business.findMany({
+      where: { status: "PUBLISHED", lat: { not: null }, lng: { not: null }, districtId: { not: null } },
+      select: { lat: true, lng: true, districtId: true },
+    }),
+  ]);
+  const cityOfDistrict = new Map(districts.map((d) => [d.id, d.cityId]));
+
+  return cities.flatMap((city) => {
+    const points = rows.filter((r) => r.districtId !== null && cityOfDistrict.get(r.districtId) === city.id);
+    if (points.length === 0) return [];
+    return [
+      {
+        slug: city.slug,
+        name: city.name,
+        lat: points.reduce((acc, p) => acc + (p.lat ?? 0), 0) / points.length,
+        lng: points.reduce((acc, p) => acc + (p.lng ?? 0), 0) / points.length,
+      },
+    ];
+  });
+}
+
+export { distanceKmClient as distanceKm } from "./geo";
+
+/** Parse a "lat,lng" query value; null if malformed or out of range. */
+export function parseNear(value: string | undefined): { lat: number; lng: number } | null {
+  if (!value) return null;
+  const [lat, lng] = value.split(",").map(Number);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return { lat, lng };
 }

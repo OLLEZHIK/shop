@@ -1,11 +1,7 @@
-export function VerifiedBadge({ verifiedAt }: { verifiedAt: Date | null }) {
-  if (!verifiedAt) return null;
+import { formatDate, getDictionary, type Locale } from "@/lib/i18n";
 
-  const date = verifiedAt.toLocaleDateString("en-GB", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+export function VerifiedBadge({ verifiedAt, locale }: { verifiedAt: Date | null; locale: Locale }) {
+  if (!verifiedAt) return null;
 
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/10 px-2.5 py-1 text-xs font-medium text-brand-green">
@@ -16,7 +12,7 @@ export function VerifiedBadge({ verifiedAt }: { verifiedAt: Date | null }) {
           clipRule="evenodd"
         />
       </svg>
-      Verified {date}
+      {getDictionary(locale).badges.verified(formatDate(verifiedAt, locale))}
     </span>
   );
 }

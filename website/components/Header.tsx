@@ -1,60 +1,99 @@
 import Link from "next/link";
-import { getDefaultCity } from "@/lib/data";
-import { ALL_CATEGORY_SLUGS, CATEGORY_LABELS, CATEGORY_THEME, categoryEnumFromSlug } from "@/lib/categories";
+import { getAllDistricts, getDefaultCity, getCityPoints } from "@/lib/data";
+import { ALL_CATEGORIES, CATEGORY_THEME, categoryBlurb, categoryLabel, categorySlug, listingPath } from "@/lib/categories";
+import { getDictionary, localePath, localesForCountry, type Locale } from "@/lib/i18n";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
-import { BrowseMenu } from "./BrowseMenu";
+import { BrowseMenu, type ServiceLink } from "./BrowseMenu";
+import { LanguageSwitch } from "./LanguageSwitch";
+import { FindCareButton, SearchDialog } from "./SearchDialog";
 
-export async function Header() {
-  const city = await getDefaultCity();
+export async function Header({ locale }: { locale: Locale }) {
+  const [city, cityPoints, districts] = await Promise.all([getDefaultCity(), getCityPoints(), getAllDistricts()]);
   const citySlug = city?.slug ?? "";
+  const t = getDictionary(locale);
+  const locales = localesForCountry(city?.country);
 
-  const links = ALL_CATEGORY_SLUGS.map((slug) => {
-    const category = categoryEnumFromSlug(slug)!;
-    return {
-      href: `/${slug}/${citySlug}/`,
-      label: CATEGORY_LABELS[category],
-      category,
-      blurb: CATEGORY_THEME[category].blurb,
-      accent: CATEGORY_THEME[category].accent,
-    };
-  });
+  const services: ServiceLink[] = ALL_CATEGORIES.map((category) => ({
+    href: listingPath(locale, category, citySlug),
+    label: categoryLabel(category, locale),
+    category,
+    blurb: categoryBlurb(category, locale),
+    accent: CATEGORY_THEME[category].accent,
+  }));
+  const cities = cityPoints.map(({ slug, lat, lng }) => ({ slug, lat, lng }));
+  const searchCategories = ALL_CATEGORIES.map((category) => ({
+    slug: categorySlug(category, locale),
+    label: categoryLabel(category, locale),
+    category,
+  }));
+  const searchDistricts = districts
+    .filter((d) => !city || d.cityId === city.id)
+    .map((d) => ({ slug: d.slug, label: d.name }));
 
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:py-4">
-        <Link href="/" aria-label="pawenn home" className="flex shrink-0 items-center">
+        <Link href={localePath(locale, "/")} aria-label="pawenn home" className="flex shrink-0 items-center">
           <Logo className="h-9 w-auto md:h-10" />
         </Link>
 
         {/* Zocdoc-style: Browse dropdown, plain text links, a divider,
             then one bright primary button. No log in / sign up - the
             product has no accounts (PRODUCT.md). */}
-        <nav className="hidden items-center gap-2 lg:flex" aria-label="Main">
-          <BrowseMenu links={links} />
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+          <BrowseMenu
+            locale={locale}
+            t={t.nav}
+            food={t.food}
+            services={services}
+            cities={cities}
+            defaultCitySlug={citySlug}
+          />
           <Link
             href="/how-it-works/"
-            className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-5 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
+            className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-4 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
           >
-            Help
+            {t.nav.help}
           </Link>
           <Link
             href="/add-or-fix-listing/"
-            className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-5 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
+            className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-4 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
           >
-            List your business on pawenn
+            {t.nav.listBusiness}
           </Link>
-          <span aria-hidden="true" className="mx-3 h-8 w-px bg-foreground/15" />
-          <Link
-            href="/#search"
-            className="inline-flex h-12 items-center rounded-[var(--radius-control)] bg-brand-orange px-7 text-[17px] font-semibold text-white transition hover:bg-brand-orange-deep"
-          >
-            Find pet care
-          </Link>
+          <span aria-hidden="true" className="mx-2 h-8 w-px bg-foreground/15" />
+          {locales.length > 1 && <LanguageSwitch locales={locales} />}
+          <FindCareButton
+            label={t.nav.findCare}
+            className="ml-2 inline-flex h-12 items-center rounded-[var(--radius-control)] bg-brand-orange px-6 text-[17px] font-semibold text-white transition hover:bg-brand-orange-deep"
+          />
         </nav>
 
-        <MobileMenu links={links} />
+        {/* Phones: a search button next to Browse opens the same dialog. */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <FindCareButton
+            compact
+            label={t.nav.findCare}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] bg-brand-orange text-white"
+          />
+          <MobileMenu
+          locale={locale}
+          services={services}
+          cities={cities}
+          defaultCitySlug={citySlug}
+          locales={locales}
+          />
+        </div>
       </div>
+
+      <SearchDialog
+        locale={locale}
+        citySlug={citySlug}
+        cityName={city?.name ?? "Bratislava"}
+        categories={searchCategories}
+        districts={searchDistricts}
+      />
     </header>
   );
 }
