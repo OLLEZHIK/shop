@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { HomeSearch, type SearchCategory, type SearchOption } from "./HomeSearch";
+import type { CityPointLite } from "@/lib/geo";
 import { CloseIcon, SearchIcon } from "./icons";
 
 // "Find pet care" opens the search right where the visitor is (any page):
@@ -21,9 +22,10 @@ interface SearchDialogProps {
   cityName: string;
   categories: SearchCategory[];
   districts: SearchOption[];
+  cities: CityPointLite[];
 }
 
-export function SearchDialog({ locale, citySlug, cityName, categories, districts }: SearchDialogProps) {
+export function SearchDialog({ locale, citySlug, cityName, categories, districts, cities }: SearchDialogProps) {
   const [open, setOpen] = useState(false);
   const t = getDictionary(locale);
 
@@ -90,6 +92,7 @@ export function SearchDialog({ locale, citySlug, cityName, categories, districts
             popularCategorySlugs={[]}
             districts={districts}
             popularDistrictSlugs={[]}
+            cities={cities}
             onNavigate={() => setOpen(false)}
           />
         </div>

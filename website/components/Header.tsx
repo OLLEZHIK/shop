@@ -90,6 +90,7 @@ export async function Header({ locale }: { locale: Locale }) {
         cityName={city?.name ?? "Bratislava"}
         categories={searchCategories}
         districts={searchDistricts}
+        cities={cities}
       />
     </HeaderShell>
   );
