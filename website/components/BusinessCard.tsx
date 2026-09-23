@@ -90,7 +90,7 @@ export function BusinessCard({ business, priceTier = null }: BusinessCardProps) 
   );
 }
 
-function StarRow({ rating }: { rating: number }) {
+export function StarRow({ rating }: { rating: number }) {
   return (
     <span className="flex items-center gap-0.5" aria-hidden="true">
       {[1, 2, 3, 4, 5].map((n) => (
