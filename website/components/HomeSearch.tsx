@@ -54,6 +54,9 @@ export function HomeSearch({
   const [categorySlug, setCategorySlug] = useState<string | null>(null);
   const [districtSlug, setDistrictSlug] = useState<string | null>(null);
   const [overlay, setOverlay] = useState<Overlay>(null);
+  // Bumped when Search is pressed with no service: remounts the Service
+  // dropdown already open.
+  const [serviceNudge, setServiceNudge] = useState(0);
 
   // Services that make sense for the chosen pet, and pets that make
   // sense for the chosen service (lib/animals.ts): no dog training for birds.
@@ -94,7 +97,7 @@ export function HomeSearch({
             aria-pressed={active}
             onClick={() => setAnimal(active ? null : value)}
             className={`flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] px-4 font-semibold transition ${
-              active ? "bg-brand-orange text-white" : "bg-surface-sunken text-foreground hover:bg-brand-orange-muted"
+              active ? "bg-brand-orange text-white shadow-[var(--shadow-card)]" : "bg-surface-sunken text-foreground ring-1 ring-transparent hover:-translate-y-0.5 hover:bg-brand-orange-muted hover:text-brand-orange-deep hover:shadow-[var(--shadow-card)] hover:ring-brand-orange/60"
             }`}
           >
             <AnimalIcon animal={value} className="h-5 w-5" />
@@ -113,8 +116,16 @@ export function HomeSearch({
         <p className={stepLabel}>{t.search.stepPet}</p>
         {petChips}
 
-        <p className={`mt-5 ${stepLabel}`}>{t.search.stepService}</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
+        <p className={`mt-5 ${stepLabel} ${serviceNudge > 0 && !categorySlug ? "!text-brand-orange-deep" : ""}`}>
+          {t.search.stepService}
+        </p>
+        {/* Pressing search without a service flashes this block. */}
+        <div
+          key={serviceNudge}
+          className={`mt-2 grid grid-cols-2 gap-2 rounded-[var(--radius-control)] ${
+            serviceNudge > 0 && !categorySlug ? "nudge ring-2 ring-brand-orange/60 ring-offset-4 ring-offset-surface" : ""
+          }`}
+        >
           {visibleCategories.map((c) => {
             const active = c.slug === categorySlug;
             return (
@@ -124,7 +135,9 @@ export function HomeSearch({
                 aria-pressed={active}
                 onClick={() => setCategorySlug(active ? null : c.slug)}
                 className={`flex min-h-12 items-center gap-2.5 rounded-[var(--radius-control)] px-3 py-2 text-left text-sm font-semibold transition ${
-                  active ? "accent-solid" : "bg-surface-sunken text-foreground hover:bg-brand-blue-muted"
+                  active
+                    ? "accent-solid shadow-[var(--shadow-card)]"
+                    : "bg-surface-sunken text-foreground ring-1 ring-transparent hover:-translate-y-0.5 hover:bg-surface hover:text-[var(--accent)] hover:shadow-[var(--shadow-card)] hover:ring-[var(--accent)]"
                 }`}
                 style={{ "--accent": CATEGORY_THEME[c.category].accent } as React.CSSProperties}
               >
@@ -150,9 +163,8 @@ export function HomeSearch({
 
         <button
           type="button"
-          disabled={!categorySlug}
-          onClick={goSearch}
-          className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-orange px-6 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-40"
+          onClick={() => (categorySlug ? goSearch() : setServiceNudge((n) => n + 1))}
+          className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-orange px-6 font-semibold text-white transition hover:bg-brand-orange-deep"
         >
           <SearchIcon className="h-5 w-5" />
           {categorySlug ? t.search.showResults : t.search.pickService}
@@ -195,9 +207,8 @@ export function HomeSearch({
 
         <button
           type="button"
-          disabled={!categorySlug}
-          onClick={goSearch}
-          className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-orange px-6 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-40"
+          onClick={() => (categorySlug ? goSearch() : setOverlay("category"))}
+          className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-orange px-6 font-semibold text-white transition hover:bg-brand-orange-deep"
         >
           <SearchIcon className="h-5 w-5" />
           {categorySlug ? t.search.showResults : t.search.pickService}
@@ -218,10 +229,12 @@ export function HomeSearch({
             icon: <AnimalIcon animal={value} className="h-5 w-5 text-brand-orange" />,
           }))}
           onChange={(v) => setAnimal(v as Animal)}
-          className="flex-1"
+          className="min-w-0 flex-1"
         />
         <span aria-hidden="true" className="h-8 w-px bg-line" />
         <Dropdown
+          key={serviceNudge}
+          defaultOpen={serviceNudge > 0}
           variant="bar"
           label={t.search.service}
           ariaLabel={t.search.service}
@@ -229,7 +242,7 @@ export function HomeSearch({
           value={categorySlug}
           options={visibleCategories.map((c) => ({ value: c.slug, label: c.label }))}
           onChange={setCategorySlug}
-          className="flex-[1.2]"
+          className="min-w-0 flex-[1.25]"
         />
         <span aria-hidden="true" className="h-8 w-px bg-line" />
         <Dropdown
@@ -240,14 +253,15 @@ export function HomeSearch({
           value={districtSlug}
           options={districts.map((d) => ({ value: d.slug, label: d.label }))}
           onChange={setDistrictSlug}
-          className="flex-1"
+          className="min-w-0 flex-[1.1]"
         />
         <button
           type="button"
-          disabled={!categorySlug}
-          onClick={goSearch}
+          // Always clickable: without a service it opens the Service list
+          // instead of looking broken (a faded, disabled button).
+          onClick={() => (categorySlug ? goSearch() : setServiceNudge((n) => n + 1))}
           title={categorySlug ? undefined : t.search.chooseServiceFirst}
-          className="ml-2 flex h-14 shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-brand-orange px-7 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-50"
+          className="ml-2 flex h-14 shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-brand-orange px-7 font-semibold text-white shadow-[0_8px_20px_-8px_rgba(255,107,53,0.7)] transition hover:-translate-y-0.5 hover:bg-brand-orange-deep"
         >
           <SearchIcon className="h-5 w-5" />
           {t.search.search}

@@ -20,6 +20,8 @@ interface DropdownProps {
    *  with a small label, for the homepage's combined search bar. */
   variant?: "boxed" | "bar";
   label?: string;
+  /** Start open (remount with a new `key` to open it programmatically). */
+  defaultOpen?: boolean;
 }
 
 export function Dropdown({
@@ -31,8 +33,9 @@ export function Dropdown({
   className,
   variant = "boxed",
   label,
+  defaultOpen = false,
 }: DropdownProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const rootRef = useRef<HTMLDivElement>(null);
   const listboxId = useId();
   const selected = options.find((o) => o.value === value);
@@ -64,7 +67,7 @@ export function Dropdown({
         onClick={() => setOpen((o) => !o)}
         className={
           variant === "bar"
-            ? "flex w-full items-center gap-2 rounded-[var(--radius-pill)] px-5 py-2.5 text-left transition-colors hover:bg-surface-sunken"
+            ? "flex w-full items-center gap-2 rounded-[var(--radius-pill)] px-4 py-2.5 text-left transition-colors hover:bg-surface-sunken"
             : "flex w-full items-center gap-2 rounded-[var(--radius-control)] border-2 border-gray-200 bg-white px-4 py-3 text-left text-sm transition-colors hover:border-brand-blue-muted-border focus-visible:border-brand-blue"
         }
       >

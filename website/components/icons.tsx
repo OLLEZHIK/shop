@@ -5,47 +5,50 @@
 
 type IconProps = { className?: string };
 
+// Pet heads, 24x24 grid, same round stroke style as the rest of the set.
 export function DogIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M7.2 5.6C8.5 4.6 10.2 4 12 4s3.5.6 4.8 1.6c1.2 1.4 1.8 3.2 1.8 5.4 0 4.8-3 8.5-6.6 8.5S5.4 15.8 5.4 11c0-2.2.6-4 1.8-5.4Z" />
+      <path d="M7.2 5.6C5.3 4.9 2.8 6 2.6 8.8c-.2 2.4.9 4.3 2.9 5" />
+      <path d="M16.8 5.6c1.9-.7 4.4.4 4.6 3.2.2 2.4-.9 4.3-2.9 5" />
+      <circle cx="9.4" cy="10.4" r="1" fill="currentColor" stroke="none" />
+      <circle cx="14.6" cy="10.4" r="1" fill="currentColor" stroke="none" />
       <path
-        d="M5.5 5.5c-1.6-.4-3 .6-3 2.4 0 1.6 1 2.9 2.4 3.4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M14.5 5.5c1.6-.4 3 .6 3 2.4 0 1.6-1 2.9-2.4 3.4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <circle cx="10" cy="10.5" r="5.5" stroke="currentColor" strokeWidth="1.6" />
-      <circle cx="8" cy="9.5" r="0.9" fill="currentColor" />
-      <circle cx="12" cy="9.5" r="0.9" fill="currentColor" />
-      <path
-        d="M8.6 12.2c0-.7.6-1.2 1.4-1.2s1.4.5 1.4 1.2-.9 1.6-1.4 1.6-1.4-.9-1.4-1.6Z"
+        d="M10.5 13.4c0-.7.7-1.1 1.5-1.1s1.5.4 1.5 1.1-.9 1.5-1.5 1.5-1.5-.8-1.5-1.5Z"
         fill="currentColor"
       />
+      <path d="M12 14.9v1.3M10.2 16.8c.7.5 1.3.4 1.8-.2.5.6 1.1.7 1.8.2" />
     </svg>
   );
 }
 
 export function CatIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
-      <path d="M5 4.5 6.5 8.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M15 4.5 13.5 8.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path
-        d="M6.5 8.8c-2 3.7-.3 6.7 3.5 6.7s5.5-3 3.5-6.7"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <circle cx="8.1" cy="10.8" r="0.9" fill="currentColor" />
-      <circle cx="11.9" cy="10.8" r="0.9" fill="currentColor" />
-      <path d="M9.3 12.6h1.4l-.7 1-.7-1Z" fill="currentColor" />
-      <path d="M9.4 13.3 7.5 14.2M10.6 13.3l1.9.9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M4.8 3.8 8.7 7.3c1-.4 2.1-.6 3.3-.6s2.3.2 3.3.6l3.9-3.5v6.6c.6 1 .9 2.2.9 3.5 0 4-3.6 6.8-8.1 6.8s-8.1-2.8-8.1-6.8c0-1.3.3-2.5.9-3.5V3.8Z" />
+      <path d="M9.1 11.6v1.3M14.9 11.6v1.3" />
+      <path d="M11.2 14.6h1.6L12 15.6l-.8-1Z" fill="currentColor" />
+      <path d="M12 15.6v.7M10.7 17.1c.6.4 1 .3 1.3-.1.3.4.7.5 1.3.1" />
+      <path d="M3.2 14.2l3.3.5M3.6 17l3-.7M20.8 14.2l-3.3.5M20.4 17l-3-.7" />
     </svg>
   );
 }

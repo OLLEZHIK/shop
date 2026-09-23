@@ -5,26 +5,28 @@ import { usePathname } from "next/navigation";
 import type { Locale } from "@/lib/i18n";
 import { localeOfPath, switchLocalePath } from "@/lib/localeSwitch";
 
-// "EN | SK" pill linking to the same page in the other language.
+// The page's language follows its URL (search engines send people to
+// the right version via hreflang), so there is no switch in the header -
+// just this quiet footer link to the same page in the other language.
+const NAMES: Record<Locale, string> = { en: "English", sk: "Slovenčina" };
+
 export function LanguageSwitch({ locales }: { locales: Locale[] }) {
   const pathname = usePathname() ?? "/";
   const current = localeOfPath(pathname);
 
   return (
-    <div className="inline-flex rounded-[var(--radius-control)] bg-surface-sunken p-1 text-sm font-semibold">
-      {locales.map((l) => (
-        <Link
-          key={l}
-          href={switchLocalePath(pathname, l)}
-          hrefLang={l}
-          aria-current={l === current ? "true" : undefined}
-          className={`rounded-[10px] px-2.5 py-1.5 uppercase transition ${
-            l === current ? "bg-surface text-foreground shadow-[var(--shadow-card)]" : "text-foreground/55 hover:text-foreground"
-          }`}
-        >
-          {l}
-        </Link>
-      ))}
-    </div>
+    <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {locales.map((l) =>
+        l === current ? (
+          <span key={l} className="font-semibold text-white/80">
+            {NAMES[l]}
+          </span>
+        ) : (
+          <Link key={l} href={switchLocalePath(pathname, l)} hrefLang={l} className="hover:text-brand-orange">
+            {NAMES[l]}
+          </Link>
+        )
+      )}
+    </p>
   );
 }

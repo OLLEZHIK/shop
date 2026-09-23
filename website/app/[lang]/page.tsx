@@ -98,7 +98,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         <AmbientBackground />
         <div className="dot-grid pointer-events-none absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" />
 
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-10 md:pt-16 lg:grid-cols-[1.15fr_1fr] lg:pb-24">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-10 md:pt-16 lg:grid-cols-[1.6fr_1fr] lg:pb-24">
           <div className="rise-in min-w-0 text-center lg:text-left">
             <p className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-surface px-3 py-1.5 text-sm font-medium text-foreground/70 shadow-[var(--shadow-card)]">
               <span className="h-2 w-2 rounded-full bg-brand-green" />
@@ -370,18 +370,18 @@ function HeroCollage({
   t: ReturnType<typeof getDictionary>["home"];
 }) {
   const positions = [
-    "left-[2%] top-[4%] -rotate-6",
-    "right-[4%] top-[0%] rotate-3",
-    "left-[-2%] top-[40%] rotate-2",
-    "right-[-2%] top-[38%] -rotate-3",
-    "left-[8%] bottom-[2%] rotate-3",
-    "right-[8%] bottom-[0%] -rotate-2",
+    "left-[-4%] top-[0%] -rotate-6",
+    "right-[-6%] top-[8%] rotate-3",
+    "left-[-12%] top-[40%] rotate-2",
+    "right-[-10%] top-[46%] -rotate-3",
+    "left-[-2%] bottom-[2%] rotate-3",
+    "right-[-2%] bottom-[-4%] -rotate-2",
   ];
 
   return (
     <div className="relative mx-auto hidden aspect-square w-full max-w-[520px] lg:block">
       {/* center card */}
-      <div className="absolute left-1/2 top-1/2 flex h-[46%] w-[46%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[36px] bg-ink text-white shadow-[var(--shadow-panel)]">
+      <div className="absolute left-1/2 top-1/2 flex h-[40%] w-[40%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[36px] bg-ink text-white shadow-[var(--shadow-panel)]">
         <div className="flex items-center gap-2 text-brand-orange">
           <DogIcon className="h-12 w-12" />
           <CatIcon className="h-12 w-12 text-white" />
@@ -397,14 +397,14 @@ function HeroCollage({
           className={`group absolute ${positions[i % positions.length]}`}
         >
           <span
-            className="float-y flex items-center gap-3 rounded-2xl bg-surface py-3 pl-3 pr-5 shadow-[var(--shadow-card-hover)] transition duration-300 group-hover:scale-105"
+            className="float-y flex items-center gap-2.5 rounded-2xl bg-surface py-2.5 pl-2.5 pr-4 shadow-[var(--shadow-card-hover)] transition duration-300 group-hover:scale-105"
             style={{ "--accent": c.accent, animationDelay: `${i * -1.1}s` } as React.CSSProperties}
           >
             <span className="accent-solid flex h-11 w-11 items-center justify-center rounded-xl">
               <CategoryIcon category={c.category} className="h-6 w-6" />
             </span>
             <span>
-              <span className="block max-w-[10.5rem] text-sm font-bold leading-tight text-foreground">{c.label}</span>
+              <span className="block max-w-[8.5rem] text-sm font-bold leading-tight text-foreground">{c.label}</span>
               <span className="block text-xs text-foreground/55">{t.listed(c.count)}</span>
             </span>
           </span>

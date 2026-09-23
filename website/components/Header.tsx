@@ -1,18 +1,16 @@
 import Link from "next/link";
 import { getAllDistricts, getDefaultCity, getCityPoints } from "@/lib/data";
 import { ALL_CATEGORIES, CATEGORY_THEME, categoryBlurb, categoryLabel, categorySlug, listingPath } from "@/lib/categories";
-import { getDictionary, localePath, localesForCountry, type Locale } from "@/lib/i18n";
+import { getDictionary, localePath, type Locale } from "@/lib/i18n";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 import { BrowseMenu, type ServiceLink } from "./BrowseMenu";
-import { LanguageSwitch } from "./LanguageSwitch";
 import { FindCareButton, SearchDialog } from "./SearchDialog";
 
 export async function Header({ locale }: { locale: Locale }) {
   const [city, cityPoints, districts] = await Promise.all([getDefaultCity(), getCityPoints(), getAllDistricts()]);
   const citySlug = city?.slug ?? "";
   const t = getDictionary(locale);
-  const locales = localesForCountry(city?.country);
 
   const services: ServiceLink[] = ALL_CATEGORIES.map((category) => ({
     href: listingPath(locale, category, citySlug),
@@ -63,7 +61,6 @@ export async function Header({ locale }: { locale: Locale }) {
             {t.nav.listBusiness}
           </Link>
           <span aria-hidden="true" className="mx-2 h-8 w-px bg-foreground/15" />
-          {locales.length > 1 && <LanguageSwitch locales={locales} />}
           <FindCareButton
             label={t.nav.findCare}
             className="ml-2 inline-flex h-12 items-center rounded-[var(--radius-control)] bg-brand-orange px-6 text-[17px] font-semibold text-white transition hover:bg-brand-orange-deep"
@@ -82,7 +79,6 @@ export async function Header({ locale }: { locale: Locale }) {
           services={services}
           cities={cities}
           defaultCitySlug={citySlug}
-          locales={locales}
           />
         </div>
       </div>

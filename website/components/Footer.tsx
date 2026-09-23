@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { getDefaultCity } from "@/lib/data";
+import { LanguageSwitch } from "./LanguageSwitch";
 import { ALL_CATEGORIES, categoryLabel, listingPath } from "@/lib/categories";
-import { getDictionary, type Locale } from "@/lib/i18n";
+import { getDictionary, localesForCountry, type Locale } from "@/lib/i18n";
 import { Logo } from "./Logo";
 import { ShieldCheckIcon } from "./icons";
 
@@ -55,6 +56,7 @@ export async function Footer({ locale }: { locale: Locale }) {
 
         <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row sm:items-center">
           <p>&copy; {new Date().getFullYear()} pawenn.com</p>
+          <LanguageSwitch locales={localesForCountry(city?.country)} />
           <p>{t.madeWithCare(cityName)}</p>
         </div>
       </div>
