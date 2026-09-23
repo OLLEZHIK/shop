@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   reactStrictMode: true,
+  // Every internal link, the sitemap and canonical URLs use a trailing
+  // slash (`/grooming/bratislava/`). Without this Next.js 308-redirects
+  // those to the slash-less form, so crawlers hit a redirect on every
+  // sitemap URL.
+  trailingSlash: true,
 };
 
 export default nextConfig;

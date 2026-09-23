@@ -57,7 +57,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
           name="authorName"
           required
           maxLength={100}
-          className="mt-1 w-full rounded-lg border-2 border-gray-200 px-3 py-2 focus:border-brand-blue focus:outline-none"
+          className="mt-1 w-full rounded-[var(--radius-control)] border-2 border-line bg-surface px-3 py-2.5 transition focus:border-brand-blue focus:outline-none"
         />
       </div>
 
@@ -70,7 +70,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
           name="rating"
           required
           defaultValue="5"
-          className="mt-1 rounded-lg border-2 border-gray-200 px-3 py-2 focus:border-brand-blue focus:outline-none"
+          className="mt-1 rounded-[var(--radius-control)] border-2 border-line bg-surface px-3 py-2.5 transition focus:border-brand-blue focus:outline-none"
         >
           {[5, 4, 3, 2, 1].map((n) => (
             <option key={n} value={n}>
@@ -90,7 +90,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
           required
           maxLength={2000}
           rows={4}
-          className="mt-1 w-full rounded-lg border-2 border-gray-200 px-3 py-2 focus:border-brand-blue focus:outline-none"
+          className="mt-1 w-full rounded-[var(--radius-control)] border-2 border-line bg-surface px-3 py-2.5 transition focus:border-brand-blue focus:outline-none"
         />
       </div>
 
@@ -99,7 +99,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="min-h-11 rounded-lg bg-brand-orange px-5 py-2.5 font-medium text-white transition hover:bg-brand-orange/90 disabled:opacity-60"
+        className="min-h-11 rounded-[var(--radius-pill)] bg-brand-orange px-6 py-2.5 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-60"
       >
         {status === "submitting" ? "Submitting..." : "Submit review"}
       </button>

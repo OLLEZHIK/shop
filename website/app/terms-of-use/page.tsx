@@ -11,8 +11,10 @@ export const metadata: Metadata = {
 export default function TermsOfUsePage() {
   const content = readDocsMarkdown("legal/terms-of-use-draft.md");
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <MarkdownContent content={content} />
+    <main className="mx-auto max-w-3xl px-4 py-10 md:py-16">
+      <article className="rounded-[28px] bg-surface p-6 shadow-[var(--shadow-card)] md:p-12">
+        <MarkdownContent content={content} />
+      </article>
     </main>
   );
 }

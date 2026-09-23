@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { categoryEnumFromSlug, CATEGORY_LABELS, ALL_CATEGORY_SLUGS } from "@/lib/categories";
 import { getCityBySlug, getAllCities, getAllDistricts, getDistrictBySlug, getCategoryAggregates } from "@/lib/data";
 import { CategoryListing } from "@/components/CategoryListing";
+import { SITE_URL } from "@/lib/site";
 
 interface PageParams {
   category: string;
@@ -41,6 +42,9 @@ export async function generateMetadata({
   const title = `${CATEGORY_LABELS[category]} in ${district.name}, ${city.name}`;
 
   return {
+    // Filter variants (?animal=dog) are crawlable links now - point them
+    // at the unfiltered page so they don't count as duplicates.
+    alternates: { canonical: `${SITE_URL}/${resolved.categorySlug}/${resolved.citySlug}/${resolved.districtSlug}/` },
     title,
     description: `Browse ${aggregates.count} ${CATEGORY_LABELS[category].toLowerCase()} in ${district.name}, ${city.name}.`,
     robots: aggregates.count < 3 ? { index: false, follow: true } : undefined,

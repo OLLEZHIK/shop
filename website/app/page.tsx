@@ -5,12 +5,29 @@ import {
   getPopularNearby,
   getFeaturedBusinesses,
   getBusinessCount,
+  getDistrictSummaries,
 } from "@/lib/data";
-import { ALL_CATEGORY_SLUGS, CATEGORY_LABELS, categoryEnumFromSlug } from "@/lib/categories";
+import {
+  ALL_CATEGORY_SLUGS,
+  CATEGORY_LABELS,
+  CATEGORY_THEME,
+  categoryEnumFromSlug,
+} from "@/lib/categories";
 import { HomeSearch } from "@/components/HomeSearch";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { BusinessCard } from "@/components/BusinessCard";
-import { MapPinIcon } from "@/components/icons";
+import { CategoryIcon } from "@/components/CategoryIcon";
+import { DistrictExplorer } from "@/components/DistrictExplorer";
+import { MythOrFact } from "@/components/MythOrFact";
+import {
+  ArrowRightIcon,
+  CatIcon,
+  DogIcon,
+  PhoneIcon,
+  SearchIcon,
+  ShieldCheckIcon,
+  PawIcon,
+} from "@/components/icons";
 
 const CARE_TIPS = [
   {
@@ -37,93 +54,208 @@ const CARE_TIPS = [
     title: "Brush short-haired dogs weekly, long-haired daily",
     body: "Regular brushing catches mats before they need to be shaved out, and it's a lot cheaper than a grooming visit for a tangled coat.",
   },
+];
+
+const STEPS = [
   {
-    format: "myth" as const,
-    myth: "A warm, dry nose means a sick dog.",
-    fact: "Nose temperature and moisture change constantly through the day for healthy dogs. Watch behavior and appetite instead.",
+    icon: SearchIcon,
+    title: "Pick what you need",
+    body: "Choose your pet, the service and a district - or just browse a category.",
+  },
+  {
+    icon: ShieldCheckIcon,
+    title: "Compare with confidence",
+    body: "Every listing links to where its details came from. Paid placements are always labelled.",
+  },
+  {
+    icon: PhoneIcon,
+    title: "Contact them directly",
+    body: "Call, open the website or get directions in one tap. No accounts, no booking fees.",
   },
 ];
 
 export default async function HomePage() {
-  const [city, districts, popularNearby, featured, counts] = await Promise.all([
+  const [city, districts, popularNearby, featured, counts, districtSummaries] = await Promise.all([
     getDefaultCity(),
     getAllDistricts(),
     getPopularNearby(),
     getFeaturedBusinesses(),
     getBusinessCount(),
+    getDistrictSummaries(),
   ]);
 
   const cityName = city?.name ?? "Bratislava";
   const citySlug = city?.slug ?? "";
 
-  const categories = ALL_CATEGORY_SLUGS.map((slug) => ({
-    slug,
-    label: CATEGORY_LABELS[categoryEnumFromSlug(slug)!],
-  }));
-  // Real counts, used only to rank the mobile overlay's "Popular"
-  // shortcuts - the numeric stats block itself is removed from this page.
+  const categories = ALL_CATEGORY_SLUGS.map((slug) => {
+    const category = categoryEnumFromSlug(slug)!;
+    return {
+      slug,
+      category,
+      label: CATEGORY_LABELS[category],
+      count: counts.byCategory[category] ?? 0,
+      ...CATEGORY_THEME[category],
+    };
+  });
+  // Real counts, used to rank the mobile overlay's "Popular" shortcuts.
   const popularCategorySlugs = [...categories]
-    .sort(
-      (a, b) =>
-        (counts.byCategory[categoryEnumFromSlug(b.slug)!] ?? 0) -
-        (counts.byCategory[categoryEnumFromSlug(a.slug)!] ?? 0)
-    )
+    .sort((a, b) => b.count - a.count)
     .slice(0, 3)
     .map((c) => c.slug);
 
   const districtOptions = districts.map((d) => ({ slug: d.slug, label: d.name }));
 
+  const stats = [
+    { value: counts.total, label: "places listed" },
+    { value: districtSummaries.length, label: "districts covered" },
+    { value: categories.filter((c) => c.count > 0).length, label: "kinds of service" },
+    { value: 0, label: "ads or sign-ups" },
+  ];
+
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      <AmbientBackground />
+    <main className="relative overflow-hidden">
+      {/* ---------- Hero ---------- */}
+      <section className="relative">
+        <AmbientBackground />
+        <div className="dot-grid pointer-events-none absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" />
 
-      <div className="mx-auto max-w-4xl px-4 pb-8 pt-16 text-center">
-        <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground md:text-6xl">
-          Find pet services in {cityName}
-        </h1>
-        <p className="mb-10 text-lg text-foreground/70">
-          Discover trusted groomers, vets, hotels and trainers for your pets
-        </p>
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-10 md:pt-16 lg:grid-cols-[1.15fr_1fr] lg:pb-24">
+          <div className="rise-in text-center lg:text-left">
+            <p className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-surface px-3 py-1.5 text-sm font-medium text-foreground/70 shadow-[var(--shadow-card)]">
+              <span className="h-2 w-2 rounded-full bg-brand-green" />
+              {counts.total} pet services across {cityName}
+            </p>
+            <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] text-foreground sm:text-5xl md:text-6xl xl:text-7xl">
+              Find trusted{" "}
+              <span className="relative whitespace-nowrap text-brand-orange">
+                pet services
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 300 16"
+                  preserveAspectRatio="none"
+                  className="absolute -bottom-2 left-0 h-3 w-full text-brand-orange/40"
+                >
+                  <path d="M3 12C60 4 140 2 297 8" stroke="currentColor" strokeWidth="5" strokeLinecap="round" fill="none" />
+                </svg>
+              </span>{" "}
+              in {cityName}
+            </h1>
+            <p className="mx-auto mt-6 max-w-xl text-lg text-foreground/70 lg:mx-0">
+              Groomers, vets, pet hotels and trainers in {cityName} - with honest details, clear sources and one-tap
+              contact.
+            </p>
 
-        <HomeSearch
-          citySlug={citySlug}
-          cityName={cityName}
-          categories={categories}
-          popularCategorySlugs={popularCategorySlugs}
-          districts={districtOptions}
-          popularDistrictSlugs={popularNearby.map((p) => p.districtSlug)}
+            <div id="search" className="mt-8 scroll-mt-28 lg:max-w-none">
+              <HomeSearch
+                citySlug={citySlug}
+                cityName={cityName}
+                categories={categories.map((c) => ({ slug: c.slug, label: c.label }))}
+                popularCategorySlugs={popularCategorySlugs}
+                districts={districtOptions}
+                popularDistrictSlugs={popularNearby.map((p) => p.districtSlug)}
+              />
+            </div>
+
+            <div className="mt-5 hidden flex-wrap items-center gap-2 text-sm md:flex lg:justify-start">
+              <span className="text-foreground/50">Popular:</span>
+              {popularCategorySlugs.map((slug) => {
+                const c = categories.find((cat) => cat.slug === slug)!;
+                return (
+                  <Link
+                    key={slug}
+                    href={`/${slug}/${citySlug}/`}
+                    className="rounded-[var(--radius-pill)] border border-line bg-surface/70 px-3 py-1 text-foreground/75 transition hover:border-brand-blue-muted-border hover:text-brand-blue"
+                  >
+                    {c.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <HeroCollage categories={categories} citySlug={citySlug} total={counts.total} />
+        </div>
+      </section>
+
+      {/* ---------- Stats strip ---------- */}
+      <section className="mx-auto max-w-7xl px-4">
+        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-card)] bg-line shadow-[var(--shadow-card)] md:grid-cols-4">
+          {stats.map((s) => (
+            <div key={s.label} className="bg-surface px-6 py-6 text-center md:py-8">
+              <dt className="sr-only">{s.label}</dt>
+              <dd>
+                <span className="block font-heading text-3xl font-extrabold text-ink md:text-4xl">{s.value}</span>
+                <span className="mt-1 block text-sm text-foreground/60">{s.label}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {/* ---------- Browse by service ---------- */}
+      <section className="mx-auto max-w-7xl px-4 pt-24">
+        <SectionHeading
+          eyebrow="Browse by service"
+          title="What does your pet need today?"
+          body="Six kinds of pet care, each with its own list of places - checked and kept up to date."
         />
-      </div>
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+          {categories.map((c, i) => (
+            <Link
+              key={c.slug}
+              href={`/${c.slug}/${citySlug}/`}
+              className="rise-in group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] bg-surface p-4 shadow-[var(--shadow-card)] transition duration-300 hover:-translate-y-1 sm:p-6 hover:shadow-[var(--shadow-card-hover)]"
+              style={{ "--accent": c.accent, animationDelay: `${i * 60}ms` } as React.CSSProperties}
+            >
+              <span
+                aria-hidden="true"
+                className="absolute -right-10 -top-10 h-36 w-36 rounded-full opacity-[0.08] transition-transform duration-500 group-hover:scale-150"
+                style={{ background: c.accent }}
+              />
+              <span className="accent-soft relative flex h-11 w-11 items-center justify-center rounded-2xl sm:h-14 sm:w-14 transition duration-300 group-hover:rotate-[-6deg]">
+                <CategoryIcon category={c.category} className="h-6 w-6 sm:h-7 sm:w-7" />
+              </span>
+              <h3 className="relative mt-4 text-base font-bold leading-tight text-foreground sm:mt-6 sm:text-xl">{c.label}</h3>
+              <p className="relative mt-1.5 hidden text-foreground/65 sm:block">{c.blurb}</p>
+              <div className="relative mt-auto flex items-center justify-between pt-4 sm:mt-6 sm:border-t sm:border-line">
+                <span className="text-sm font-medium text-foreground/70">
+                  {c.count} {c.count === 1 ? "place" : "places"}
+                </span>
+                <span
+                  className="flex h-8 w-8 items-center justify-center rounded-full transition duration-300 group-hover:translate-x-1 sm:h-9 sm:w-9"
+                  style={{ background: c.accent, color: "white" }}
+                >
+                  <ArrowRightIcon className="h-4 w-4" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-      {popularNearby.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-12">
-          <h2 className="text-2xl font-bold text-foreground">Popular nearby</h2>
-          <p className="mt-1 text-foreground/60">The most-listed services by district, right now.</p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {popularNearby.map((item) => (
-              <Link
-                key={item.districtSlug}
-                href={`/${item.categorySlug}/${citySlug}/${item.districtSlug}/`}
-                className="group rounded-[var(--radius-card)] bg-white p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)]"
-              >
-                <div className="flex items-center gap-1.5 text-sm text-foreground/60">
-                  <MapPinIcon className="h-4 w-4" />
-                  {item.districtName}
-                </div>
-                <p className="mt-2 font-semibold text-foreground group-hover:text-brand-blue">
-                  {item.categoryLabel}
-                </p>
-                <p className="mt-1 text-sm text-foreground/60">{item.count} listed</p>
-              </Link>
-            ))}
+      {/* ---------- Explore by district ---------- */}
+      {districtSummaries.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pt-24">
+          <SectionHeading
+            eyebrow="Explore the city"
+            title={`What's in your part of ${cityName}?`}
+            body="Tap a district to see what's nearby. Bigger bubbles mean more places listed."
+          />
+          <div className="mt-10">
+            <DistrictExplorer districts={districtSummaries} citySlug={citySlug} cityName={cityName} />
           </div>
         </section>
       )}
 
+      {/* ---------- Featured partners ---------- */}
       {featured.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-12">
-          <h2 className="text-2xl font-bold text-foreground">Featured partners</h2>
-          <div className="mt-6 space-y-4">
+        <section className="mx-auto max-w-7xl px-4 pt-24">
+          <SectionHeading
+            eyebrow="Partners"
+            title="Featured partners"
+            body="Paid placements - always labelled, never mixed into the regular order."
+          />
+          <div className="mt-10 grid gap-4 lg:grid-cols-2">
             {featured.map((business) => (
               <BusinessCard key={business.id} business={business} />
             ))}
@@ -131,45 +263,165 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="mx-auto max-w-6xl px-4 py-12">
-        <h2 className="text-2xl font-bold text-foreground">Pet care basics</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CARE_TIPS.map((tip, i) => (
-            <div key={i} className="rounded-[var(--radius-card)] bg-white p-5 shadow-[var(--shadow-card)]">
-              {tip.format === "tip" && (
-                <>
-                  <p className="font-semibold text-foreground">{tip.title}</p>
-                  <p className="mt-2 text-sm text-foreground/70">{tip.body}</p>
-                </>
-              )}
-              {tip.format === "qa" && (
-                <>
-                  <p className="font-semibold text-brand-blue">{tip.question}</p>
-                  <p className="mt-2 text-sm text-foreground/70">{tip.answer}</p>
-                </>
-              )}
-              {tip.format === "checklist" && (
-                <>
-                  <p className="font-semibold text-foreground">{tip.title}</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-foreground/70">
+      {/* ---------- How it works ---------- */}
+      <section className="mx-auto max-w-7xl px-4 pt-24">
+        <SectionHeading eyebrow="How it works" title="From “I need a groomer” to a phone call in a minute" />
+        <ol className="mt-10 grid gap-4 md:grid-cols-3">
+          {STEPS.map((step, i) => (
+            <li
+              key={step.title}
+              className="relative rounded-[var(--radius-card)] bg-surface p-6 shadow-[var(--shadow-card)] md:p-8"
+            >
+              <span className="absolute right-6 top-5 font-heading text-6xl font-extrabold text-foreground/[0.06]">
+                0{i + 1}
+              </span>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-orange-muted text-brand-orange-deep">
+                <step.icon className="h-6 w-6" />
+              </span>
+              <h3 className="mt-5 text-lg font-bold text-foreground">{step.title}</h3>
+              <p className="mt-2 text-foreground/65">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+        <Link
+          href="/how-it-works/"
+          className="mt-6 inline-flex items-center gap-1.5 font-semibold text-brand-blue hover:underline"
+        >
+          How we check listings
+          <ArrowRightIcon className="h-4 w-4" />
+        </Link>
+      </section>
+
+      {/* ---------- Pet care corner ---------- */}
+      <section className="mx-auto max-w-7xl px-4 pt-24">
+        <SectionHeading
+          eyebrow="Pet care corner"
+          title="Test yourself, pick up a tip"
+          body="A one-minute quiz on the pet myths everyone has heard - and a few habits worth keeping."
+        />
+        <div className="mt-10 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+          <MythOrFact />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            {CARE_TIPS.map((tip, i) => (
+              <details
+                key={i}
+                className="group rounded-[var(--radius-card)] bg-surface p-5 shadow-[var(--shadow-card)] open:shadow-[var(--shadow-card-hover)]"
+                open={i === 0}
+              >
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-3 font-semibold text-foreground">
+                  <span>{tip.format === "qa" ? tip.question : tip.title}</span>
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-sunken text-foreground/60 transition group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                {tip.format === "tip" && <p className="mt-3 text-sm text-foreground/70">{tip.body}</p>}
+                {tip.format === "qa" && <p className="mt-3 text-sm text-foreground/70">{tip.answer}</p>}
+                {tip.format === "checklist" && (
+                  <ul className="mt-3 space-y-1.5 text-sm text-foreground/70">
                     {tip.items.map((item) => (
-                      <li key={item}>{item}</li>
+                      <li key={item} className="flex gap-2">
+                        <PawIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-orange" />
+                        {item}
+                      </li>
                     ))}
                   </ul>
-                </>
-              )}
-              {tip.format === "myth" && (
-                <>
-                  <p className="text-xs font-medium uppercase tracking-wide text-brand-amber">Myth</p>
-                  <p className="mt-1 text-sm text-foreground/70 line-through decoration-foreground/30">{tip.myth}</p>
-                  <p className="mt-3 text-xs font-medium uppercase tracking-wide text-brand-green">Fact</p>
-                  <p className="mt-1 text-sm text-foreground/70">{tip.fact}</p>
-                </>
-              )}
-            </div>
-          ))}
+                )}
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- Business CTA ---------- */}
+      <section className="mx-auto max-w-7xl px-4 pt-24">
+        <div className="relative overflow-hidden rounded-[28px] bg-brand-orange px-6 py-12 text-white md:px-14 md:py-16">
+          <PawIcon className="pointer-events-none absolute -right-6 -top-6 h-48 w-48 rotate-12 text-white/10" />
+          <PawIcon className="pointer-events-none absolute bottom-[-3rem] right-40 h-32 w-32 -rotate-12 text-white/10" />
+          <div className="relative max-w-2xl">
+            <h2 className="text-3xl font-extrabold md:text-4xl">Run a pet business in {cityName}?</h2>
+            <p className="mt-3 text-lg text-white/85">
+              Add your salon, clinic or hotel, or tell us if something on your listing is out of date.
+            </p>
+            <Link
+              href="/add-or-fix-listing/"
+              className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-pill)] bg-white px-6 py-3 font-semibold text-ink transition hover:bg-ink hover:text-white"
+            >
+              Add or fix a listing
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
     </main>
+  );
+}
+
+function SectionHeading({ eyebrow, title, body }: { eyebrow: string; title: string; body?: string }) {
+  return (
+    <div className="max-w-2xl">
+      <p className="eyebrow">{eyebrow}</p>
+      <h2 className="mt-3 text-3xl font-extrabold text-foreground md:text-4xl">{title}</h2>
+      {body && <p className="mt-3 text-lg text-foreground/65">{body}</p>}
+    </div>
+  );
+}
+
+// Right side of the hero: category tiles arranged as a playful collage
+// around a central "pet" card. Real category counts only; decorative
+// motion is CSS-only and disabled under prefers-reduced-motion.
+function HeroCollage({
+  categories,
+  citySlug,
+  total,
+}: {
+  categories: { slug: string; category: Parameters<typeof CategoryIcon>[0]["category"]; label: string; count: number; accent: string }[];
+  citySlug: string;
+  total: number;
+}) {
+  const positions = [
+    "left-[2%] top-[4%] -rotate-6",
+    "right-[4%] top-[0%] rotate-3",
+    "left-[-2%] top-[40%] rotate-2",
+    "right-[-2%] top-[38%] -rotate-3",
+    "left-[8%] bottom-[2%] rotate-3",
+    "right-[8%] bottom-[0%] -rotate-2",
+  ];
+
+  return (
+    <div className="relative mx-auto hidden aspect-square w-full max-w-[520px] lg:block">
+      {/* center card */}
+      <div className="absolute left-1/2 top-1/2 flex h-[46%] w-[46%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[36px] bg-ink text-white shadow-[var(--shadow-panel)]">
+        <div className="flex items-center gap-2 text-brand-orange">
+          <DogIcon className="h-12 w-12" />
+          <CatIcon className="h-12 w-12 text-white" />
+        </div>
+        <p className="mt-3 font-heading text-4xl font-extrabold">{total}</p>
+        <p className="text-sm text-white/60">places to explore</p>
+      </div>
+
+      {categories.map((c, i) => (
+        <Link
+          key={c.slug}
+          href={`/${c.slug}/${citySlug}/`}
+          className={`group absolute ${positions[i % positions.length]}`}
+        >
+          <span
+            className="float-y flex items-center gap-3 rounded-2xl bg-surface py-3 pl-3 pr-5 shadow-[var(--shadow-card-hover)] transition duration-300 group-hover:scale-105"
+            style={{ "--accent": c.accent, animationDelay: `${i * -1.1}s` } as React.CSSProperties}
+          >
+            <span className="accent-solid flex h-11 w-11 items-center justify-center rounded-xl">
+              <CategoryIcon category={c.category} className="h-6 w-6" />
+            </span>
+            <span>
+              <span className="block text-sm font-bold text-foreground">{c.label}</span>
+              <span className="block text-xs text-foreground/55">{c.count} listed</span>
+            </span>
+          </span>
+        </Link>
+      ))}
+    </div>
   );
 }

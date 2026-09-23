@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dropdown } from "./Dropdown";
-import { DogIcon, CatIcon } from "./icons";
+import { DogIcon, CatIcon, ChevronDownIcon, MapPinIcon, SearchIcon } from "./icons";
 
 interface Option {
   slug: string;
@@ -56,102 +56,110 @@ export function HomeSearch({
 
   return (
     <>
-      {/* Mobile: 3-step vertical cards */}
-      <div className="space-y-4 md:hidden">
-        <div className="rounded-[var(--radius-card)] bg-white p-6 shadow-[var(--shadow-card)]">
-          <h2 className="mb-4 text-xl font-semibold">1. Choose your pet</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              type="button"
-              onClick={() => setAnimal("dog")}
-              className={`flex flex-col items-center gap-2 rounded-[var(--radius-control)] py-6 font-medium transition ${
-                animal === "dog" ? "bg-brand-orange text-white" : "bg-gray-50 text-foreground hover:bg-brand-orange-muted"
-              }`}
-            >
-              <DogIcon className="h-7 w-7" />
-              Dog
-            </button>
-            <button
-              type="button"
-              onClick={() => setAnimal("cat")}
-              className={`flex flex-col items-center gap-2 rounded-[var(--radius-control)] py-6 font-medium transition ${
-                animal === "cat" ? "bg-brand-orange text-white" : "bg-gray-50 text-foreground hover:bg-brand-orange-muted"
-              }`}
-            >
-              <CatIcon className="h-7 w-7" />
-              Cat
-            </button>
-          </div>
+      {/* Mobile: one compact card - pet toggle, then service and place */}
+      <div className="rounded-[var(--radius-card)] bg-surface p-4 text-left shadow-[var(--shadow-panel)] md:hidden">
+        <p className="px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">1 · Your pet</p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          {(["dog", "cat"] as const).map((value) => {
+            const Icon = value === "dog" ? DogIcon : CatIcon;
+            const active = animal === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setAnimal(active ? null : value)}
+                className={`flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-control)] font-semibold capitalize transition ${
+                  active ? "bg-brand-orange text-white" : "bg-surface-sunken text-foreground hover:bg-brand-orange-muted"
+                }`}
+              >
+                <Icon className="h-6 w-6" />
+                {value}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="rounded-[var(--radius-card)] bg-white p-6 shadow-[var(--shadow-card)]">
-          <h2 className="mb-4 text-xl font-semibold">2. What do you need?</h2>
-          <button
-            type="button"
-            onClick={() => setOverlay("category")}
-            className="block w-full rounded-[var(--radius-control)] bg-gray-50 px-4 py-4 text-left font-medium hover:bg-brand-blue-muted"
-          >
-            {categoryLabel ?? "Choose a service"}
-          </button>
-        </div>
+        <p className="mt-4 px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">2 · Service</p>
+        <button
+          type="button"
+          onClick={() => setOverlay("category")}
+          className="mt-2 flex min-h-12 w-full items-center justify-between rounded-[var(--radius-control)] bg-surface-sunken px-4 text-left font-medium"
+        >
+          <span className={categoryLabel ? "text-foreground" : "text-foreground/55"}>
+            {categoryLabel ?? "What do you need?"}
+          </span>
+          <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
+        </button>
 
-        <div className="rounded-[var(--radius-card)] bg-white p-6 shadow-[var(--shadow-card)]">
-          <h2 className="mb-4 text-xl font-semibold">3. Where?</h2>
-          <button
-            type="button"
-            onClick={() => setOverlay("district")}
-            className="block w-full rounded-[var(--radius-control)] bg-gray-50 px-4 py-4 text-left font-medium hover:bg-brand-blue-muted"
-          >
+        <p className="mt-4 px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">3 · Where</p>
+        <button
+          type="button"
+          onClick={() => setOverlay("district")}
+          className="mt-2 flex min-h-12 w-full items-center justify-between rounded-[var(--radius-control)] bg-surface-sunken px-4 text-left font-medium"
+        >
+          <span className="flex items-center gap-2">
+            <MapPinIcon className="h-4 w-4 text-foreground/50" />
             {districtLabel ?? `All ${cityName}`}
-          </button>
-        </div>
+          </span>
+          <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
+        </button>
 
         <button
           type="button"
           disabled={!categorySlug}
           onClick={() => goSearch()}
-          className="block w-full rounded-[var(--radius-control)] bg-brand-orange px-6 py-4 text-center font-medium text-white transition hover:bg-brand-orange/90 disabled:opacity-40"
+          className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-orange px-6 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-40"
         >
-          Search
+          <SearchIcon className="h-5 w-5" />
+          {categorySlug ? "Show results" : "Pick a service to search"}
         </button>
       </div>
 
-      {/* Desktop: single search panel with custom dropdowns */}
-      <div className="hidden rounded-[var(--radius-card)] bg-white p-4 shadow-[var(--shadow-panel)] md:block">
-        <div className="flex gap-3">
-          <Dropdown
-            ariaLabel="Choose pet"
-            placeholder="Choose pet"
-            value={animal}
-            options={ANIMAL_OPTIONS}
-            onChange={(v) => setAnimal(v as "dog" | "cat")}
-            className="flex-1"
-          />
-          <Dropdown
-            ariaLabel="Service needed"
-            placeholder="Service needed"
-            value={categorySlug}
-            options={categories.map((c) => ({ value: c.slug, label: c.label }))}
-            onChange={setCategorySlug}
-            className="flex-1"
-          />
-          <Dropdown
-            ariaLabel="Location"
-            placeholder={`All ${cityName}`}
-            value={districtSlug}
-            options={districts.map((d) => ({ value: d.slug, label: d.label }))}
-            onChange={setDistrictSlug}
-            className="flex-1"
-          />
-          <button
-            type="button"
-            disabled={!categorySlug}
-            onClick={() => goSearch()}
-            className="shrink-0 rounded-[var(--radius-control)] bg-brand-orange px-8 py-3 font-medium text-white transition hover:bg-brand-orange/90 disabled:opacity-40"
-          >
-            Search
-          </button>
-        </div>
+      {/* Desktop: one pill-shaped bar, three labelled segments (Zocdoc pattern) */}
+      <div className="hidden items-center rounded-[var(--radius-pill)] bg-surface p-2 shadow-[var(--shadow-panel)] ring-1 ring-line md:flex">
+        <Dropdown
+          variant="bar"
+          label="Pet"
+          ariaLabel="Choose pet"
+          placeholder="Dog or cat?"
+          value={animal}
+          options={ANIMAL_OPTIONS}
+          onChange={(v) => setAnimal(v as "dog" | "cat")}
+          className="flex-1"
+        />
+        <span aria-hidden="true" className="h-8 w-px bg-line" />
+        <Dropdown
+          variant="bar"
+          label="Service"
+          ariaLabel="Service needed"
+          placeholder="What do you need?"
+          value={categorySlug}
+          options={categories.map((c) => ({ value: c.slug, label: c.label }))}
+          onChange={setCategorySlug}
+          className="flex-[1.2]"
+        />
+        <span aria-hidden="true" className="h-8 w-px bg-line" />
+        <Dropdown
+          variant="bar"
+          label="Where"
+          ariaLabel="Location"
+          placeholder={`All ${cityName}`}
+          value={districtSlug}
+          options={districts.map((d) => ({ value: d.slug, label: d.label }))}
+          onChange={setDistrictSlug}
+          className="flex-1"
+        />
+        <button
+          type="button"
+          disabled={!categorySlug}
+          onClick={() => goSearch()}
+          title={categorySlug ? undefined : "Choose a service first"}
+          className="ml-2 flex h-14 shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-brand-orange px-7 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-50"
+        >
+          <SearchIcon className="h-5 w-5" />
+          Search
+        </button>
       </div>
 
       {overlay && (
