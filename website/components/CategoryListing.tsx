@@ -3,6 +3,7 @@ import {
   searchBusinesses,
   getCategoryAggregates,
   getAllDistricts,
+  getPriceTierMap,
 } from "@/lib/data";
 import { CATEGORY_LABELS, CATEGORY_LABELS_SINGULAR } from "@/lib/categories";
 import { BusinessCard } from "./BusinessCard";
@@ -29,10 +30,11 @@ export async function CategoryListing({
   districtName,
   animal,
 }: CategoryListingProps) {
-  const [businesses, aggregates, districts] = await Promise.all([
+  const [businesses, aggregates, districts, priceTiers] = await Promise.all([
     searchBusinesses({ category, citySlug, districtSlug, animal }),
     getCategoryAggregates(category, districtSlug),
     getAllDistricts(),
+    getPriceTierMap(category),
   ]);
 
   const categoryLabel = CATEGORY_LABELS[category];
@@ -77,7 +79,9 @@ export async function CategoryListing({
         {businesses.length === 0 ? (
           <EmptyState resetHref={resetHref} />
         ) : (
-          businesses.map((business) => <BusinessCard key={business.id} business={business} />)
+          businesses.map((business) => (
+            <BusinessCard key={business.id} business={business} priceTier={priceTiers.get(business.id) ?? null} />
+          ))
         )}
       </div>
 
