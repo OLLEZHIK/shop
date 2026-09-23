@@ -84,7 +84,11 @@ export async function CategoryListing({
               <h1 className="text-3xl font-extrabold text-foreground md:text-5xl">
                 {categoryLabel} <span className="text-foreground/40">in</span> {locationLabel}
               </h1>
-              <p className="mt-2 text-lg text-foreground/65">{theme.blurb} - checked and kept up to date.</p>
+              <p className="mt-2 text-lg text-foreground/65">
+                Browse {aggregates.count}{" "}
+                {aggregates.count === 1 ? CATEGORY_LABELS_SINGULAR[category] : categoryLabel.toLowerCase()} in{" "}
+                {locationLabel}, checked and kept up to date. {theme.blurb}.
+              </p>
             </div>
           </div>
 

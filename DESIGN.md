@@ -131,13 +131,15 @@ placeholder; never a stock photo pretending to be the place.
   well-established pet-care knowledge (never claims about businesses).
 
 ### Header
-Sticky, translucent (`backdrop-blur`) with a hairline bottom border.
-Below `lg` the category nav collapses into a full-screen menu
-(`MobileMenu.tsx`, rendered through a portal because the header's
-backdrop-filter would clip a fixed overlay). Nav
-links carry no border at rest; on hover/focus a muted-brand pill
-(`.pill-hover` in `design-tokens.css`) fades in around the link,
-200ms ease-out. Logo SVG unchanged.
+Zocdoc pattern: logo left; on the right a tinted **Browse ▾** button
+(dropdown panel with all 6 categories, `BrowseMenu.tsx`), plain text
+links **Help** (→ `/how-it-works/`) and **List your business on
+pawenn**, a thin vertical divider, then one bright primary button
+**Find pet care** (brand orange, → `/#search`). No "Log in / Sign up" -
+the product has no accounts. Sticky and translucent (`backdrop-blur`).
+Below `lg` only logo + a **Browse ▾** button that opens a full-screen
+category menu (`MobileMenu.tsx`, rendered through a portal because the
+header's backdrop-filter would clip a fixed overlay).
 
 ## Motion & Interaction
 

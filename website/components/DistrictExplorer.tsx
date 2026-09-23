@@ -58,44 +58,52 @@ export function DistrictExplorer({
         })}
       </div>
 
-      <div
-        key={selected.slug}
-        role="tabpanel"
-        className="rise-in rounded-[var(--radius-card)] bg-surface p-6 shadow-[var(--shadow-card)] md:p-8"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="flex items-center gap-1.5 text-sm text-foreground/60">
-              <MapPinIcon className="h-4 w-4" />
-              {cityName} district
-            </p>
-            <h3 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">{selected.name}</h3>
+      {/* Every district's panel is server-rendered (inactive ones
+          `hidden`), so crawlers see links to all district pages, not
+          only the selected one. */}
+      {districts.map((district) => (
+        <div
+          key={district.slug}
+          role="tabpanel"
+          hidden={district.slug !== selected.slug}
+          className="rise-in rounded-[var(--radius-card)] bg-surface p-6 shadow-[var(--shadow-card)] md:p-8"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="flex items-center gap-1.5 text-sm text-foreground/60">
+                <MapPinIcon className="h-4 w-4" />
+                {cityName} district
+              </p>
+              <h3 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">{district.name}</h3>
+            </div>
+            <div className="text-right">
+              <p className="font-heading text-3xl font-extrabold text-brand-orange md:text-4xl">{district.total}</p>
+              <p className="text-xs text-foreground/60">{district.total === 1 ? "place listed" : "places listed"}</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="font-heading text-3xl font-extrabold text-brand-orange md:text-4xl">{selected.total}</p>
-            <p className="text-xs text-foreground/60">{selected.total === 1 ? "place listed" : "places listed"}</p>
-          </div>
-        </div>
 
-        <ul className="mt-6 space-y-2">
-          {selected.byCategory.map((c) => (
-            <li key={c.categorySlug}>
-              <Link
-                href={`/${c.categorySlug}/${citySlug}/${selected.slug}/`}
-                className="group flex items-center gap-3 rounded-[var(--radius-control)] p-2.5 transition hover:bg-surface-sunken"
-                style={{ "--accent": CATEGORY_THEME[c.category].accent } as React.CSSProperties}
-              >
-                <span className="accent-soft flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-                  <CategoryIcon category={c.category} className="h-5 w-5" />
-                </span>
-                <span className="flex-1 font-medium text-foreground">{c.categoryLabel}</span>
-                <span className="text-sm text-foreground/60">{c.count}</span>
-                <ArrowRightIcon className="h-4 w-4 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-brand-blue" />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+          <ul className="mt-6 space-y-2">
+            {district.byCategory.map((c) => (
+              <li key={c.categorySlug}>
+                <Link
+                  href={`/${c.categorySlug}/${citySlug}/${district.slug}/`}
+                  className="group flex items-center gap-3 rounded-[var(--radius-control)] p-2.5 transition hover:bg-surface-sunken"
+                  style={{ "--accent": CATEGORY_THEME[c.category].accent } as React.CSSProperties}
+                >
+                  <span className="accent-soft flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                    <CategoryIcon category={c.category} className="h-5 w-5" />
+                  </span>
+                  <span className="flex-1 font-medium text-foreground">
+                    {c.categoryLabel} <span className="sr-only">in {district.name}</span>
+                  </span>
+                  <span className="text-sm text-foreground/60">{c.count}</span>
+                  <ArrowRightIcon className="h-4 w-4 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-brand-blue" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }

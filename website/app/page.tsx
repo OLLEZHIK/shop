@@ -126,9 +126,9 @@ export default async function HomePage() {
               {counts.total} pet services across {cityName}
             </p>
             <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] text-foreground sm:text-5xl md:text-6xl xl:text-7xl">
-              Good care for your pet,{" "}
+              Find trusted{" "}
               <span className="relative whitespace-nowrap text-brand-orange">
-                close to home
+                pet services
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 300 16"
@@ -137,14 +137,15 @@ export default async function HomePage() {
                 >
                   <path d="M3 12C60 4 140 2 297 8" stroke="currentColor" strokeWidth="5" strokeLinecap="round" fill="none" />
                 </svg>
-              </span>
+              </span>{" "}
+              in {cityName}
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg text-foreground/70 lg:mx-0">
               Groomers, vets, pet hotels and trainers in {cityName} - with honest details, clear sources and one-tap
               contact.
             </p>
 
-            <div className="mt-8 lg:max-w-none">
+            <div id="search" className="mt-8 scroll-mt-28 lg:max-w-none">
               <HomeSearch
                 citySlug={citySlug}
                 cityName={cityName}

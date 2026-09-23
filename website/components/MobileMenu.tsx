@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import type { BusinessCategory } from "@prisma/client";
 import { CategoryIcon } from "./CategoryIcon";
-import { ArrowRightIcon, CloseIcon, MenuIcon } from "./icons";
+import { ArrowRightIcon, ChevronDownIcon, CloseIcon } from "./icons";
 
 interface MenuLink {
   href: string;
@@ -38,11 +38,12 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Open menu"
+        aria-label="Browse services"
         aria-expanded={open}
-        className="flex h-11 w-11 items-center justify-center rounded-full bg-surface text-foreground shadow-[var(--shadow-card)] lg:hidden"
+        className="inline-flex h-11 items-center gap-1.5 rounded-[var(--radius-control)] bg-surface-sunken px-4 font-medium text-foreground lg:hidden"
       >
-        <MenuIcon className="h-5 w-5" />
+        Browse
+        <ChevronDownIcon className="h-4 w-4" />
       </button>
 
       {/* Portal: the sticky header's backdrop-filter would otherwise
@@ -93,7 +94,7 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                 href="/how-it-works/"
                 className="flex items-center justify-between rounded-[var(--radius-control)] bg-surface px-4 py-3.5 font-medium"
               >
-                How pawenn works
+                Help - how pawenn works
                 <ArrowRightIcon className="h-4 w-4 text-foreground/50" />
               </Link>
               <Link

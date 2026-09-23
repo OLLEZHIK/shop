@@ -3,6 +3,7 @@ import { getDefaultCity } from "@/lib/data";
 import { ALL_CATEGORY_SLUGS, CATEGORY_LABELS, CATEGORY_THEME, categoryEnumFromSlug } from "@/lib/categories";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
+import { BrowseMenu } from "./BrowseMenu";
 
 export async function Header() {
   const city = await getDefaultCity();
@@ -20,35 +21,39 @@ export async function Header() {
   });
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:py-4">
         <Link href="/" aria-label="pawenn home" className="flex shrink-0 items-center">
-          <Logo className="h-9 w-auto" />
+          <Logo className="h-9 w-auto md:h-10" />
         </Link>
 
-        <nav className="hidden items-center gap-0.5 text-sm lg:flex" aria-label="Categories">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="pill-hover px-3 py-1.5 font-medium text-foreground/75">
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-2">
+        {/* Zocdoc-style: Browse dropdown, plain text links, a divider,
+            then one bright primary button. No log in / sign up - the
+            product has no accounts (PRODUCT.md). */}
+        <nav className="hidden items-center gap-2 lg:flex" aria-label="Main">
+          <BrowseMenu links={links} />
           <Link
             href="/how-it-works/"
-            className="pill-hover hidden px-3 py-1.5 text-sm font-medium text-foreground/75 sm:inline-flex"
+            className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-5 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
           >
-            How it works
+            Help
           </Link>
           <Link
             href="/add-or-fix-listing/"
-            className="hidden rounded-[var(--radius-pill)] bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue md:inline-flex"
+            className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-5 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
           >
-            List your business
+            List your business on pawenn
           </Link>
-          <MobileMenu links={links} />
-        </div>
+          <span aria-hidden="true" className="mx-3 h-8 w-px bg-foreground/15" />
+          <Link
+            href="/#search"
+            className="inline-flex h-12 items-center rounded-[var(--radius-control)] bg-brand-orange px-7 text-[17px] font-semibold text-white transition hover:bg-brand-orange-deep"
+          >
+            Find pet care
+          </Link>
+        </nav>
+
+        <MobileMenu links={links} />
       </div>
     </header>
   );
