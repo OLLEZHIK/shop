@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowRightIcon, MailIcon, ShieldCheckIcon, SparkleIcon, TagIcon } from "@/components/icons";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Add or Fix a Listing - pawenn",
@@ -36,7 +37,7 @@ export default async function AddOrFixListingPage({ params }: { params: Promise<
             prices, or hours on an existing listing? Let us know and we&apos;ll review it.
           </p>
           <a
-            href="mailto:{EMAIL}?subject=Add%20or%20fix%20a%20listing"
+            href={`mailto:${CONTACT_EMAIL}?subject=Add%20or%20fix%20a%20listing`}
             className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-pill)] bg-brand-orange px-6 py-3 font-semibold text-white transition hover:bg-white hover:text-ink"
           >
             <MailIcon className="h-5 w-5" />

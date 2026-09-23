@@ -127,6 +127,7 @@ const en = {
   } as Record<string, string>,
   home: {
     metaTitle: (city: string) => `pawenn - Pet Services in ${city}`,
+    ogTagline: (city: string) => `Pet services in ${city}`,
     metaDescription: (city: string) =>
       `Find trusted pet services in ${city} - groomers, vets, hotels, training and more`,
     badge: (n: number, city: string) => `${n} pet services across ${city}`,
@@ -429,6 +430,7 @@ const sk: Dictionary = {
   },
   home: {
     metaTitle: (city: string) => `pawenn - Služby pre zvieratá v meste ${city}`,
+    ogTagline: (city: string) => `Služby pre zvieratá v meste ${city}`,
     metaDescription: (city: string) =>
       `Overené služby pre zvieratá v meste ${city} - psie salóny, veterinári, hotely pre zvieratá, výcvik a ďalšie`,
     badge: (n: number, city: string) =>

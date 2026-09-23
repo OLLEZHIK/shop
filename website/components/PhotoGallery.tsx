@@ -69,21 +69,45 @@ export function PhotoGallery({ photoUrls, alt, variant = "card", className }: Ph
   );
 }
 
+// One paw print as a <g>, not <symbol>+<use id>: this renders on every
+// card of a listing, and duplicate ids in one document would make <use>
+// references resolve unpredictably.
+function PawMark({ transform, opacity = 1 }: { transform?: string; opacity?: number }) {
+  return (
+    <g transform={transform} opacity={opacity}>
+      <ellipse cx="10" cy="13.2" rx="4.2" ry="3.4" />
+      <ellipse cx="4.6" cy="8.6" rx="1.7" ry="2.1" />
+      <ellipse cx="8.3" cy="5.8" rx="1.6" ry="2" />
+      <ellipse cx="11.7" cy="5.8" rx="1.6" ry="2" />
+      <ellipse cx="15.4" cy="8.6" rx="1.7" ry="2.1" />
+    </g>
+  );
+}
+
 function PhotoPlaceholder({ variant, className }: { variant: "card" | "detail"; className?: string }) {
   const aspect = variant === "card" ? "aspect-square" : "aspect-video";
   return (
     <div
-      className={`flex items-center justify-center rounded-[var(--radius-card)] ${aspect} ${className ?? ""}`}
+      className={`relative flex items-center justify-center overflow-hidden rounded-[var(--radius-card)] ${aspect} ${className ?? ""}`}
       style={{
         background: "linear-gradient(135deg, var(--brand-orange-muted), var(--brand-blue-muted))",
       }}
     >
-      <svg viewBox="0 0 20 20" fill="currentColor" className="h-8 w-8 text-white/70" aria-hidden="true">
-        <ellipse cx="10" cy="13.2" rx="4.2" ry="3.4" />
-        <ellipse cx="4.6" cy="8.6" rx="1.7" ry="2.1" />
-        <ellipse cx="8.3" cy="5.8" rx="1.6" ry="2" />
-        <ellipse cx="11.7" cy="5.8" rx="1.6" ry="2" />
-        <ellipse cx="15.4" cy="8.6" rx="1.7" ry="2.1" />
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="absolute inset-0 h-full w-full text-white"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <PawMark transform="translate(-2 2) scale(0.7) rotate(-18 10 13)" opacity={0.35} />
+        <PawMark transform="translate(76 -4) scale(0.85) rotate(22 10 13)" opacity={0.35} />
+        <PawMark transform="translate(-6 68) scale(0.8) rotate(12 10 13)" opacity={0.35} />
+        <PawMark transform="translate(74 74) scale(0.9) rotate(-15 10 13)" opacity={0.35} />
+        <PawMark transform="translate(32 -10) scale(0.6) rotate(8 10 13)" opacity={0.3} />
+      </svg>
+      <svg viewBox="0 0 20 20" fill="currentColor" className="relative h-10 w-10 text-white drop-shadow-sm" aria-hidden="true">
+        <PawMark />
       </svg>
     </div>
   );

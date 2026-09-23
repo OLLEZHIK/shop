@@ -1,33 +1,27 @@
-// Soft, out-of-focus color underneath a page's content - two or three
-// organic blob shapes in muted brand tones, blurred and low-opacity.
-// Purely decorative: aria-hidden, no pointer events, sits behind
-// everything else on the page. Reused wherever the brief calls for an
-// "ambient" backdrop (homepage hero, business detail page) instead of
-// being redrawn per page.
+// A single blurred paw silhouette - the same ellipse cluster as PawIcon,
+// scaled up and blurred so it reads as an out-of-focus shape.
+function PawSilhouette({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className={className} aria-hidden="true">
+      <ellipse cx="10" cy="13.2" rx="4.2" ry="3.4" />
+      <ellipse cx="4.6" cy="8.6" rx="1.7" ry="2.1" />
+      <ellipse cx="8.3" cy="5.8" rx="1.6" ry="2" />
+      <ellipse cx="11.7" cy="5.8" rx="1.6" ry="2" />
+      <ellipse cx="15.4" cy="8.6" rx="1.7" ry="2.1" />
+    </svg>
+  );
+}
+
+// Soft, out-of-focus backdrop underneath a page's content: blurred,
+// low-opacity paw silhouettes in brand tones (owner asked for paws
+// instead of plain colour blobs). Purely decorative: aria-hidden, no
+// pointer events, sits behind everything else on the page.
 export function AmbientBackground() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      <div
-        className="absolute -left-24 -top-32 h-[420px] w-[420px] opacity-[0.14] blur-3xl"
-        style={{
-          background: "var(--brand-orange)",
-          borderRadius: "42% 58% 63% 37% / 41% 45% 55% 59%",
-        }}
-      />
-      <div
-        className="absolute -right-32 top-10 h-[360px] w-[360px] opacity-[0.12] blur-3xl"
-        style={{
-          background: "var(--brand-blue)",
-          borderRadius: "63% 37% 41% 59% / 51% 44% 56% 49%",
-        }}
-      />
-      <div
-        className="absolute left-1/3 top-[55%] h-[300px] w-[300px] opacity-[0.10] blur-3xl"
-        style={{
-          background: "var(--brand-green)",
-          borderRadius: "55% 45% 37% 63% / 49% 59% 41% 51%",
-        }}
-      />
+      <PawSilhouette className="absolute -left-28 -top-36 h-[440px] w-[440px] rotate-[-22deg] text-brand-orange opacity-[0.16] blur-3xl" />
+      <PawSilhouette className="absolute -right-36 top-4 h-[380px] w-[380px] rotate-[18deg] text-brand-blue opacity-[0.14] blur-3xl" />
+      <PawSilhouette className="absolute left-1/3 top-[52%] h-[320px] w-[320px] rotate-[8deg] text-brand-green opacity-[0.12] blur-3xl" />
     </div>
   );
 }

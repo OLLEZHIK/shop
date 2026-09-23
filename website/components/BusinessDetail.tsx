@@ -12,7 +12,7 @@ import type { BusinessWithRelations } from "@/lib/data";
 import { CATEGORY_THEME, businessPath, categoryLabel, listingPath } from "@/lib/categories";
 import { formatDate as formatLocaleDate, getDictionary, localesForCountry, type Locale } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
-import { SITE_URL } from "@/lib/site";
+import { CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PartnerBadge } from "@/components/PartnerBadge";
@@ -369,7 +369,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
               </p>
             )}
             <a
-              href={`mailto:{EMAIL}?subject=${encodeURIComponent(`Report an issue: ${business.name}`)}`}
+              href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Report an issue: ${business.name}`)}`}
               className="mt-1 inline-block hover:underline"
             >
               {t.business.reportIssue}
