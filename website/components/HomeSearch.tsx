@@ -87,7 +87,9 @@ export function HomeSearch({
   }
 
   const petChips = (
-    <div className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
+    // py-2: room inside the horizontal scroller for the hover lift and
+    // ring - overflow-x clips vertically too.
+    <div className="-mx-4 mt-0.5 flex gap-2 overflow-x-auto px-4 py-2 [scrollbar-width:none]">
       {visibleAnimals.map((value) => {
         const active = animal === value;
         return (
