@@ -146,7 +146,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
       />
 
       {/* ---------- Header band ---------- */}
-      <section className="relative overflow-hidden border-b border-line">
+      <section className="under-header relative overflow-hidden border-b border-line">
         <AmbientBackground />
         <div
           aria-hidden="true"

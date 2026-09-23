@@ -129,7 +129,6 @@ const en = {
     metaTitle: (city: string) => `pawenn - Pet Services in ${city}`,
     metaDescription: (city: string) =>
       `Find trusted pet services in ${city} - groomers, vets, hotels, training and more`,
-    badge: (n: number, city: string) => `${n} pet services across ${city}`,
     h1Before: "Find trusted",
     h1Highlight: "pet services",
     subtitle: (city: string) =>
@@ -292,6 +291,11 @@ const en = {
     allOf: (city: string) => `All of ${city}`,
     results: (n: number) => `${n} ${n === 1 ? "result" : "results"}`,
     forAnimal: (animal: string) => ` for ${animal.toLowerCase()}`,
+    unconfirmedTitle: (animal: string) => `Not yet confirmed for ${animal.toLowerCase()}`,
+    unconfirmedBody:
+      "These places haven't told us whether they cater for this pet. Many do - give them a quick call before you go.",
+    moreToCheck: (n: number) => `${n} more to check`,
+    confirmedFor: (n: number, animal: string) => `${n} confirmed for ${animal.toLowerCase()}`,
     fairTurn: "order changes daily so everyone gets a fair turn",
     nearest: "nearest first",
     kmAway: (km: string) => `${km} km away`,
@@ -431,8 +435,6 @@ const sk: Dictionary = {
     metaTitle: (city: string) => `pawenn - Služby pre zvieratá v meste ${city}`,
     metaDescription: (city: string) =>
       `Overené služby pre zvieratá v meste ${city} - psie salóny, veterinári, hotely pre zvieratá, výcvik a ďalšie`,
-    badge: (n: number, city: string) =>
-      `${n} ${plural("sk", n, { one: "služba", few: "služby", other: "služieb" })} pre zvieratá v meste ${city}`,
     h1Before: "Nájdite overené",
     h1Highlight: "služby pre zvieratá",
     subtitle: (city: string) =>
@@ -604,6 +606,11 @@ const sk: Dictionary = {
     allOf: (city: string) => `Celá ${city}`,
     results: (n: number) => `${n} ${plural("sk", n, { one: "výsledok", few: "výsledky", other: "výsledkov" })}`,
     forAnimal: (animal: string) => ` - ${animal.toLowerCase()}`,
+    unconfirmedTitle: (animal: string) => `Zatiaľ nepotvrdené: ${animal.toLowerCase()}`,
+    unconfirmedBody:
+      "Tieto podniky nám zatiaľ neuviedli, či sa venujú aj tomuto zvieraťu. Mnohé áno - pred návštevou im radšej zavolajte.",
+    moreToCheck: (n: number) => `ďalšie na overenie: ${n}`,
+    confirmedFor: (n: number, animal: string) => `${cap(animal)} – potvrdené: ${n}`,
     fairTurn: "poradie sa mení každý deň, aby mal každý rovnakú šancu",
     nearest: "najbližšie ako prvé",
     kmAway: (km: string) => `${km} km od vás`,

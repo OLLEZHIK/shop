@@ -24,6 +24,7 @@ import { FilterPanel } from "./FilterPanel";
 import { EmptyState } from "./EmptyState";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { CategoryIcon } from "./CategoryIcon";
+import { AnimalIcon } from "./AnimalIcon";
 import { ArrowRightIcon, RouteIcon } from "./icons";
 
 interface CategoryListingProps {
@@ -56,8 +57,12 @@ export async function CategoryListing({
   // Ignore a pet this service isn't for (e.g. ?animal=bird on dog training).
   const animal =
     isAnimal(requestedAnimal) && animalsForService(category).includes(requestedAnimal) ? requestedAnimal : undefined;
-  const [found, aggregates, districts, priceTiers, districtCounts] = await Promise.all([
-    searchBusinesses({ category, citySlug, districtSlug, animal }),
+  // With a pet filter we still load the whole list: most places haven't
+  // told us every pet they cater for yet (Business.animals is mostly just
+  // dog/cat), so an unconfirmed place is shown in a second, clearly
+  // labelled group instead of vanishing from an empty result.
+  const [all, aggregates, districts, priceTiers, districtCounts] = await Promise.all([
+    searchBusinesses({ category, citySlug, districtSlug }),
     getCategoryAggregates(category, districtSlug),
     getAllDistricts(),
     getPriceTierMap(category),
@@ -75,13 +80,17 @@ export async function CategoryListing({
   // "Near me": sort by distance from the visitor, places without
   // coordinates last (in their usual daily order).
   const origin = parseNear(near);
-  const withDistance = found.map((b) => ({
+  const found = animal ? all.filter((b) => b.animals.includes(animal)) : all;
+  const unconfirmed = animal ? all.filter((b) => !b.animals.includes(animal)) : [];
+  const toItem = (b: (typeof all)[number]) => ({
     business: b,
     km: origin && b.lat !== null && b.lng !== null ? distanceKm(origin.lat, origin.lng, b.lat, b.lng) : null,
-  }));
-  if (origin) {
-    withDistance.sort((a, b) => (a.km ?? Infinity) - (b.km ?? Infinity));
-  }
+  });
+  const byDistance = (a: { km: number | null }, b: { km: number | null }) => (a.km ?? Infinity) - (b.km ?? Infinity);
+  const withDistance = found.map(toItem);
+  const unconfirmedItems = unconfirmed.map(toItem);
+  if (origin) unconfirmedItems.sort(byDistance);
+  if (origin) withDistance.sort(byDistance);
 
   const faqs = buildFaqs({ locale, category, where, aggregates });
   const countLabel = aggregates.count === 1 ? categorySingular(category, locale) : label.toLowerCase();
@@ -89,7 +98,7 @@ export async function CategoryListing({
   return (
     <main style={{ "--accent": theme.accent } as React.CSSProperties}>
       {/* ---------- Header band ---------- */}
-      <section className="relative overflow-hidden border-b border-line">
+      <section className="under-header relative overflow-hidden border-b border-line">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full opacity-[0.14] blur-3xl"
@@ -180,13 +189,13 @@ export async function CategoryListing({
 
           <p className="mt-6 flex items-center gap-1.5 text-sm text-foreground/60">
             {origin && <RouteIcon className="h-4 w-4 text-brand-blue" />}
-            {t.listing.results(found.length)}
-            {animal && t.animals[animal] ? t.listing.forAnimal(t.animals[animal]) : ""} ·{" "}
+            {animal ? t.listing.confirmedFor(found.length, t.animals[animal]) : t.listing.results(found.length)}
+            {unconfirmed.length > 0 ? ` · ${t.listing.moreToCheck(unconfirmed.length)}` : ""} ·{" "}
             {origin ? t.listing.nearest : t.listing.fairTurn}
           </p>
 
           <div className="mt-3 space-y-4">
-            {found.length === 0 ? (
+            {found.length === 0 && unconfirmed.length === 0 ? (
               <EmptyState resetHref={resetHref} locale={locale} />
             ) : (
               withDistance.map(({ business, km }) => (
@@ -200,6 +209,29 @@ export async function CategoryListing({
               ))
             )}
           </div>
+
+          {animal && unconfirmedItems.length > 0 && (
+            <section className="mt-10">
+              <div className="rounded-[var(--radius-card)] border border-dashed border-brand-amber/50 bg-brand-amber/5 p-5">
+                <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
+                  <AnimalIcon animal={animal} className="h-5 w-5 text-brand-amber" />
+                  {t.listing.unconfirmedTitle(t.animals[animal])}
+                </h2>
+                <p className="mt-1 text-sm text-foreground/70">{t.listing.unconfirmedBody}</p>
+              </div>
+              <div className="mt-4 space-y-4">
+                {unconfirmedItems.map(({ business, km }) => (
+                  <BusinessCard
+                    key={business.id}
+                    business={business}
+                    priceTier={priceTiers.get(business.id) ?? null}
+                    locale={locale}
+                    distanceKm={km}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
 
           {faqs.length > 0 && (
             <section className="mt-16">

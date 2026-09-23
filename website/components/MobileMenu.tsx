@@ -7,7 +7,6 @@ import type { CityPointLite } from "@/lib/geo";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import type { ServiceLink } from "./BrowseMenu";
 import { CategoryIcon } from "./CategoryIcon";
-import { LanguageSwitch } from "./LanguageSwitch";
 import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MapPinIcon, ShopBagIcon } from "./icons";
 import { useServiceNavigation } from "./useServiceNavigation";
 import { openSearch } from "./SearchDialog";
@@ -17,12 +16,11 @@ interface MobileMenuProps {
   services: ServiceLink[];
   cities: CityPointLite[];
   defaultCitySlug: string;
-  locales: Locale[];
 }
 
 // Full-screen two-level menu for small screens (the desktop Browse
 // dropdown is hidden below `lg`): Services, then Food & supplements.
-export function MobileMenu({ locale, services, cities, defaultCitySlug, locales }: MobileMenuProps) {
+export function MobileMenu({ locale, services, cities, defaultCitySlug }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   const t = getDictionary(locale);
   const { open: openService, pending } = useServiceNavigation(locale, cities, defaultCitySlug, () => setOpen(false));
@@ -61,7 +59,6 @@ export function MobileMenu({ locale, services, cities, defaultCitySlug, locales 
             <div className="flex items-center justify-between px-4 py-3">
               <span className="font-heading text-lg font-bold">{t.nav.browse}</span>
               <div className="flex items-center gap-2">
-                {locales.length > 1 && <LanguageSwitch locales={locales} />}
                 <button
                   type="button"
                   onClick={() => setOpen(false)}

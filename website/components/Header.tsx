@@ -1,18 +1,17 @@
 import Link from "next/link";
 import { getAllDistricts, getDefaultCity, getCityPoints } from "@/lib/data";
 import { ALL_CATEGORIES, CATEGORY_THEME, categoryBlurb, categoryLabel, categorySlug, listingPath } from "@/lib/categories";
-import { getDictionary, localePath, localesForCountry, type Locale } from "@/lib/i18n";
+import { getDictionary, localePath, type Locale } from "@/lib/i18n";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 import { BrowseMenu, type ServiceLink } from "./BrowseMenu";
-import { LanguageSwitch } from "./LanguageSwitch";
 import { FindCareButton, SearchDialog } from "./SearchDialog";
+import { HeaderShell } from "./HeaderShell";
 
 export async function Header({ locale }: { locale: Locale }) {
   const [city, cityPoints, districts] = await Promise.all([getDefaultCity(), getCityPoints(), getAllDistricts()]);
   const citySlug = city?.slug ?? "";
   const t = getDictionary(locale);
-  const locales = localesForCountry(city?.country);
 
   const services: ServiceLink[] = ALL_CATEGORIES.map((category) => ({
     href: listingPath(locale, category, citySlug),
@@ -32,7 +31,7 @@ export async function Header({ locale }: { locale: Locale }) {
     .map((d) => ({ slug: d.slug, label: d.name }));
 
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+    <HeaderShell>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:py-4">
         <Link href={localePath(locale, "/")} aria-label="pawenn home" className="flex shrink-0 items-center">
           <Logo className="h-9 w-auto md:h-10" />
@@ -63,7 +62,6 @@ export async function Header({ locale }: { locale: Locale }) {
             {t.nav.listBusiness}
           </Link>
           <span aria-hidden="true" className="mx-2 h-8 w-px bg-foreground/15" />
-          {locales.length > 1 && <LanguageSwitch locales={locales} />}
           <FindCareButton
             label={t.nav.findCare}
             className="ml-2 inline-flex h-12 items-center rounded-[var(--radius-control)] bg-brand-orange px-6 text-[17px] font-semibold text-white transition hover:bg-brand-orange-deep"
@@ -82,7 +80,6 @@ export async function Header({ locale }: { locale: Locale }) {
           services={services}
           cities={cities}
           defaultCitySlug={citySlug}
-          locales={locales}
           />
         </div>
       </div>
@@ -94,6 +91,6 @@ export async function Header({ locale }: { locale: Locale }) {
         categories={searchCategories}
         districts={searchDistricts}
       />
-    </header>
+    </HeaderShell>
   );
 }

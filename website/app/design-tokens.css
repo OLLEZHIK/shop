@@ -45,6 +45,16 @@
   --shadow-card: 0 1px 2px rgba(20, 22, 27, 0.04), 0 8px 24px -12px rgba(20, 22, 27, 0.12);
   --shadow-card-hover: 0 2px 6px rgba(20, 22, 27, 0.06), 0 22px 44px -16px rgba(20, 22, 27, 0.24);
   --shadow-panel: 0 24px 60px -20px rgba(11, 37, 69, 0.28);
+
+  /* Sticky header height (components/Header.tsx: h-11 + py-3 on phones,
+     h-12 + py-4 from md). Used to slide page heroes under it. */
+  --header-h: 68px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 80px;
+  }
 }
 
 @theme inline {
@@ -139,4 +149,21 @@
 }
 .float-y {
   animation: float-y 6s ease-in-out infinite;
+}
+
+/* Short shake to point at a step the visitor skipped. */
+@keyframes nudge {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.nudge {
+  animation: nudge 300ms ease-in-out 2;
+}
+
+/* Seamless header: the first band of a page starts under the
+   transparent header, so its background runs to the top of the screen. */
+.under-header {
+  margin-top: calc(-1 * var(--header-h));
+  padding-top: var(--header-h);
 }
