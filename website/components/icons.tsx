@@ -273,3 +273,31 @@ export function MailIcon({ className }: IconProps) {
     </StrokeIcon>
   );
 }
+
+export function RabbitIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M8 8.5C6.8 6.5 6.3 3.8 7.3 3c1-.8 2.4 1.7 2.7 4.6M12 8.5c1.2-2 1.7-4.7.7-5.5-1-.8-2.4 1.7-2.7 4.6" />
+      <circle cx="10" cy="12.2" r="4.5" />
+      <path d="M8.4 11.6h.01M11.6 11.6h.01M9.3 13.6c.4.3 1 .3 1.4 0" />
+    </StrokeIcon>
+  );
+}
+
+export function BirdIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M3 14.5c4 1.2 9 .4 11.5-3.8L17 9l-2.6-.8A4.2 4.2 0 0 0 7 9.7L3 14.5Z" />
+      <path d="M12.2 7.8h.01M8 14.8l-1 2.4M10.5 14.6l-.4 2.6" />
+    </StrokeIcon>
+  );
+}
+
+export function FishIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M2.8 10c2.3-3.4 5.5-4.6 8.6-4.6 2.7 0 4.8 1.9 5.8 4.6-1 2.7-3.1 4.6-5.8 4.6-3.1 0-6.3-1.2-8.6-4.6Z" />
+      <path d="M2.8 10 1.5 7.5M2.8 10l-1.3 2.5M13.4 9.2h.01" />
+    </StrokeIcon>
+  );
+}

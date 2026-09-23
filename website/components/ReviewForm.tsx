@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { getDictionary, type Locale } from "@/lib/i18n";
 
-export function ReviewForm({ businessId }: { businessId: number }) {
+export function ReviewForm({ businessId, locale }: { businessId: number; locale: Locale }) {
+  const t = getDictionary(locale).reviewForm;
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -28,20 +30,20 @@ export function ReviewForm({ businessId }: { businessId: number }) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Something went wrong.");
+        throw new Error(data.error ?? t.error);
       }
       setStatus("done");
       formEl.reset();
     } catch (err) {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : t.error);
     }
   }
 
   if (status === "done") {
     return (
       <p className="rounded-lg bg-brand-green/10 p-4 text-brand-green">
-        Thanks, your review will appear after it&apos;s checked.
+        {t.thanks}
       </p>
     );
   }
@@ -50,7 +52,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
         <label htmlFor="authorName" className="block text-sm font-medium text-foreground">
-          Your name
+          {t.name}
         </label>
         <input
           id="authorName"
@@ -63,7 +65,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
 
       <div>
         <label htmlFor="rating" className="block text-sm font-medium text-foreground">
-          Rating
+          {t.rating}
         </label>
         <select
           id="rating"
@@ -74,7 +76,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
         >
           {[5, 4, 3, 2, 1].map((n) => (
             <option key={n} value={n}>
-              {n} {n === 1 ? "star" : "stars"}
+              {t.stars(n)}
             </option>
           ))}
         </select>
@@ -82,7 +84,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
 
       <div>
         <label htmlFor="comment" className="block text-sm font-medium text-foreground">
-          Review
+          {t.review}
         </label>
         <textarea
           id="comment"
@@ -101,7 +103,7 @@ export function ReviewForm({ businessId }: { businessId: number }) {
         disabled={status === "submitting"}
         className="min-h-11 rounded-[var(--radius-pill)] bg-brand-orange px-6 py-2.5 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-60"
       >
-        {status === "submitting" ? "Submitting..." : "Submit review"}
+        {status === "submitting" ? t.submitting : t.submit}
       </button>
     </form>
   );

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { DistrictSummary } from "@/lib/data";
-import { CATEGORY_THEME } from "@/lib/categories";
+import { CATEGORY_THEME, categoryLabel, listingPath } from "@/lib/categories";
+import { getDictionary, type Locale } from "@/lib/i18n";
 import { CategoryIcon } from "./CategoryIcon";
 import { ArrowRightIcon, MapPinIcon } from "./icons";
 
@@ -11,10 +12,12 @@ import { ArrowRightIcon, MapPinIcon } from "./icons";
 // listing counts; the panel shows the district's categories as links
 // straight into the district listing pages.
 export function DistrictExplorer({
+  locale,
   districts,
   citySlug,
   cityName,
 }: {
+  locale: Locale;
   districts: DistrictSummary[];
   citySlug: string;
   cityName: string;
@@ -23,11 +26,12 @@ export function DistrictExplorer({
   const selected = districts.find((d) => d.slug === selectedSlug) ?? districts[0];
   if (!selected) return null;
 
+  const t = getDictionary(locale).explorer;
   const max = Math.max(...districts.map((d) => d.total));
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-      <div className="flex flex-wrap content-start gap-2" role="tablist" aria-label="Districts">
+      <div className="flex flex-wrap content-start gap-2" role="tablist" aria-label={t.tabs}>
         {districts.map((d) => {
           const active = d.slug === selected.slug;
           // 0..1 weight for a subtle size/intensity scale.
@@ -72,13 +76,13 @@ export function DistrictExplorer({
             <div>
               <p className="flex items-center gap-1.5 text-sm text-foreground/60">
                 <MapPinIcon className="h-4 w-4" />
-                {cityName} district
+                {t.district(cityName)}
               </p>
               <h3 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">{district.name}</h3>
             </div>
             <div className="text-right">
               <p className="font-heading text-3xl font-extrabold text-brand-orange md:text-4xl">{district.total}</p>
-              <p className="text-xs text-foreground/60">{district.total === 1 ? "place listed" : "places listed"}</p>
+              <p className="text-xs text-foreground/60">{t.placesListed(district.total)}</p>
             </div>
           </div>
 
@@ -86,7 +90,7 @@ export function DistrictExplorer({
             {district.byCategory.map((c) => (
               <li key={c.categorySlug}>
                 <Link
-                  href={`/${c.categorySlug}/${citySlug}/${district.slug}/`}
+                  href={listingPath(locale, c.category, citySlug, district.slug)}
                   className="group flex items-center gap-3 rounded-[var(--radius-control)] p-2.5 transition hover:bg-surface-sunken"
                   style={{ "--accent": CATEGORY_THEME[c.category].accent } as React.CSSProperties}
                 >
@@ -94,7 +98,7 @@ export function DistrictExplorer({
                     <CategoryIcon category={c.category} className="h-5 w-5" />
                   </span>
                   <span className="flex-1 font-medium text-foreground">
-                    {c.categoryLabel} <span className="sr-only">in {district.name}</span>
+                    {categoryLabel(c.category, locale)} <span className="sr-only">– {district.name}</span>
                   </span>
                   <span className="text-sm text-foreground/60">{c.count}</span>
                   <ArrowRightIcon className="h-4 w-4 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-brand-blue" />

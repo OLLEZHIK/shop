@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dropdown } from "./Dropdown";
-import { DogIcon, CatIcon, ChevronDownIcon, MapPinIcon, SearchIcon } from "./icons";
+import { ChevronDownIcon, MapPinIcon, SearchIcon } from "./icons";
+import { AnimalIcon } from "./AnimalIcon";
+import { ANIMALS, type Animal } from "@/lib/animals";
+import { getDictionary, localePath, type Locale } from "@/lib/i18n";
 
 interface Option {
   slug: string;
@@ -11,6 +14,7 @@ interface Option {
 }
 
 interface HomeSearchProps {
+  locale: Locale;
   citySlug: string;
   cityName: string;
   categories: Option[];
@@ -21,12 +25,9 @@ interface HomeSearchProps {
 
 type Overlay = "category" | "district" | null;
 
-const ANIMAL_OPTIONS = [
-  { value: "dog", label: "Dog", icon: <DogIcon className="h-5 w-5 text-brand-orange" /> },
-  { value: "cat", label: "Cat", icon: <CatIcon className="h-5 w-5 text-brand-orange" /> },
-];
 
 export function HomeSearch({
+  locale,
   citySlug,
   cityName,
   categories,
@@ -35,7 +36,13 @@ export function HomeSearch({
   popularDistrictSlugs,
 }: HomeSearchProps) {
   const router = useRouter();
-  const [animal, setAnimal] = useState<"dog" | "cat" | null>(null);
+  const t = getDictionary(locale);
+  const [animal, setAnimal] = useState<Animal | null>(null);
+  const animalOptions = ANIMALS.map((value) => ({
+    value,
+    label: t.animalSingular[value],
+    icon: <AnimalIcon animal={value} className="h-5 w-5 text-brand-orange" />,
+  }));
   const [categorySlug, setCategorySlug] = useState<string | null>(null);
   const [districtSlug, setDistrictSlug] = useState<string | null>(null);
   const [overlay, setOverlay] = useState<Overlay>(null);
@@ -48,7 +55,7 @@ export function HomeSearch({
     if (!finalCategory) return;
     const finalDistrict = overrides?.district !== undefined ? overrides.district : districtSlug;
 
-    let path = `/${finalCategory}/${citySlug}/`;
+    let path = localePath(locale, `/${finalCategory}/${citySlug}/`);
     if (finalDistrict) path += `${finalDistrict}/`;
     if (animal) path += `?animal=${animal}`;
     router.push(path);
@@ -58,10 +65,9 @@ export function HomeSearch({
     <>
       {/* Mobile: one compact card - pet toggle, then service and place */}
       <div className="rounded-[var(--radius-card)] bg-surface p-4 text-left shadow-[var(--shadow-panel)] md:hidden">
-        <p className="px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">1 · Your pet</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {(["dog", "cat"] as const).map((value) => {
-            const Icon = value === "dog" ? DogIcon : CatIcon;
+        <p className="px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">{t.search.stepPet}</p>
+        <div className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
+          {ANIMALS.map((value) => {
             const active = animal === value;
             return (
               <button
@@ -69,30 +75,30 @@ export function HomeSearch({
                 type="button"
                 aria-pressed={active}
                 onClick={() => setAnimal(active ? null : value)}
-                className={`flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-control)] font-semibold capitalize transition ${
+                className={`flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] px-4 font-semibold transition ${
                   active ? "bg-brand-orange text-white" : "bg-surface-sunken text-foreground hover:bg-brand-orange-muted"
                 }`}
               >
-                <Icon className="h-6 w-6" />
-                {value}
+                <AnimalIcon animal={value} className="h-5 w-5" />
+                {t.animalSingular[value]}
               </button>
             );
           })}
         </div>
 
-        <p className="mt-4 px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">2 · Service</p>
+        <p className="mt-4 px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">{t.search.stepService}</p>
         <button
           type="button"
           onClick={() => setOverlay("category")}
           className="mt-2 flex min-h-12 w-full items-center justify-between rounded-[var(--radius-control)] bg-surface-sunken px-4 text-left font-medium"
         >
           <span className={categoryLabel ? "text-foreground" : "text-foreground/55"}>
-            {categoryLabel ?? "What do you need?"}
+            {categoryLabel ?? t.search.servicePlaceholder}
           </span>
           <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
         </button>
 
-        <p className="mt-4 px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">3 · Where</p>
+        <p className="mt-4 px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50">{t.search.stepWhere}</p>
         <button
           type="button"
           onClick={() => setOverlay("district")}
@@ -100,7 +106,7 @@ export function HomeSearch({
         >
           <span className="flex items-center gap-2">
             <MapPinIcon className="h-4 w-4 text-foreground/50" />
-            {districtLabel ?? `All ${cityName}`}
+            {districtLabel ?? t.search.all(cityName)}
           </span>
           <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
         </button>
@@ -112,7 +118,7 @@ export function HomeSearch({
           className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-orange px-6 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-40"
         >
           <SearchIcon className="h-5 w-5" />
-          {categorySlug ? "Show results" : "Pick a service to search"}
+          {categorySlug ? t.search.showResults : t.search.pickService}
         </button>
       </div>
 
@@ -120,20 +126,20 @@ export function HomeSearch({
       <div className="hidden items-center rounded-[var(--radius-pill)] bg-surface p-2 shadow-[var(--shadow-panel)] ring-1 ring-line md:flex">
         <Dropdown
           variant="bar"
-          label="Pet"
-          ariaLabel="Choose pet"
-          placeholder="Dog or cat?"
+          label={t.search.pet}
+          ariaLabel={t.search.pet}
+          placeholder={t.search.petPlaceholder}
           value={animal}
-          options={ANIMAL_OPTIONS}
-          onChange={(v) => setAnimal(v as "dog" | "cat")}
+          options={animalOptions}
+          onChange={(v) => setAnimal(v as Animal)}
           className="flex-1"
         />
         <span aria-hidden="true" className="h-8 w-px bg-line" />
         <Dropdown
           variant="bar"
-          label="Service"
-          ariaLabel="Service needed"
-          placeholder="What do you need?"
+          label={t.search.service}
+          ariaLabel={t.search.service}
+          placeholder={t.search.servicePlaceholder}
           value={categorySlug}
           options={categories.map((c) => ({ value: c.slug, label: c.label }))}
           onChange={setCategorySlug}
@@ -142,9 +148,9 @@ export function HomeSearch({
         <span aria-hidden="true" className="h-8 w-px bg-line" />
         <Dropdown
           variant="bar"
-          label="Where"
-          ariaLabel="Location"
-          placeholder={`All ${cityName}`}
+          label={t.search.where}
+          ariaLabel={t.search.where}
+          placeholder={t.search.all(cityName)}
           value={districtSlug}
           options={districts.map((d) => ({ value: d.slug, label: d.label }))}
           onChange={setDistrictSlug}
@@ -154,19 +160,20 @@ export function HomeSearch({
           type="button"
           disabled={!categorySlug}
           onClick={() => goSearch()}
-          title={categorySlug ? undefined : "Choose a service first"}
+          title={categorySlug ? undefined : t.search.chooseServiceFirst}
           className="ml-2 flex h-14 shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-brand-orange px-7 font-semibold text-white transition hover:bg-brand-orange-deep disabled:opacity-50"
         >
           <SearchIcon className="h-5 w-5" />
-          Search
+          {t.search.search}
         </button>
       </div>
 
       {overlay && (
         <StepOverlay
-          title={overlay === "category" ? "What do you need?" : "Where?"}
-          options={overlay === "category" ? categories : [{ slug: "", label: `All ${cityName}` }, ...districts]}
+          title={overlay === "category" ? t.search.servicePlaceholder : t.search.where}
+          options={overlay === "category" ? categories : [{ slug: "", label: t.search.all(cityName) }, ...districts]}
           popularSlugs={overlay === "category" ? popularCategorySlugs : popularDistrictSlugs}
+          labels={{ close: t.search.close, popular: t.search.popular }}
           onClose={() => setOverlay(null)}
           onSelect={(slug) => {
             if (overlay === "category") {
@@ -187,12 +194,14 @@ function StepOverlay({
   title,
   options,
   popularSlugs,
+  labels,
   onClose,
   onSelect,
 }: {
   title: string;
   options: Option[];
   popularSlugs: string[];
+  labels: { close: string; popular: string };
   onClose: () => void;
   onSelect: (slug: string) => void;
 }) {
@@ -209,7 +218,7 @@ function StepOverlay({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={labels.close}
           className="flex h-11 w-11 items-center justify-center rounded-full text-2xl text-foreground/60 hover:bg-gray-100"
         >
           &times;
@@ -219,7 +228,7 @@ function StepOverlay({
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {popular.length > 0 && (
           <div className="mb-6">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">Popular</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">{labels.popular}</p>
             <div className="flex flex-wrap gap-2">
               {popular.map((o) => (
                 <button

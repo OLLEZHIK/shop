@@ -1,20 +1,26 @@
 import Link from "next/link";
 import type { BusinessWithRelations } from "@/lib/data";
 import { averageRating, publicDescription } from "@/lib/data";
-import { CATEGORY_LABELS, CATEGORY_THEME } from "@/lib/categories";
+import { CATEGORY_THEME, businessPath, categoryLabel } from "@/lib/categories";
+import { getDictionary, type Locale } from "@/lib/i18n";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { PartnerBadge } from "./PartnerBadge";
 import { QuickActions } from "./QuickActions";
 import { PhotoGallery } from "./PhotoGallery";
 import { BusinessAvatar } from "./BusinessAvatar";
-import { ArrowRightIcon, CatIcon, DogIcon, MapPinIcon } from "./icons";
+import { AnimalIcon } from "./AnimalIcon";
+import { ArrowRightIcon, MapPinIcon, RouteIcon } from "./icons";
 
 interface BusinessCardProps {
   business: BusinessWithRelations;
   priceTier?: number | null;
+  locale: Locale;
+  /** Distance from the visitor, when the list is sorted by "near me". */
+  distanceKm?: number | null;
 }
 
-export function BusinessCard({ business, priceTier = null }: BusinessCardProps) {
+export function BusinessCard({ business, priceTier = null, locale, distanceKm = null }: BusinessCardProps) {
+  const t = getDictionary(locale);
   const rating = averageRating(business.reviews);
   const description = publicDescription(business.notes);
   const accent = CATEGORY_THEME[business.category].accent;
@@ -25,7 +31,7 @@ export function BusinessCard({ business, priceTier = null }: BusinessCardProps) 
       className="group relative flex gap-4 rounded-[var(--radius-card)] border border-transparent bg-surface p-4 shadow-[var(--shadow-card)] transition duration-200 hover:-translate-y-0.5 hover:border-brand-blue-muted-border hover:shadow-[var(--shadow-card-hover)] sm:gap-5 sm:p-5"
       style={{ "--accent": accent } as React.CSSProperties}
     >
-      <Link href={`/business/${business.slug}/`} className="absolute inset-0 z-0 rounded-[var(--radius-card)]" aria-label={business.name} />
+      <Link href={businessPath(locale, business.slug)} className="absolute inset-0 z-0 rounded-[var(--radius-card)]" aria-label={business.name} />
 
       {hasPhotos ? (
         <PhotoGallery
@@ -42,7 +48,7 @@ export function BusinessCard({ business, priceTier = null }: BusinessCardProps) 
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: accent }}>
-              {CATEGORY_LABELS[business.category]}
+              {categoryLabel(business.category, locale)}
             </p>
             <h3 className="mt-0.5 font-heading text-lg font-bold leading-snug text-foreground transition group-hover:text-brand-blue md:text-xl">
               {business.name}
@@ -58,6 +64,12 @@ export function BusinessCard({ business, priceTier = null }: BusinessCardProps) 
               {business.district.name}
             </span>
           )}
+          {distanceKm !== null && (
+            <span className="inline-flex items-center gap-1 font-semibold text-brand-blue">
+              <RouteIcon className="h-3.5 w-3.5" />
+              {t.listing.kmAway(distanceKm < 10 ? distanceKm.toFixed(1) : distanceKm.toFixed(0))}
+            </span>
+          )}
           {rating !== null && (
             <span className="inline-flex items-center gap-1">
               <StarRow rating={rating} />
@@ -66,31 +78,28 @@ export function BusinessCard({ business, priceTier = null }: BusinessCardProps) 
             </span>
           )}
           {priceTier !== null && (
-            <span aria-label={`Price level ${priceTier} of 5`}>
+            <span aria-label={t.card.priceLevel(priceTier)}>
               <span className="font-semibold text-brand-green">{"€".repeat(priceTier)}</span>
               <span className="text-foreground/25">{"€".repeat(5 - priceTier)}</span>
             </span>
           )}
-          {business.animals.map((animal) => {
-            const Icon = animal === "dog" ? DogIcon : animal === "cat" ? CatIcon : null;
-            return (
-              <span
-                key={animal}
-                className="inline-flex items-center gap-1 rounded-[var(--radius-pill)] bg-surface-sunken px-2 py-0.5 text-xs capitalize text-foreground/70"
-              >
-                {Icon && <Icon className="h-3.5 w-3.5" />}
-                {animal}
-              </span>
-            );
-          })}
+          {business.animals.map((animal) => (
+            <span
+              key={animal}
+              className="inline-flex items-center gap-1 rounded-[var(--radius-pill)] bg-surface-sunken px-2 py-0.5 text-xs text-foreground/70"
+            >
+              <AnimalIcon animal={animal} className="h-3.5 w-3.5" />
+              {t.animalSingular[animal] ?? animal}
+            </span>
+          ))}
         </div>
 
         {description && <p className="mt-2 line-clamp-2 text-sm text-foreground/70">{description}</p>}
 
         {(business.verifiedAt || business.featured) && (
           <div className="mt-2.5 flex flex-wrap gap-1.5">
-            <VerifiedBadge verifiedAt={business.verifiedAt} />
-            <PartnerBadge featured={business.featured} />
+            <VerifiedBadge verifiedAt={business.verifiedAt} locale={locale} />
+            <PartnerBadge featured={business.featured} locale={locale} />
           </div>
         )}
 
@@ -101,6 +110,7 @@ export function BusinessCard({ business, priceTier = null }: BusinessCardProps) 
             website={business.website}
             address={business.address}
             size="sm"
+            locale={locale}
           />
         </div>
       </div>

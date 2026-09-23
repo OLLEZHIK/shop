@@ -1,3 +1,4 @@
+import type { Locale } from "./i18n";
 import type { BusinessCategory } from "@prisma/client";
 
 // URL slugs confirmed by keyword research (docs/seo/english-keywords.md) -
@@ -60,3 +61,118 @@ export const CATEGORY_THEME: Record<BusinessCategory, { accent: string; blurb: s
   PET_SHOP: { accent: "var(--cat-shop)", blurb: "Food, toys and everyday supplies" },
   PET_SITTING: { accent: "var(--cat-sitting)", blurb: "Walks, visits and care at home" },
 };
+
+// ---------------------------------------------------------------------
+// Per-locale slugs, labels and blurbs. English values mirror the maps
+// above. Slovak slugs follow the original Slovak URL plan
+// (docs/concept.md section 4, e.g. /psi-salon/) and the owner's example
+// /sk/veterinar/bratislava/; they are provisional until the Slovak
+// keyword research task confirms them.
+// ---------------------------------------------------------------------
+
+const SLUGS: Record<Locale, Record<BusinessCategory, string>> = {
+  en: CATEGORY_ENUM_TO_SLUG,
+  sk: {
+    GROOMING: "psi-salon",
+    VET_CLINIC: "veterinar",
+    PET_HOTEL: "hotel-pre-zvierata",
+    DOG_TRAINING: "vycvik-psov",
+    PET_SHOP: "chovatelske-potreby",
+    PET_SITTING: "opatrovanie-zvierat",
+  },
+};
+
+const LABELS: Record<Locale, Record<BusinessCategory, string>> = {
+  en: CATEGORY_LABELS,
+  sk: {
+    GROOMING: "Psie salóny",
+    VET_CLINIC: "Veterinárne ambulancie",
+    PET_HOTEL: "Hotely pre zvieratá",
+    DOG_TRAINING: "Výcvik psov",
+    PET_SHOP: "Chovateľské potreby",
+    PET_SITTING: "Opatrovanie zvierat",
+  },
+};
+
+const SINGULAR: Record<Locale, Record<BusinessCategory, string>> = {
+  en: CATEGORY_LABELS_SINGULAR,
+  sk: {
+    GROOMING: "psí salón",
+    VET_CLINIC: "veterinárna ambulancia",
+    PET_HOTEL: "hotel pre zvieratá",
+    DOG_TRAINING: "výcvik psa",
+    PET_SHOP: "chovateľské potreby",
+    PET_SITTING: "opatrovanie zvierat",
+  },
+};
+
+const BLURBS: Record<Locale, Record<BusinessCategory, string>> = {
+  en: {
+    GROOMING: CATEGORY_THEME.GROOMING.blurb,
+    VET_CLINIC: CATEGORY_THEME.VET_CLINIC.blurb,
+    PET_HOTEL: CATEGORY_THEME.PET_HOTEL.blurb,
+    DOG_TRAINING: CATEGORY_THEME.DOG_TRAINING.blurb,
+    PET_SHOP: CATEGORY_THEME.PET_SHOP.blurb,
+    PET_SITTING: CATEGORY_THEME.PET_SITTING.blurb,
+  },
+  sk: {
+    GROOMING: "Kúpanie, strihanie, trimovanie a starostlivosť o pazúry",
+    VET_CLINIC: "Prehliadky, očkovanie a pohotovosť",
+    PET_HOTEL: "Bezpečný pobyt, kým ste na cestách",
+    DOG_TRAINING: "Kurzy pre šteňatá, poslušnosť a správanie",
+    PET_SHOP: "Krmivo, hračky a potreby na každý deň",
+    PET_SITTING: "Venčenie, návštevy a starostlivosť doma",
+  },
+};
+
+export const ALL_CATEGORIES: BusinessCategory[] = [
+  "GROOMING",
+  "VET_CLINIC",
+  "PET_HOTEL",
+  "DOG_TRAINING",
+  "PET_SHOP",
+  "PET_SITTING",
+];
+
+export function categorySlug(category: BusinessCategory, locale: Locale): string {
+  return SLUGS[locale][category];
+}
+
+export function categoryFromSlug(slug: string, locale: Locale): BusinessCategory | null {
+  const entry = Object.entries(SLUGS[locale]).find(([, s]) => s === slug);
+  return entry ? (entry[0] as BusinessCategory) : null;
+}
+
+export function categoryLabel(category: BusinessCategory, locale: Locale): string {
+  return LABELS[locale][category];
+}
+
+export function categorySingular(category: BusinessCategory, locale: Locale): string {
+  return SINGULAR[locale][category];
+}
+
+export function categoryBlurb(category: BusinessCategory, locale: Locale): string {
+  return BLURBS[locale][category];
+}
+
+// Locale-aware paths. English is unprefixed; see lib/i18n.ts.
+const BUSINESS_SEGMENT: Record<Locale, string> = { en: "business", sk: "podnik" };
+
+export function businessSegment(locale: Locale): string {
+  return BUSINESS_SEGMENT[locale];
+}
+
+export function listingPath(
+  locale: Locale,
+  category: BusinessCategory,
+  citySlug: string,
+  districtSlug?: string | null
+): string {
+  const base = `/${categorySlug(category, locale)}/${citySlug}/${districtSlug ? `${districtSlug}/` : ""}`;
+  return locale === "en" ? base : `/${locale}${base}`;
+}
+
+export function businessPath(locale: Locale, slug: string): string {
+  const base = `/${BUSINESS_SEGMENT[locale]}/${slug}/`;
+  return locale === "en" ? base : `/${locale}${base}`;
+}
