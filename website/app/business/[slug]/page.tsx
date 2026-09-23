@@ -16,6 +16,7 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { PhotoGallery } from "@/components/PhotoGallery";
 import { BusinessCard, StarRow } from "@/components/BusinessCard";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 interface PageParams {
   slug: string;
@@ -31,9 +32,12 @@ export async function generateMetadata({
   if (!business) return {};
 
   const locationBit = business.district ? `${business.district.name}, ${business.district.city.name}` : "";
+  const title = `${business.name} - ${CATEGORY_LABELS[business.category]}${locationBit ? ` in ${locationBit}` : ""}`;
+  const description = `Contact details, prices and reviews for ${business.name}${locationBit ? ` in ${locationBit}` : ""}.`;
   return {
-    title: `${business.name} - ${CATEGORY_LABELS[business.category]}${locationBit ? ` in ${locationBit}` : ""}`,
-    description: `Contact details, prices and reviews for ${business.name}${locationBit ? ` in ${locationBit}` : ""}.`,
+    title,
+    description,
+    openGraph: { title, description },
   };
 }
 
@@ -288,7 +292,7 @@ export default async function BusinessPage({ params }: { params: Promise<PagePar
           </p>
         )}
         <a
-          href={`mailto:{EMAIL}?subject=${encodeURIComponent(`Report an issue: ${business.name}`)}`}
+          href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Report an issue: ${business.name}`)}`}
           className="mt-1 inline-block hover:underline"
         >
           Report an issue

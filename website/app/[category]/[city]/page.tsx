@@ -36,10 +36,12 @@ export async function generateMetadata({
   const { category, city } = resolved;
   const aggregates = await getCategoryAggregates(category);
   const title = `${CATEGORY_LABELS[category]} in ${city.name}`;
+  const description = `Browse ${aggregates.count} ${CATEGORY_LABELS[category].toLowerCase()} in ${city.name}, checked and kept up to date.`;
 
   return {
     title,
-    description: `Browse ${aggregates.count} ${CATEGORY_LABELS[category].toLowerCase()} in ${city.name}, checked and kept up to date.`,
+    description,
+    openGraph: { title, description },
     robots: aggregates.count < 3 ? { index: false, follow: true } : undefined,
   };
 }
