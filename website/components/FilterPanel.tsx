@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { BusinessCategory } from "@prisma/client";
-import { ANIMALS } from "@/lib/animals";
+import { animalsForService } from "@/lib/animals";
 import { listingPath } from "@/lib/categories";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { AnimalIcon } from "./AnimalIcon";
@@ -53,7 +53,7 @@ export function FilterPanel({
           role="group"
           aria-label={t.listing.filterAnimal}
         >
-          {[null, ...ANIMALS].map((value) => {
+          {[null, ...animalsForService(category)].map((value) => {
             const active = (currentAnimal ?? null) === value;
             return (
               <Link

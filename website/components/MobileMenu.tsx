@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import type { CityPointLite } from "@/lib/geo";
-import { getDictionary, localePath, type Locale } from "@/lib/i18n";
+import { getDictionary, type Locale } from "@/lib/i18n";
 import type { ServiceLink } from "./BrowseMenu";
 import { CategoryIcon } from "./CategoryIcon";
 import { LanguageSwitch } from "./LanguageSwitch";
 import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MapPinIcon, ShopBagIcon } from "./icons";
 import { useServiceNavigation } from "./useServiceNavigation";
+import { openSearch } from "./SearchDialog";
 
 interface MobileMenuProps {
   locale: Locale;
@@ -153,14 +154,17 @@ export function MobileMenu({ locale, services, cities, defaultCitySlug, locales 
                   {t.nav.listYourBusiness}
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
-                <Link
-                  data-close
-                  href={`${localePath(locale, "/")}#search`}
-                  className="flex items-center justify-between rounded-[var(--radius-control)] bg-brand-orange px-4 py-3.5 font-semibold text-white"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    openSearch();
+                  }}
+                  className="flex w-full items-center justify-between rounded-[var(--radius-control)] bg-brand-orange px-4 py-3.5 font-semibold text-white"
                 >
                   {t.nav.findCare}
                   <ArrowRightIcon className="h-4 w-4" />
-                </Link>
+                </button>
               </div>
             </nav>
           </div>,

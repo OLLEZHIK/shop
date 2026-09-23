@@ -128,7 +128,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 locale={locale}
                 citySlug={citySlug}
                 cityName={cityName}
-                categories={categories.map((c) => ({ slug: c.slug, label: c.label }))}
+                categories={categories.map((c) => ({ slug: c.slug, label: c.label, category: c.category }))}
                 popularCategorySlugs={popularCategorySlugs}
                 districts={districtOptions}
                 popularDistrictSlugs={popularNearby.map((p) => p.districtSlug)}

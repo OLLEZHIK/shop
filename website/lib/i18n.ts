@@ -210,6 +210,8 @@ const en = {
     stepWhere: "3 · Where",
     popular: "Popular",
     close: "Close",
+    dialogTitle: "Find pet care",
+    dialogBody: "Pick your pet and what it needs - we'll show the places nearby.",
   },
   explorer: {
     district: (city: string) => `${city} district`,
@@ -514,6 +516,8 @@ const sk: Dictionary = {
     stepWhere: "3 · Kde",
     popular: "Obľúbené",
     close: "Zavrieť",
+    dialogTitle: "Nájsť starostlivosť",
+    dialogBody: "Vyberte zviera a to, čo potrebuje - ukážeme vám podniky nablízku.",
   },
   explorer: {
     district: (city: string) => `Mestská časť - ${city}`,

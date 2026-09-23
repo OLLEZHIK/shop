@@ -18,6 +18,7 @@ import {
   listingPath,
 } from "@/lib/categories";
 import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
+import { animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
 import { FilterPanel } from "./FilterPanel";
 import { EmptyState } from "./EmptyState";
@@ -49,9 +50,12 @@ export async function CategoryListing({
   cityName,
   districtSlug,
   districtName,
-  animal,
   near,
+  animal: requestedAnimal,
 }: CategoryListingProps) {
+  // Ignore a pet this service isn't for (e.g. ?animal=bird on dog training).
+  const animal =
+    isAnimal(requestedAnimal) && animalsForService(category).includes(requestedAnimal) ? requestedAnimal : undefined;
   const [found, aggregates, districts, priceTiers, districtCounts] = await Promise.all([
     searchBusinesses({ category, citySlug, districtSlug, animal }),
     getCategoryAggregates(category, districtSlug),
@@ -298,6 +302,10 @@ function DistrictLink({ href, label, count, active }: { href: string; label: str
   return (
     <Link
       href={href}
+      // Next 16 re-prefetches a child of the current [category]/[city]
+      // route behind the proxy.ts rewrite in an endless loop (hundreds of
+      // requests per second); these links load on click instead.
+      prefetch={false}
       aria-current={active ? "page" : undefined}
       className={`flex items-center justify-between rounded-[var(--radius-control)] px-3 py-2 text-sm transition ${
         active ? "accent-soft font-semibold" : "text-foreground/75 hover:bg-surface-sunken hover:text-foreground"
