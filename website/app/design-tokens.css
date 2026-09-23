@@ -1,0 +1,65 @@
+/* Design tokens - single source of truth for colors, fonts, radii and
+   shadows. Change a value here and it propagates everywhere; nothing
+   below should be hardcoded again in a component. */
+
+:root {
+  /* Brand colors - moved from globals.css as-is, values unchanged */
+  --brand-orange: #FF6B35;
+  --brand-blue: #004E89;
+  --brand-green: #06A77D;
+  --brand-amber: #F59E0B;
+  --background: #F7F9FB;
+  --foreground: #171717;
+
+  /* Muted brand tones for hover/active surfaces (nav pills, dropdown
+     items) - softer than the raw brand colors, still legibly branded. */
+  --brand-orange-muted: color-mix(in srgb, var(--brand-orange) 16%, white);
+  --brand-blue-muted: color-mix(in srgb, var(--brand-blue) 12%, white);
+  --brand-orange-muted-border: color-mix(in srgb, var(--brand-orange) 45%, white);
+  --brand-blue-muted-border: color-mix(in srgb, var(--brand-blue) 40%, white);
+
+  /* Radii */
+  --radius-card: 16px;
+  --radius-control: 12px;
+  --radius-pill: 999px;
+
+  /* Shadows - soft, offset, never a flat colored halo */
+  --shadow-card: 0 1px 2px rgba(23, 23, 23, 0.04), 0 10px 28px -12px rgba(23, 23, 23, 0.14);
+  --shadow-card-hover: 0 2px 6px rgba(23, 23, 23, 0.06), 0 20px 44px -14px rgba(23, 23, 23, 0.22);
+  --shadow-panel: 0 16px 40px -14px rgba(23, 23, 23, 0.22);
+}
+
+@theme inline {
+  --color-brand-orange-muted: var(--brand-orange-muted);
+  --color-brand-blue-muted: var(--brand-blue-muted);
+  --color-brand-orange-muted-border: var(--brand-orange-muted-border);
+  --color-brand-blue-muted-border: var(--brand-blue-muted-border);
+
+  --radius-card: var(--radius-card);
+  --radius-control: var(--radius-control);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-card-hover: var(--shadow-card-hover);
+  --shadow-panel: var(--shadow-panel);
+
+  /* Heading font: set from next/font/google's --font-heading variable
+     (applied to <html> in layout.tsx), Inter as fallback if it fails
+     to load - never the system sans as the display voice. */
+  --font-heading: var(--font-plus-jakarta-sans), var(--font-sans);
+}
+
+/* Reusable hover pattern for Header nav and dropdown items: no border
+   at rest, a muted brand-toned pill fades in on hover/focus. One
+   pattern, shared, not re-authored per component. */
+.pill-hover {
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  transition: border-color 200ms ease-out, background-color 200ms ease-out, color 200ms ease-out;
+}
+.pill-hover:hover,
+.pill-hover:focus-visible {
+  border-color: var(--brand-blue-muted-border);
+  background-color: var(--brand-blue-muted);
+  color: var(--brand-blue);
+}
