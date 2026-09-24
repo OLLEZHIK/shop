@@ -419,6 +419,31 @@ vet»), и совпадает с `docs/ux-flow.md` (SEO-страница усл�
   реальных отзывов — это как раз тот фиктивный сигнал, который Google
   наказывает, и который прямо противоречит «не выдумывать факты»).
 
+#### Сводка отзывов «Что говорят клиенты» (решение владельца 2026-09-24)
+
+Данные: `data/review-insights/<slug>.json` (задача
+`tasks/ide-review-insights.md`): 3 тематические карточки + 3-6 FAQ,
+EN/SK, по отзывам Google за последние 6 месяцев. Правила показа:
+
+- Заголовок блока: «What customers say» / «Čo hovoria zákazníci»,
+  подзаголовок: «pawenn summary of {N} Google reviews from {period}» /
+  «Zhrnutie pawenn z {N} recenzií na Google za {obdobie}» + ссылка
+  «All reviews on Google» / «Všetky recenzie na Google»
+  (`google_maps_url`, `rel="nofollow noopener"`, новая вкладка).
+- Карточки — **не в виде отзывов**: без аватаров, имён, звёзд на
+  карточке. Тема + метка тональности (positive/mixed/negative) +
+  «{mentions} z {N} recenzií».
+- Строка-раскрытие под блоком (Omnibus): «Súhrn verejných recenzií z
+  Google, pawenn ich neoverujeme.» / «Summary of public Google reviews;
+  pawenn does not verify them.»
+- **Никакой разметки `Review`/`AggregateRating`** для этого блока и
+  для рейтинга Google (правила Google запрещают размечать чужие
+  отзывы). Разрешено: `FAQPage` JSON-LD для FAQ — это наш контент.
+- Язык — по языку страницы (`/sk/` — `sk`, `/en/` — `en`), без
+  подстановки другого языка.
+- Нет файла или ему больше 7 месяцев (`observed_at`) — блок не
+  показывать.
+
 ### 4.5 How it works (`/how-it-works/`)
 Рендерит уже готовый черновик `docs/content/how-it-works-draft.md`
 (Antigravity, PR #6, смёржен) как статическую страницу. Сохранить
