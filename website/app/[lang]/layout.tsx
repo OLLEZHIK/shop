@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Analytics } from "@vercel/analytics/next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "../globals.css";
 import { Header } from "@/components/Header";
@@ -40,6 +41,7 @@ export default async function RootLayout({
         <Header locale={lang} />
         {children}
         <Footer locale={lang} />
+        <Analytics />
       </body>
     </html>
   );
