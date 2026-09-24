@@ -14,7 +14,7 @@ import {
   CATEGORY_THEME,
   categoryBlurb,
   categoryLabel,
-  categorySingular,
+  categoryPlural, categorySingular,
   listingPath,
 } from "@/lib/categories";
 import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
@@ -93,7 +93,7 @@ export async function CategoryListing({
   if (origin) withDistance.sort(byDistance);
 
   const faqs = buildFaqs({ locale, category, where, aggregates });
-  const countLabel = aggregates.count === 1 ? categorySingular(category, locale) : label.toLowerCase();
+  const countLabel = aggregates.count === 1 ? categorySingular(category, locale) : categoryPlural(category, locale);
 
   return (
     <main style={{ "--accent": theme.accent } as React.CSSProperties}>
@@ -369,7 +369,7 @@ function buildFaqs({
 }): Faq[] {
   const t = getDictionary(locale).listing;
   const faqs: Faq[] = [];
-  const label = categoryLabel(category, locale).toLowerCase();
+  const label = categoryPlural(category, locale);
   const singular = categorySingular(category, locale);
 
   if (aggregates.count > 0) {

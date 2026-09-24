@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ALL_CATEGORIES, categoryFromSlug, categoryLabel, categorySingular, categorySlug, listingPath } from "@/lib/categories";
+import { ALL_CATEGORIES, categoryFromSlug, categoryPlural, categorySeoTitle, categorySingular, categorySlug, listingPath } from "@/lib/categories";
 import { getCityBySlug, getAllCities, getCategoryAggregates } from "@/lib/data";
 import { getDictionary, isLocale, localesForCountry } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const t = getDictionary(locale).listing;
   const aggregates = await getCategoryAggregates(category);
   const where = whereLabel(locale, city.slug, city.name);
-  const what = aggregates.count === 1 ? categorySingular(category, locale) : categoryLabel(category, locale).toLowerCase();
+  const what = aggregates.count === 1 ? categorySingular(category, locale) : categoryPlural(category, locale);
   const locales = localesForCountry(city.country);
 
   return {
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
       locale,
       Object.fromEntries(locales.map((l) => [l, listingPath(l, category, city.slug)]))
     ),
-    title: t.metaTitle(categoryLabel(category, locale), where),
+    title: t.metaTitle(categorySeoTitle(category, locale), where),
     description: t.metaDescription(aggregates.count, what, where),
     robots: aggregates.count < 3 ? { index: false, follow: true } : undefined,
   };
