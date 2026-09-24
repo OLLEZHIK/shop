@@ -30,6 +30,10 @@ async function main() {
     return;
   }
 
+  // Host only, never the credentials: shows in the Vercel build log which
+  // database this build is about to touch.
+  console.log(`db-setup: database host ${new URL(url).hostname} (${process.env.VERCEL_ENV})`);
+
   const client = new Client({ connectionString: url });
   await client.connect();
   const { rows } = await client.query<{ exists: boolean }>(
