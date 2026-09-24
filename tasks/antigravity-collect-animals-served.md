@@ -4,7 +4,7 @@
 **Роль:** Data agent.
 **Тип:** сбор данных, объём средний (все записи в 4 CSV).
 **Ветка:** `antigravity/collect-animals-served`
-**Зависимости:** нет.
+**Зависимости:** `tasks/antigravity-collect-ratings-and-review-summaries.md` смёржена — обе задачи правят одни и те же `data/*.csv`, параллельно будут конфликты. Брать эту после неё, от свежего `main`.
 
 ## Контекст
 
