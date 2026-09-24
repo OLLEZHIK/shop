@@ -1,0 +1,96 @@
+{
+  "slug": "veterinarna-nemocnica-bennett",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=15018714217976194413",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 27,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "results",
+      "sentiment": "positive",
+      "mentions": 20,
+      "title": {
+        "en": "Leader in orthopedics and surgery",
+        "sk": "Uznávaný líder v ortopédii a chirurgii"
+      },
+      "text": {
+        "en": "Pet owners consistently single out this veterinary hospital in Lamač as one of the best orthopedic and surgical centers in Slovakia. Reviews praise complex joint operations, minimally invasive laparoscopy, and unique gait analysis technology that restored mobility to injured pets when other clinics could offer only pain management.",
+        "sk": "Majitelia zvierat opakovane označujú túto veterinárnu nemocnicu v Lamači za jedno z najlepších ortopedických a chirurgických centier na Slovensku. Recenzie vyzdvihujú náročné operácie kĺbov, laparoskopiu a špeciálne laboratórium chôdze, vďaka ktorým sa zranené zvieratá vrátili k plnohodnotnému pohybu po vážnych úrazoch."
+      }
+    },
+    {
+      "topic": "staff",
+      "sentiment": "positive",
+      "mentions": 17,
+      "title": {
+        "en": "Dedicated specialists with high professional standards",
+        "sk": "Skúsení špecialisti s vysokým štandardom"
+      },
+      "text": {
+        "en": "The medical team is frequently commended in reviews for deep expertise, thorough pre-surgical briefings, and attentive patient care. Reviewers appreciate that surgeons take the time to review X-rays with owners in detail and provide clear step-by-step recovery plans. The postoperative hydrotherapy and rehabilitation staff also receive positive remarks.",
+        "sk": "Lekársky tím je v recenziách chválený za hlbokú odbornosť, podrobné predoperačné konzultácie a starostlivý prístup. Majitelia oceňujú, že chirurgovia s nimi detailne prechádzajú snímky a zrozumiteľne vysvetľujú rehabilitačný plán. Pozitívne hodnotenia získava aj personál zabezpečujúci následnú hydroterapiu a fyzioterapiu."
+      }
+    },
+    {
+      "topic": "waiting",
+      "sentiment": "mixed",
+      "mentions": 13,
+      "title": {
+        "en": "Operating hours shift to daytime appointments",
+        "sk": "Zmena prevádzkového režimu na denné hodiny"
+      },
+      "text": {
+        "en": "Recent reviews often note that the clinic transitioned from a 24-hour nonstop emergency model to scheduled daytime operations from 8:00 to 20:00. While scheduled orthopedic visits and procedures proceed smoothly on time, a few reviewers express regret over the loss of late-night emergency intake, recommending that clients always book ahead.",
+        "sk": "Novšie recenzie často spomínajú zmenu prevádzkového režimu, kedy klinika prešla z nonstop pohotovosti na denné ordinačné hodiny od 8:00 do 20:00. Zatiaľ čo plánované ortopedické zákroky prebiehajú presne a plynulo, niektorí majitelia vyjadrujú ľútosť nad zrušením nočného príjmu a odporúčajú sa na termíny vopred objednať."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "What are the clinic's current operating hours?",
+        "sk": "Aké sú aktuálne ordinačné hodiny nemocnice?"
+      },
+      "a": {
+        "en": "The hospital operates Monday through Sunday from 08:00 to 20:00 for scheduled and emergency daytime visits.",
+        "sk": "Nemocnica je otvorená od pondelka do nedele v čase od 08:00 do 20:00 pre plánované i akútne denné prípady."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Does the clinic offer hydrotherapy and rehabilitation?",
+        "sk": "Poskytuje klinika hydroterapiu a rehabilitáciu zvierat?"
+      },
+      "a": {
+        "en": "Yes, Bennett has a dedicated rehabilitation suite featuring an underwater treadmill and therapeutic equipment.",
+        "sk": "Áno, klinika disponuje rehabilitačným pracoviskom s vodným bežiacim pásom a odbornou fyzioterapiou."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Is prior appointment booking mandatory for specialist exams?",
+        "sk": "Je nutné sa na špecializované vyšetrenie vopred objednať?"
+      },
+      "a": {
+        "en": "Yes, orthopedic consultations and MRI diagnostics require advance appointment booking by phone or email.",
+        "sk": "Áno, na ortopedické konzultácie a magnetickú rezonanciu je potrebné objednať sa vopred telefonicky alebo e-mailom."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Are there parking spaces available on-site?",
+        "sk": "Dá sa pri klinike bez problémov zaparkovať?"
+      },
+      "a": {
+        "en": "Yes, dedicated parking spaces for visitors are situated directly in front of the clinic entrance on Lamačská cesta.",
+        "sk": "Áno, vyhradené parkovisko pre klientov sa nachádza priamo pred vchodom do kliniky na Lamačskej ceste."
+      },
+      "basis": "both"
+    }
+  ]
+}

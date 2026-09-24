@@ -1,0 +1,96 @@
+{
+  "slug": "super-zoo-bajkalska",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=7754246788071376993",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 46,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "place",
+      "sentiment": "positive",
+      "mentions": 24,
+      "title": {
+        "en": "Convenient access and free parking",
+        "sk": "Výborná dostupnosť a bezplatné parkovanie"
+      },
+      "text": {
+        "en": "Most customers appreciate the spacious layout of this pet store located in Ružinov on Bajkalská street. A major advantage when purchasing heavy sacks of pet food is the wheelchair-accessible entrance and free parking directly in front of the building. Visitors also frequently praise the pet-friendly policy that welcomes dogs inside the store.",
+        "sk": "Väčšina zákazníkov vyzdvihuje veľkorysé priestory predajne chovateľských potrieb v Ružinove na Bajkalskej ulici. Veľkou výhodou pri nákupe ťažkých balení krmív je bezbariérový vstup a vyhradené bezplatné parkovisko priamo pred vchodom. Návštevníci tiež veľmi pozitívne vnímajú možnosť bezproblémového vstupu so psom priamo do predajne."
+      }
+    },
+    {
+      "topic": "staff",
+      "sentiment": "positive",
+      "mentions": 18,
+      "title": {
+        "en": "Helpful staff with knowledgeable advice",
+        "sk": "Ochotný personál a odborné poradenstvo"
+      },
+      "text": {
+        "en": "According to multiple reviews, the store staff in Ružinov are friendly and ready to advise on pet nutrition, terrariums, and aquatics. Shoppers repeatedly praise their patience in answering specific pet care questions. A few reviewers occasionally note slower checkout lines during busy afternoon peak hours, though the overall impression remains positive.",
+        "sk": "Podľa početných recenzií je personál predajne v Ružinove priateľský a pripravený poradiť pri výbere krmív, terárií či akvaristických potrieb. Zákazníci opakovane oceňujú trpezlivosť obsluhy pri zodpovedaní otázok o starostlivosti o zvieratá. Ojedinele sa objavujú poznámky k pomalšiemu vybavovaniu pri pokladni počas vyťažených poobedňajších hodín."
+      }
+    },
+    {
+      "topic": "prices",
+      "sentiment": "mixed",
+      "mentions": 15,
+      "title": {
+        "en": "Club discounts balance higher prices",
+        "sk": "Zľavy s klubom vyvažujú ceny"
+      },
+      "text": {
+        "en": "Standard shelf prices are generally seen by shoppers as average to slightly higher compared to generic online shops in Bratislava. However, most reviewers highlight that loyalty club membership and regular store promotions make premium pet food quite affordable. Customers also appreciate the fast and free in-store pickup for web orders.",
+        "sk": "Bežné pultové ceny zákazníci vnímajú ako priemerné až mierne vyššie oproti bežným e-shopom v Bratislave. Väčšina recenzentov však zdôrazňuje, že vernostný program a pravidelné akcie v predajni chovateľských potrieb umožňujú nakúpiť krmivá za výhodnejšie ceny. Pozitívne hodnotia aj rýchly osobný odber internetových objednávok bez poplatku."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "Is the store on Bajkalská wheelchair accessible?",
+        "sk": "Je predajňa na Bajkalskej bezbariérová?"
+      },
+      "a": {
+        "en": "Yes, the store has level ground-floor access with automatic entrance doors.",
+        "sk": "Áno, predajňa má bezbariérový prístup s automatickými dverami na prízemí."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Can I bring my dog inside the shop?",
+        "sk": "Môžem do predajne vstúpiť so psom?"
+      },
+      "a": {
+        "en": "Yes, domestic pets on a leash are welcomed by staff throughout the store.",
+        "sk": "Áno, domáce zvieratá na vôdzke sú v celej predajni vítané."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Is there dedicated customer parking available?",
+        "sk": "Je k dispozícii vyhradené parkovisko pre zákazníkov?"
+      },
+      "a": {
+        "en": "Yes, there is free customer parking located directly in front of the store entrance.",
+        "sk": "Áno, bezplatné parkovisko pre zákazníkov sa nachádza priamo pred vchodom do predajne."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Can I pick up online e-shop orders in the store?",
+        "sk": "Dá sa v predajni vyzdvihnúť online objednávka?"
+      },
+      "a": {
+        "en": "Yes, the store functions as a pickup branch for online orders with express preparation.",
+        "sk": "Áno, predajňa slúži ako odberné miesto pre e-shopové objednávky s rýchlou prípravou."
+      },
+      "basis": "website"
+    }
+  ]
+}

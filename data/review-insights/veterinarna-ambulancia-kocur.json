@@ -1,0 +1,96 @@
+{
+  "slug": "veterinarna-ambulancia-kocur",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=12495950317244915024",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 24,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "staff",
+      "sentiment": "positive",
+      "mentions": 18,
+      "title": {
+        "en": "Kind and dedicated family veterinary doctor",
+        "sk": "Milý a obetavý rodinný veterinárny lekár"
+      },
+      "text": {
+        "en": "Reviews consistently praise MVDr. Július Kocúr for his exceptional dedication, empathy, and calming manner. Pet owners in the Štrkovec neighborhood of Ružinov describe him as a genuine family veterinarian who knows his patients personally and treats animals with authentic care, patience, and warmth during every single visit.",
+        "sk": "Recenzie mimoriadne pozitívne hodnotia MVDr. Júliusa Kocúra za jeho obetavosť, empatiu a upokojujúci prístup. Majitelia zvierat zo Štrkovca v Ružinove ho opisujú ako skutočného rodinného veterinára, ktorý pozná svojich pacientov po mene a ku každému zvieraťu pristupuje s úprimnou trpezlivosťou, porozumením a láskavosťou."
+      }
+    },
+    {
+      "topic": "prices",
+      "sentiment": "positive",
+      "mentions": 15,
+      "title": {
+        "en": "Fair and accessible veterinary pricing",
+        "sk": "Veľmi férové a dostupné lokálne ceny"
+      },
+      "text": {
+        "en": "A recurring highlight across reviews is the very reasonable and humane pricing structure. Multiple owners state that routine examinations, vaccinations, and basic treatments cost noticeably less than at large commercial animal hospitals in Bratislava, making quality preventative pet healthcare accessible without hidden fees.",
+        "sk": "Opakujúcim sa motívom v recenziách sú veľmi férové a ľudské ceny za poskytnuté služby. Viacerí majitelia zdôrazňujú, že bežné prehliadky, očkovania a ošetrenia sú výrazne dostupnejšie než na veľkých komerčných klinikách v Bratislave, pričom oceňujú transparentnosť bez akýchkoľvek skrytých poplatkov."
+      }
+    },
+    {
+      "topic": "animals",
+      "sentiment": "positive",
+      "mentions": 12,
+      "title": {
+        "en": "Calm stress-free environment for pets",
+        "sk": "Pokojné prostredie bez stresu pre zvieratá"
+      },
+      "text": {
+        "en": "Reviewers frequently remark that their pets do not experience the fear usually associated with veterinary visits. The cozy, quieter atmosphere of this neighborhood practice, combined with gentle physical handling, helps keep both dogs and cats relaxed during examinations, blood draws, and routine vaccinations.",
+        "sk": "Hodnotiaci často spomínajú, že ich psíky a mačky nepociťujú pri návšteve ambulancie obvyklý strach. Komorné, pokojné prostredie menšej lokálnej praxe a citlivý prístup pána doktora pomáhajú udržať zvieratá v pokoji a bez stresu aj pri vyšetreniach, odbere krvi či bežnom očkovaní."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "Which animals does Dr. Kocúr treat?",
+        "sk": "Aké zvieratá v ambulancii ošetrujú?"
+      },
+      "a": {
+        "en": "The practice cares for dogs, cats, small rodents, rabbits, guinea pigs, ferrets, and pet birds.",
+        "sk": "Ambulancia poskytuje starostlivosť pre psy, mačky, drobné hlodavce, králiky, morčatá, fretky a vtáky."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Is it necessary to make an appointment in advance?",
+        "sk": "Treba sa na vyšetrenie vopred objednať?"
+      },
+      "a": {
+        "en": "While routine checkups are welcomed during open consulting hours, a brief telephone call beforehand is recommended.",
+        "sk": "Bežné vyšetrenia prebiehajú počas ordinačných hodín, no pre istotu a minimalizáciu čakania sa odporúča vopred zavolať."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Can clients pay by credit card?",
+        "sk": "Je možné v ambulancii platiť kartou?"
+      },
+      "a": {
+        "en": "Cash payment is standard; clients should verify current card terminal availability by phone before visiting.",
+        "sk": "Štandardom je platba v hotovosti, pred návštevou sa odporúča telefonicky overiť aktuálnu dostupnosť platobného terminálu."
+      },
+      "basis": "reviews"
+    },
+    {
+      "q": {
+        "en": "Where is the practice located in Ružinov?",
+        "sk": "Kde presne v Ružinove sa ambulancia nachádza?"
+      },
+      "a": {
+        "en": "The clinic is located on Herlianska 45 in the Štrkovec neighborhood, with convenient street parking in the residential zone.",
+        "sk": "Ambulancia sídli na Herlianskej 45 na Štrkovci, pričom parkovanie je možné na okolitých uliciach rezidenčnej zóny."
+      },
+      "basis": "both"
+    }
+  ]
+}

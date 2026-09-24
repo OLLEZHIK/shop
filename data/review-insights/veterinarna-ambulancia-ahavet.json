@@ -1,0 +1,96 @@
+{
+  "slug": "veterinarna-ambulancia-ahavet",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=13890847067888717291",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 25,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "staff",
+      "sentiment": "positive",
+      "mentions": 17,
+      "title": {
+        "en": "Empathetic team led by Dr. Talajka",
+        "sk": "Empatický tím pod vedením MVDr. Talajku"
+      },
+      "text": {
+        "en": "Pet owners consistently praise the veterinary team at this clinic in Karlova Ves for their kind, sensitive approach. Reviews frequently highlight MVDr. Jozef Talajka and his colleagues for their willingness to explain medical diagnoses in detail, offer practical advice, and treat animal patients with genuine patience and compassion.",
+        "sk": "Majitelia zvierat opakovane vyzdvihujú veterinárny tím tejto kliniky v Karlovej Vsi za milý a citlivý prístup. Recenzie pravidelne chvália MVDr. Jozefa Talajku a jeho kolegov za ochotu podrobne vysvetliť zdravotný stav, poradiť pri liečbe a zaobchádzať so zvieracími pacientmi s veľkou trpezlivosťou a porozumením."
+      }
+    },
+    {
+      "topic": "results",
+      "sentiment": "positive",
+      "mentions": 15,
+      "title": {
+        "en": "Strong orthopedic and rehabilitation veterinary care",
+        "sk": "Kvalitná ortopédia a odborná rehabilitácia"
+      },
+      "text": {
+        "en": "Reviews frequently recommend this practice for orthopedic diagnostics, soft-tissue surgeries, and specialized pet rehabilitation. Clients appreciate that the clinic offers targeted physical therapy, hydrotherapy, and modern ultrasound diagnostics, helping dogs recover mobility following joint issues, patella luxations, and injuries.",
+        "sk": "Hodnotenia často odporúčajú toto pracovisko pri ortopedickej diagnostike, chirurgii mäkkých tkanív a rehabilitácii zvierat. Klienti oceňujú, že ambulancia poskytuje cielenú fyzioterapiu, hydroterapiu a modernú sonografiu, vďaka čomu sa psíkom po luxácii pately či zraneniach rýchlo a úspešne vracia pohyblivosť."
+      }
+    },
+    {
+      "topic": "place",
+      "sentiment": "positive",
+      "mentions": 12,
+      "title": {
+        "en": "Modern practice serving Dlhé diely neighborhood",
+        "sk": "Moderná ambulancia na Dlhých dieloch"
+      },
+      "text": {
+        "en": "Local residents on Dlhé diely value having a well-equipped veterinary facility located right in their residential quarter. The clinic is described as clean, well organized, and welcoming. While parking on Ľudovíta Fullu street can be busy during late afternoons, pet owners appreciate the convenience of accessible neighborhood care.",
+        "sk": "Obyvatelia Dlhých dielov oceňujú prítomnosť moderne vybavenej veterinárnej ambulancie priamo vo svojej obytnej štvrti. Priestory sú hodnotené ako čisté, prehľadné a príjemné. Hoci parkovanie na ulici Ľudovíta Fullu býva v podvečerných hodinách vyťaženejšie, dostupnosť kvalitnej starostlivosti v susedstve je veľkým plusom."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "Does the clinic offer hydrotherapy and physiotherapy?",
+        "sk": "Poskytuje klinika hydroterapiu a fyzioterapiu pre zvieratá?"
+      },
+      "a": {
+        "en": "Yes, AHAvet features certified physiotherapists and hydrotherapy equipment for post-operative animal rehabilitation.",
+        "sk": "Áno, klinika disponuje certifikovanou fyzioterapiou a hydroterapiou pre rehabilitáciu po operáciách a úrazoch."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Is on-call emergency care available at night?",
+        "sk": "Zabezpečuje ambulancia nočnú pohotovostnú službu?"
+      },
+      "a": {
+        "en": "Yes, on-call emergency service is accessible via telephone for life-threatening acute conditions.",
+        "sk": "Áno, pre život ohrozujúce akútne stavy je k dispozícii pohotovostná služba na telefónne privolanie."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "How can I book an appointment at the clinic?",
+        "sk": "Ako sa môžem objednať na vyšetrenie?"
+      },
+      "a": {
+        "en": "Appointments can be scheduled by phone via the reception desk or by email.",
+        "sk": "Na vyšetrenie je možné sa pohodlne objednať telefonicky cez recepciu alebo e-mailom."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Where can visitors park during their visit?",
+        "sk": "Kde je možné pri ambulancii zaparkovať?"
+      },
+      "a": {
+        "en": "Public parking spaces are available along Ľudovíta Fullu street in the surrounding residential area.",
+        "sk": "Parkovanie je možné na verejných parkovacích miestach pozdĺž ulice Ľudovíta Fullu v okolí ambulancie."
+      },
+      "basis": "both"
+    }
+  ]
+}

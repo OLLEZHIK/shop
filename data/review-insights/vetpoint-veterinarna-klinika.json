@@ -1,0 +1,96 @@
+{
+  "slug": "vetpoint-veterinarna-klinika",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=14214852142696420325",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 31,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "results",
+      "sentiment": "positive",
+      "mentions": 20,
+      "title": {
+        "en": "Advanced surgical and oncology veterinary expertise",
+        "sk": "Špecializovaná chirurgia a onkologická starostlivosť"
+      },
+      "text": {
+        "en": "Reviewers frequently describe this veterinary hospital in Petržalka as a trusted referral facility for complicated surgical interventions, orthopedic treatments, and veterinary oncology. Owners praise the thorough diagnostic workup, high-standard operating suites, and post-surgery rehabilitation protocols that helped pets recover after serious illnesses.",
+        "sk": "Recenzenti často označujú túto veterinárnu kliniku v Petržalke za vyhľadávané pracovisko pri zložitých operáciách, ortopédii a onkológii. Majitelia oceňujú komplexnú predoperačnú diagnostiku, moderné vybavenie sál aj starostlivo nastavené rehabilitačné plány, ktoré pomohli ich zvieratám zotaviť sa po náročných zdravotných problémoch."
+      }
+    },
+    {
+      "topic": "staff",
+      "sentiment": "mixed",
+      "mentions": 18,
+      "title": {
+        "en": "Expert medical team with pragmatic communication",
+        "sk": "Vysoko odborný tím s vecnou komunikáciou"
+      },
+      "text": {
+        "en": "Most clients express deep gratitude for the high clinical expertise and diligence of the veterinary surgeons. At the same time, some reviewers feel that doctor consultations can occasionally be overly clinical and pragmatic, particularly when communicating serious diagnoses under time pressure. The clinical dedication of the staff, however, is widely acknowledged.",
+        "sk": "Väčšina klientov vyjadruje vďaku za vysokú odbornosť a precíznosť veterinárnych chirurgov. Menšia časť recenzií však poznamenáva, že rozhovory s lekármi môžu pri časovej vyťaženosti pôsobiť prísne racionálne a málo osobne, najmä pri ťažkých prognózach. Odbornú úroveň poskytnutej starostlivosti však hodnotenia nespochybňujú."
+      }
+    },
+    {
+      "topic": "waiting",
+      "sentiment": "mixed",
+      "mentions": 14,
+      "title": {
+        "en": "Prioritized scheduling and emergency intake balance",
+        "sk": "Kombinácia termínov a akútneho príjmu"
+      },
+      "text": {
+        "en": "Reviews note that while pre-scheduled consultations usually run smoothly, unexpected urgent surgeries can occasionally lead to waiting room delays for routine checkups. Pet owners appreciate that true life-threatening emergencies are triaged immediately, but advise booking non-urgent examinations several days in advance to ensure preferred time slots.",
+        "sk": "V recenziách sa uvádza, že zatiaľ čo vopred dohodnuté termíny prebiehajú plynulo, nečakané urgentné operácie môžu občas spôsobiť posun v čakárni pri bežných prehliadkach. Majitelia oceňujú okamžité riešenie život ohrozujúcich stavov, no pri bežnej návšteve odporúčajú včasnú rezerváciu termínu niekoľko dní dopredu."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "Does the clinic accept walk-in patients without booking?",
+        "sk": "Prijíma klinika pacientov aj bez objednania?"
+      },
+      "a": {
+        "en": "Walk-ins are accepted for urgent triage, but prior booking is strongly recommended for standard consultations to minimize delays.",
+        "sk": "Akútne stavy sú ošetrené prednostne, no pri bežných vyšetreniach sa dôrazne odporúča vopred sa objednať."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Is oncology treatment available for pets?",
+        "sk": "Poskytuje klinika onkologickú liečbu pre zvieratá?"
+      },
+      "a": {
+        "en": "Yes, VetPoint features a specialized veterinary oncology department including chemotherapy and surgical tumor removal.",
+        "sk": "Áno, klinika sa špecializuje na veterinárnu onkológiu vrátane chemoterapie a chirurgického odstraňovania nádorov."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Is parking available directly at the clinic?",
+        "sk": "Je pri klinike zabezpečené parkovanie?"
+      },
+      "a": {
+        "en": "Yes, customer parking spaces are situated directly next to the clinic on Panónska cesta.",
+        "sk": "Áno, vyhradené parkovacie miesta pre klientov sa nachádzajú priamo pri budove na Panónskej ceste."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Does the clinic operate emergency hours on weekends?",
+        "sk": "Funguje klinika cez víkendy v pohotovostnom režime?"
+      },
+      "a": {
+        "en": "Yes, weekend and holiday veterinary service is maintained under an emergency schedule.",
+        "sk": "Áno, počas víkendov a sviatkov funguje klinika v pohotovostnom režime pre urgentné prípady."
+      },
+      "basis": "website"
+    }
+  ]
+}
