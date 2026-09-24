@@ -69,23 +69,32 @@ export function HomeSearch({
   const [near, setNear] = useState<{ lat: number; lng: number; citySlug: string } | null>(null);
   const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
   const canLocate = cities.length > 0;
+  // Bumped to reopen the Where picker for a manual choice.
+  const [whereNudge, setWhereNudge] = useState(0);
+
+  // Location refused, unavailable or outside our cities: never a dead
+  // end - open the district picker so the visitor chooses by hand.
+  function chooseByHand(status: "denied" | "far") {
+    setNear(null);
+    setGeoStatus(status);
+    const desktop = window.matchMedia("(min-width: 768px)").matches;
+    if (layout === "hero" && !desktop) setOverlay("district");
+    else setWhereNudge((n) => n + 1);
+  }
 
   function locate() {
-    if (!("geolocation" in navigator)) return setGeoStatus("denied");
+    if (!("geolocation" in navigator)) return chooseByHand("denied");
     setGeoStatus("locating");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
         const city = nearestCity(cities, latitude, longitude);
-        if (!city) {
-          setNear(null);
-          return setGeoStatus("far");
-        }
+        if (!city) return chooseByHand("far");
         setNear({ lat: latitude, lng: longitude, citySlug: city.slug });
         setDistrictSlug(null);
         setGeoStatus("idle");
       },
-      () => setGeoStatus("denied"),
+      () => chooseByHand("denied"),
       { timeout: 8000, maximumAge: 10 * 60 * 1000 }
     );
   }
@@ -214,7 +223,8 @@ export function HomeSearch({
           {nearButton}
         </div>
         <Dropdown
-          key={near ? "near" : "district"}
+          key={`${near ? "near" : "district"}-${whereNudge}`}
+          defaultOpen={whereNudge > 0}
           ariaLabel={t.search.where}
           placeholder={t.search.all(cityName)}
           value={near ? NEAR : (districtSlug ?? "all")}
@@ -226,7 +236,7 @@ export function HomeSearch({
           onChange={(v) => (v === NEAR ? undefined : pickDistrict(v === "all" ? null : v))}
           className="mt-2"
         />
-        {geoMessage && <p className="mt-2 px-1 text-sm text-brand-orange-deep">{geoMessage}</p>}
+        {geoMessage && <p className="mt-2 px-1 text-sm text-foreground/70">{geoMessage}</p>}
 
         <button
           type="button"
@@ -274,7 +284,7 @@ export function HomeSearch({
           </span>
           <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
         </button>
-        {geoMessage && <p className="mt-2 px-1 text-sm text-brand-orange-deep">{geoMessage}</p>}
+        {geoMessage && <p className="mt-2 px-1 text-sm text-foreground/70">{geoMessage}</p>}
 
         <button
           type="button"
@@ -317,6 +327,8 @@ export function HomeSearch({
         />
         <span aria-hidden="true" className="h-8 w-px bg-line" />
         <Dropdown
+          key={`where-${whereNudge}`}
+          defaultOpen={whereNudge > 0}
           variant="bar"
           label={t.search.where}
           ariaLabel={t.search.where}
@@ -344,7 +356,7 @@ export function HomeSearch({
         </button>
       </div>
       {geoMessage && (
-        <p className="mt-3 hidden px-6 text-left text-sm text-brand-orange-deep md:block">{geoMessage}</p>
+        <p className="mt-3 hidden px-6 text-left text-sm text-foreground/70 md:block">{geoMessage}</p>
       )}
 
       {overlay && (
@@ -355,6 +367,7 @@ export function HomeSearch({
           }
           popularSlugs={overlay === "category" ? popularCategorySlugs : popularDistrictSlugs}
           labels={{ close: t.search.close, popular: t.search.popular }}
+          note={overlay === "district" ? geoMessage : null}
           onClose={() => setOverlay(null)}
           onSelect={(slug) => {
             if (overlay === "category") setCategorySlug(slug);
@@ -372,6 +385,7 @@ function StepOverlay({
   options,
   popularSlugs,
   labels,
+  note,
   onClose,
   onSelect,
 }: {
@@ -379,6 +393,7 @@ function StepOverlay({
   options: SearchOption[];
   popularSlugs: string[];
   labels: { close: string; popular: string };
+  note?: string | null;
   onClose: () => void;
   onSelect: (slug: string) => void;
 }) {
@@ -403,6 +418,9 @@ function StepOverlay({
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4">
+        {note && (
+          <p className="mb-4 rounded-[var(--radius-control)] bg-brand-blue-muted px-4 py-3 text-sm text-brand-blue">{note}</p>
+        )}
         {popular.length > 0 && (
           <div className="mb-6">
             <p className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">{labels.popular}</p>
