@@ -3,7 +3,9 @@
 // - A brand-new database (no tables yet): apply migrations and load the
 //   CSVs from data/ - this is how a fresh Neon database gets filled.
 // - Production builds: apply any new migrations (`prisma migrate deploy`
-//   only runs migrations the database hasn't seen).
+//   only runs migrations the database hasn't seen) and re-run the seed,
+//   so merged CSV changes reach the live site. The seed upserts by slug,
+//   so re-running it is safe.
 // - Preview builds against an existing database: touch nothing, so an
 //   unmerged PR can't migrate or reseed the live data.
 // - Local builds (no VERCEL env): touch nothing.
@@ -53,13 +55,8 @@ async function main() {
 
   run("npx prisma migrate deploy");
 
-  const count = await client.query<{ n: string }>(`select count(*) as n from "Business"`);
   await client.end();
-  if (Number(count.rows[0].n) === 0) {
-    run("npx tsx prisma/seed.ts");
-  } else {
-    console.log(`db-setup: ${count.rows[0].n} businesses already loaded, not reseeding`);
-  }
+  run("npx tsx prisma/seed.ts");
 }
 
 main().catch((error) => {
