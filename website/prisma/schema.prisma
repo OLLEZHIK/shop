@@ -67,6 +67,18 @@ model Business {
   sourceUrls   String[]
   notes        String?
   photoUrls    String[]         @default([])
+  // Listing-card data (tasks/done/antigravity-collect-ratings-and-review-summaries.md).
+  // Texts are our own words; the Google rating is shown with a "Google"
+  // label and only with 5+ ratings (the CSV leaves it empty otherwise).
+  description           String?
+  shortDescription      String?
+  shortDescriptionLocal String?
+  logoFile              String?
+  googlePlaceId         String?
+  googleMapsUrl         String?
+  googleRating          Float?
+  googleRatingCount     Int?
+  ratingObservedAt      DateTime?
   district     District?        @relation(fields: [districtId], references: [id])
   priceItems   PriceItem[]
   clickEvents  ClickEvent[]

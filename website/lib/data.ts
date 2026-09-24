@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "./prisma";
 import type { Business, BusinessCategory, District, City } from "@prisma/client";
 import { CATEGORY_LABELS, categorySlugFromEnum } from "./categories";
+import type { Locale } from "./i18n";
 
 export type BusinessWithRelations = Business & {
   district: (District & { city: City }) | null;
@@ -67,12 +68,22 @@ export function averageRating(reviews: { rating: number }[]): number | null {
 // pattern before using notes as a public short description anywhere
 // (BusinessCard, business detail page) - doesn't attempt to translate or
 // rewrite the rest, just avoids showing obvious internal boilerplate.
-const INTERNAL_NOTE_PATTERN = /docs\/concept\.md|per instructions|district omitted|district neur/i;
+// Visitor-facing texts. `notes` is the collectors' internal field and is
+// never shown. On a local-language page only local text is used (no
+// English fallback); on English pages English first, local as fallback
+// (docs/design-plan.md §2.2, language model).
+type BusinessTexts = Pick<BusinessWithRelations, "description" | "shortDescription" | "shortDescriptionLocal">;
 
-export function publicDescription(notes: string | null): string | null {
-  if (!notes) return null;
-  if (INTERNAL_NOTE_PATTERN.test(notes)) return null;
-  return notes;
+export function cardDescription(b: BusinessTexts, locale: Locale): string | null {
+  return locale === "en" ? (b.shortDescription ?? b.shortDescriptionLocal) : b.shortDescriptionLocal;
+}
+
+export function aboutDescription(b: BusinessTexts, locale: Locale): string | null {
+  return locale === "en" ? (b.description ?? b.shortDescription ?? b.shortDescriptionLocal) : b.shortDescriptionLocal;
+}
+
+export function logoUrl(logoFile: string | null): string | null {
+  return logoFile ? `/logos/${logoFile}` : null;
 }
 
 async function getCityBySlugRaw(slug: string) {
@@ -441,6 +452,7 @@ function reviveBusiness(b: BusinessWithRelations): BusinessWithRelations {
   return {
     ...b,
     verifiedAt: toDate(b.verifiedAt),
+    ratingObservedAt: toDate(b.ratingObservedAt),
     reviews: b.reviews.map((r) => ({ ...r, createdAt: new Date(r.createdAt) })),
   };
 }

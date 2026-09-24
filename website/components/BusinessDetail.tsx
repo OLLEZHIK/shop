@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import {
   getBusinessBySlug,
   averageRating,
-  publicDescription,
+  aboutDescription,
+  logoUrl,
   searchBusinesses,
   getPriceTierMap,
 } from "@/lib/data";
@@ -22,6 +23,7 @@ import { AmbientBackground } from "@/components/AmbientBackground";
 import { PhotoGallery } from "@/components/PhotoGallery";
 import { BusinessCard, StarRow } from "@/components/BusinessCard";
 import { BusinessAvatar } from "@/components/BusinessAvatar";
+import { GoogleRating } from "@/components/GoogleRating";
 import {
   ArrowRightIcon,
   ClockIcon,
@@ -67,7 +69,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
   const citySlug = business.district?.city.slug;
   const rating = averageRating(business.reviews);
   const sourceUrl = business.sourceUrls[0];
-  const description = publicDescription(business.notes);
+  const description = aboutDescription(business, locale);
 
   const [similarRaw, priceTiers] = await Promise.all([
     citySlug ? searchBusinesses({ category: business.category, citySlug }) : Promise.resolve([]),
@@ -164,6 +166,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
               <BusinessAvatar
                 name={business.name}
                 category={business.category}
+                logoUrl={logoUrl(business.logoFile)}
                 className="h-20 w-20 shrink-0 text-2xl shadow-[var(--shadow-card)] md:h-24 md:w-24 md:text-3xl"
               />
             )}
@@ -182,6 +185,15 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <VerifiedBadge verifiedAt={business.verifiedAt} locale={locale} />
+                {business.googleRating !== null && business.googleRatingCount !== null && (
+                  <GoogleRating
+                    rating={business.googleRating}
+                    count={business.googleRatingCount}
+                    locale={locale}
+                    href={business.googleMapsUrl}
+                    className="text-sm text-foreground/70"
+                  />
+                )}
                 {rating !== null && (
                   <a href="#reviews" className="flex items-center gap-1.5 hover:opacity-80">
                     <StarRow rating={rating} />

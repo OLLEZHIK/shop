@@ -1,11 +1,15 @@
 // Runs before `next build` on Vercel (see "build" in package.json).
 //
-// - A brand-new database (no tables yet): apply migrations and load the
-//   CSVs from data/ - this is how a fresh Neon database gets filled.
-// - Production builds: apply any new migrations (`prisma migrate deploy`
-//   only runs migrations the database hasn't seen).
-// - Preview builds against an existing database: touch nothing, so an
-//   unmerged PR can't migrate or reseed the live data.
+// - Every Vercel build applies pending migrations (`prisma migrate
+//   deploy` only runs ones the database hasn't seen). The new code needs
+//   its columns before it can prerender. Previews may share the live
+//   database, so migrations must be additive only (new tables/nullable
+//   columns; never drop or rename in the same change) - the running site
+//   keeps working on the old code. See docs/database.md.
+// - A brand-new database and production builds also run the seed, so
+//   merged CSV changes reach the live site (upserts by slug, safe to
+//   repeat). Previews never seed an existing database, so an unmerged PR
+//   can't change live data.
 // - Local builds (no VERCEL env): touch nothing.
 import { execSync } from "child_process";
 import { config as loadEnv } from "dotenv";
@@ -45,20 +49,14 @@ async function main() {
   );
   const fresh = !rows[0].exists;
 
-  if (!fresh && process.env.VERCEL_ENV !== "production") {
-    console.log("db-setup: preview build on an existing database, skipping");
-    await client.end();
-    return;
-  }
+  await client.end();
 
   run("npx prisma migrate deploy");
 
-  const count = await client.query<{ n: string }>(`select count(*) as n from "Business"`);
-  await client.end();
-  if (Number(count.rows[0].n) === 0) {
+  if (fresh || process.env.VERCEL_ENV === "production") {
     run("npx tsx prisma/seed.ts");
   } else {
-    console.log(`db-setup: ${count.rows[0].n} businesses already loaded, not reseeding`);
+    console.log("db-setup: preview build on an existing database, not seeding");
   }
 }
 

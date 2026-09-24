@@ -73,6 +73,40 @@ function parseNullableFloat(value: string | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function parseNullableInt(value: string | undefined): number | null {
+  if (value === undefined || value.trim() === "") return null;
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseNullableDate(value: string | undefined): Date | null {
+  if (!value || value.trim() === "") return null;
+  const d = new Date(value.trim());
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+// Listing-card columns shared by every CSV. Bratislava's files name the
+// local-language text short_description_sk; new city files use
+// short_description_local (docs/playbooks/add-city.md).
+function cardFields(row: CsvRow) {
+  const rating = parseNullableFloat(row.google_rating);
+  const ratingCount = parseNullableInt(row.google_rating_count);
+  // Guard the "5+ ratings or nothing" rule here too, not only in the data.
+  const showRating = rating !== null && ratingCount !== null && ratingCount >= 5;
+  const logoFile = nullableString(row.logo_file);
+  return {
+    description: nullableString(row.description),
+    shortDescription: nullableString(row.short_description),
+    shortDescriptionLocal: nullableString(row.short_description_local ?? row.short_description_sk),
+    logoFile: logoFile && /^[\w./-]+$/.test(logoFile) && !logoFile.includes("..") ? logoFile : null,
+    googlePlaceId: nullableString(row.google_place_id),
+    googleMapsUrl: nullableString(row.google_maps_url),
+    googleRating: showRating ? rating : null,
+    googleRatingCount: showRating ? ratingCount : null,
+    ratingObservedAt: parseNullableDate(row.rating_observed_at),
+  };
+}
+
 function nullableString(value: string | undefined): string | null {
   if (value === undefined) return null;
   const trimmed = value.trim();
@@ -188,6 +222,7 @@ async function main() {
           status: "PUBLISHED",
           sourceUrls: sourceUrl ? [sourceUrl] : [],
           notes: nullableString(row.notes),
+          ...cardFields(row),
         },
         create: {
           name,
@@ -204,6 +239,7 @@ async function main() {
           status: "PUBLISHED",
           sourceUrls: sourceUrl ? [sourceUrl] : [],
           notes: nullableString(row.notes),
+          ...cardFields(row),
         },
       });
 

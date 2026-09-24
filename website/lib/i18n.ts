@@ -329,6 +329,10 @@ const en = {
   card: {
     priceLevel: (tier: number) => `Price level ${tier} of 5`,
   },
+  rating: {
+    countGoogle: (count: string) => `${count} · Google`,
+    aria: (value: string, count: number) => `Rated ${value} out of 5 from ${count} Google ratings`,
+  },
   actions: { call: "Call", website: "Website", route: "Route" },
   badges: { verified: (date: string) => `Verified ${date}`, partner: "Partner" },
   business: {
@@ -657,6 +661,10 @@ const sk: Dictionary = {
   },
   card: {
     priceLevel: (tier: number) => `Cenová úroveň ${tier} z 5`,
+  },
+  rating: {
+    countGoogle: (count: string) => `${count} · Google`,
+    aria: (value: string, count: number) => `Hodnotenie ${value} z 5 podľa ${count} hodnotení na Google`,
   },
   actions: { call: "Zavolať", website: "Web", route: "Trasa" },
   badges: { verified: (date: string) => `Overené ${date}`, partner: "Partner" },

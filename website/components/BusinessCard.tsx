@@ -1,12 +1,13 @@
 import Link from "next/link";
 import type { BusinessWithRelations } from "@/lib/data";
-import { averageRating, publicDescription } from "@/lib/data";
+import { averageRating, cardDescription, logoUrl } from "@/lib/data";
 import { CATEGORY_THEME, businessPath, categoryLabel } from "@/lib/categories";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { PartnerBadge } from "./PartnerBadge";
 import { QuickActions } from "./QuickActions";
 import { BusinessAvatar } from "./BusinessAvatar";
+import { GoogleRating } from "./GoogleRating";
 import { ArrowRightIcon, MapPinIcon, RouteIcon } from "./icons";
 
 interface BusinessCardProps {
@@ -23,7 +24,7 @@ interface BusinessCardProps {
 export function BusinessCard({ business, priceTier = null, locale, distanceKm = null, showCategory = true }: BusinessCardProps) {
   const t = getDictionary(locale);
   const rating = averageRating(business.reviews);
-  const description = publicDescription(business.notes);
+  const description = cardDescription(business, locale);
   const accent = CATEGORY_THEME[business.category].accent;
 
   return (
@@ -34,8 +35,13 @@ export function BusinessCard({ business, priceTier = null, locale, distanceKm = 
       <Link href={businessPath(locale, business.slug)} className="absolute inset-0 z-0 rounded-[var(--radius-card)]" aria-label={business.name} />
 
       {/* Card format (owner, 2026-09-24): the business's logo, or its
-          initials until logos are collected; photos live on the place page. */}
-      <BusinessAvatar name={business.name} category={business.category} className="h-14 w-14 shrink-0 text-lg sm:h-16 sm:w-16" />
+          initials when it has none; photos live on the place page. */}
+      <BusinessAvatar
+        name={business.name}
+        category={business.category}
+        logoUrl={logoUrl(business.logoFile)}
+        className="h-14 w-14 shrink-0 text-lg sm:h-16 sm:w-16"
+      />
 
       <div className="pointer-events-none relative z-10 min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
@@ -53,6 +59,15 @@ export function BusinessCard({ business, priceTier = null, locale, distanceKm = 
         </div>
 
         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground/65">
+          {business.googleRating !== null && business.googleRatingCount !== null ? (
+            <GoogleRating rating={business.googleRating} count={business.googleRatingCount} locale={locale} />
+          ) : rating !== null && (
+            <span className="inline-flex items-center gap-1">
+              <StarRow rating={rating} />
+              <span className="font-semibold text-foreground">{rating.toFixed(1)}</span>
+              <span>({business.reviews.length})</span>
+            </span>
+          )}
           {business.district && (
             <span className="inline-flex items-center gap-1">
               <MapPinIcon className="h-4 w-4" />
@@ -63,13 +78,6 @@ export function BusinessCard({ business, priceTier = null, locale, distanceKm = 
             <span className="inline-flex items-center gap-1 font-semibold text-brand-blue">
               <RouteIcon className="h-3.5 w-3.5" />
               {t.listing.kmAway(distanceKm < 10 ? distanceKm.toFixed(1) : distanceKm.toFixed(0))}
-            </span>
-          )}
-          {rating !== null && (
-            <span className="inline-flex items-center gap-1">
-              <StarRow rating={rating} />
-              <span className="font-semibold text-foreground">{rating.toFixed(1)}</span>
-              <span>({business.reviews.length})</span>
             </span>
           )}
           {priceTier !== null && (
