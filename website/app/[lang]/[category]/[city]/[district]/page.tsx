@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const locales = localesForCountry(city.country);
 
   return {
-    // Filter variants (?animal=dog, ?near=) point at the unfiltered page.
+    // Filter variants (?animal=, ?near=, ?sort=, ?rating=) point at the unfiltered page.
     alternates: localeAlternates(
       locale,
       Object.fromEntries(locales.map((l) => [l, listingPath(l, category, city.slug, district.slug)]))
@@ -71,12 +71,12 @@ export default async function CategoryCityDistrictPage({
   searchParams,
 }: {
   params: Promise<PageParams>;
-  searchParams: Promise<{ animal?: string; near?: string }>;
+  searchParams: Promise<{ animal?: string; near?: string; sort?: string; rating?: string }>;
 }) {
   const resolved = await resolve(params);
   if (!resolved) notFound();
 
-  const { animal, near } = await searchParams;
+  const { animal, near, sort, rating } = await searchParams;
   const { locale, category, city, citySlug, district, districtSlug } = resolved;
 
   return (
@@ -89,6 +89,8 @@ export default async function CategoryCityDistrictPage({
       districtName={district.name}
       animal={animal}
       near={near}
+      sort={sort}
+      rating={rating}
     />
   );
 }
