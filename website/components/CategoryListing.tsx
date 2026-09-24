@@ -21,6 +21,7 @@ import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
 import { animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
 import { FilterPanel } from "./FilterPanel";
+import { meetsMinRating, parseMinRating, parseSort, sortByListing } from "@/lib/listingSort";
 import { EmptyState } from "./EmptyState";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { CategoryIcon } from "./CategoryIcon";
@@ -36,6 +37,8 @@ interface CategoryListingProps {
   districtName?: string;
   animal?: string;
   near?: string;
+  sort?: string;
+  rating?: string;
 }
 
 /** "in Bratislava" / "v Bratislave", or "Petržalka, Bratislava" for a district. */
@@ -53,7 +56,11 @@ export async function CategoryListing({
   districtName,
   near,
   animal: requestedAnimal,
+  sort: requestedSort,
+  rating: requestedRating,
 }: CategoryListingProps) {
+  const sort = parseSort(requestedSort);
+  const minRating = parseMinRating(requestedRating);
   // Ignore a pet this service isn't for (e.g. ?animal=bird on dog training).
   const animal =
     isAnimal(requestedAnimal) && animalsForService(category).includes(requestedAnimal) ? requestedAnimal : undefined;
@@ -80,8 +87,11 @@ export async function CategoryListing({
   // "Near me": sort by distance from the visitor, places without
   // coordinates last (in their usual daily order).
   const origin = parseNear(near);
-  const found = animal ? all.filter((b) => b.animals.includes(animal)) : all;
-  const unconfirmed = animal ? all.filter((b) => !b.animals.includes(animal)) : [];
+  // Rating filter first (Google rating as collected), then the pet split.
+  const rated = all.filter((b) => meetsMinRating(b, minRating));
+  const hiddenUnrated = minRating ? all.filter((b) => b.googleRating === null).length : 0;
+  const found = animal ? rated.filter((b) => b.animals.includes(animal)) : rated;
+  const unconfirmed = animal ? rated.filter((b) => !b.animals.includes(animal)) : [];
   const toItem = (b: (typeof all)[number]) => ({
     business: b,
     km: origin && b.lat !== null && b.lng !== null ? distanceKm(origin.lat, origin.lng, b.lat, b.lng) : null,
@@ -89,8 +99,11 @@ export async function CategoryListing({
   const byDistance = (a: { km: number | null }, b: { km: number | null }) => (a.km ?? Infinity) - (b.km ?? Infinity);
   const withDistance = found.map(toItem);
   const unconfirmedItems = unconfirmed.map(toItem);
-  if (origin) unconfirmedItems.sort(byDistance);
-  if (origin) withDistance.sort(byDistance);
+  // An explicit sort wins over "near me" ordering (distance stays shown).
+  const ordered = <T extends { business: (typeof all)[number]; km: number | null }>(items: T[]) =>
+    sort ? sortByListing(items, sort, (i) => i.business) : origin ? [...items].sort(byDistance) : items;
+  const listItems = ordered(withDistance);
+  const unconfirmedList = ordered(unconfirmedItems);
 
   const faqs = buildFaqs({ locale, category, where, aggregates });
   const countLabel = aggregates.count === 1 ? categorySingular(category, locale) : categoryPlural(category, locale);
@@ -148,8 +161,10 @@ export async function CategoryListing({
           </dl>
 
           {/* Switch service, keep the location */}
-          <nav aria-label={t.listing.otherServices} className="-mx-4 mt-6 overflow-x-auto px-4 [scrollbar-width:none]">
-            <ul className="flex gap-2">
+          {/* Wraps on phones: all six services stay visible, no hidden
+              sideways scroll. */}
+          <nav aria-label={t.listing.otherServices} className="mt-6">
+            <ul className="flex flex-wrap gap-2">
               {ALL_CATEGORIES.map((other) => {
                 const active = other === category;
                 return (
@@ -185,20 +200,29 @@ export async function CategoryListing({
             currentDistrictSlug={districtSlug}
             currentAnimal={animal}
             near={origin ? near : undefined}
+            sort={sort}
+            minRating={minRating}
           />
 
           <p className="mt-6 flex items-center gap-1.5 text-sm text-foreground/60">
             {origin && <RouteIcon className="h-4 w-4 text-brand-blue" />}
             {animal ? t.listing.confirmedFor(found.length, t.animals[animal]) : t.listing.results(found.length)}
-            {unconfirmed.length > 0 ? ` · ${t.listing.moreToCheck(unconfirmed.length)}` : ""} ·{" "}
-            {origin ? t.listing.nearest : t.listing.fairTurn}
+            {unconfirmed.length > 0 ? ` · ${t.listing.moreToCheck(unconfirmed.length)}` : ""}
+            {hiddenUnrated > 0 ? ` · ${t.listing.hiddenUnrated(hiddenUnrated)}` : ""} ·{" "}
+            {sort === "rating"
+              ? t.listing.ratingFirst
+              : sort === "reviews"
+                ? t.listing.reviewsFirst
+                : origin
+                  ? t.listing.nearest
+                  : t.listing.fairTurn}
           </p>
 
           <div className="mt-3 space-y-4">
             {found.length === 0 && unconfirmed.length === 0 ? (
               <EmptyState resetHref={resetHref} locale={locale} />
             ) : (
-              withDistance.map(({ business, km }) => (
+              listItems.map(({ business, km }) => (
                 <BusinessCard
                   key={business.id}
                   business={business}
@@ -211,7 +235,7 @@ export async function CategoryListing({
             )}
           </div>
 
-          {animal && unconfirmedItems.length > 0 && (
+          {animal && unconfirmedList.length > 0 && (
             <section className="mt-10">
               <div className="rounded-[var(--radius-card)] border border-dashed border-brand-amber/50 bg-brand-amber/5 p-5">
                 <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
@@ -221,7 +245,7 @@ export async function CategoryListing({
                 <p className="mt-1 text-sm text-foreground/70">{t.listing.unconfirmedBody}</p>
               </div>
               <div className="mt-4 space-y-4">
-                {unconfirmedItems.map(({ business, km }) => (
+                {unconfirmedList.map(({ business, km }) => (
                   <BusinessCard
                     key={business.id}
                     business={business}
