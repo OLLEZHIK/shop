@@ -10,6 +10,7 @@ import { CategoryIcon } from "./CategoryIcon";
 import { ANIMALS, animalsForService, servicesForAnimal, type Animal } from "@/lib/animals";
 import { CATEGORY_THEME } from "@/lib/categories";
 import { getDictionary, localePath, type Locale } from "@/lib/i18n";
+import { nearestCity, type CityPointLite } from "@/lib/geo";
 
 export interface SearchOption {
   slug: string;
@@ -33,7 +34,12 @@ interface HomeSearchProps {
   layout?: "hero" | "dialog";
   /** Called right before navigating to the results (e.g. to close a dialog). */
   onNavigate?: () => void;
+  /** Covered cities with a centre point - enables "Near me". */
+  cities?: CityPointLite[];
 }
+
+const NEAR = "__near";
+type GeoStatus = "idle" | "locating" | "denied" | "far";
 
 type Overlay = "category" | "district" | null;
 
@@ -47,6 +53,7 @@ export function HomeSearch({
   popularDistrictSlugs,
   layout = "hero",
   onNavigate,
+  cities = [],
 }: HomeSearchProps) {
   const router = useRouter();
   const t = getDictionary(locale);
@@ -57,6 +64,46 @@ export function HomeSearch({
   // Bumped when Search is pressed with no service: remounts the Service
   // dropdown already open.
   const [serviceNudge, setServiceNudge] = useState(0);
+  // "Near me": asked only when the visitor taps it (never on page load),
+  // then results open in the nearest covered city sorted by distance.
+  const [near, setNear] = useState<{ lat: number; lng: number; citySlug: string } | null>(null);
+  const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
+  const canLocate = cities.length > 0;
+  // Bumped to reopen the Where picker for a manual choice.
+  const [whereNudge, setWhereNudge] = useState(0);
+
+  // Location refused, unavailable or outside our cities: never a dead
+  // end - open the district picker so the visitor chooses by hand.
+  function chooseByHand(status: "denied" | "far") {
+    setNear(null);
+    setGeoStatus(status);
+    const desktop = window.matchMedia("(min-width: 768px)").matches;
+    if (layout === "hero" && !desktop) setOverlay("district");
+    else setWhereNudge((n) => n + 1);
+  }
+
+  function locate() {
+    if (!("geolocation" in navigator)) return chooseByHand("denied");
+    setGeoStatus("locating");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const city = nearestCity(cities, latitude, longitude);
+        if (!city) return chooseByHand("far");
+        setNear({ lat: latitude, lng: longitude, citySlug: city.slug });
+        setDistrictSlug(null);
+        setGeoStatus("idle");
+      },
+      () => chooseByHand("denied"),
+      { timeout: 8000, maximumAge: 10 * 60 * 1000 }
+    );
+  }
+
+  function pickDistrict(slug: string | null) {
+    setNear(null);
+    setGeoStatus("idle");
+    setDistrictSlug(slug);
+  }
 
   // Services that make sense for the chosen pet, and pets that make
   // sense for the chosen service (lib/animals.ts): no dog training for birds.
@@ -75,13 +122,17 @@ export function HomeSearch({
   }
 
   const categoryLabel = selectedCategory?.label;
-  const districtLabel = districts.find((d) => d.slug === districtSlug)?.label;
+  const districtLabel = near ? t.search.nearYou : districts.find((d) => d.slug === districtSlug)?.label;
 
   function goSearch() {
     if (!categorySlug) return;
-    let path = localePath(locale, `/${categorySlug}/${citySlug}/`);
+    let path = localePath(locale, `/${categorySlug}/${near?.citySlug ?? citySlug}/`);
     if (districtSlug) path += `${districtSlug}/`;
-    if (animal) path += `?animal=${animal}`;
+    const params = new URLSearchParams();
+    if (animal) params.set("animal", animal);
+    if (near) params.set("near", `${near.lat.toFixed(4)},${near.lng.toFixed(4)}`);
+    const query = params.toString();
+    if (query) path += `?${query}`;
     onNavigate?.();
     router.push(path);
   }
@@ -111,6 +162,23 @@ export function HomeSearch({
   );
 
   const stepLabel = "px-1 text-xs font-semibold uppercase tracking-wider text-foreground/50";
+
+  const nearButton = canLocate && (
+    <button
+      type="button"
+      onClick={locate}
+      aria-pressed={!!near}
+      className={`inline-flex items-center gap-1 rounded-[var(--radius-pill)] px-2.5 py-1 text-xs font-semibold normal-case tracking-normal transition ${
+        near ? "bg-brand-blue text-white" : "bg-brand-blue-muted text-brand-blue hover:bg-brand-blue hover:text-white"
+      }`}
+    >
+      <MapPinIcon className={`h-3.5 w-3.5 ${geoStatus === "locating" ? "animate-pulse" : ""}`} />
+      {geoStatus === "locating" ? t.search.locatingYou : near ? t.search.nearYou : t.search.nearMe}
+    </button>
+  );
+
+  const geoMessage =
+    geoStatus === "denied" ? t.search.geoDenied : geoStatus === "far" ? t.search.geoFar(cityName) : null;
 
   if (layout === "dialog") {
     return (
@@ -150,18 +218,25 @@ export function HomeSearch({
           })}
         </div>
 
-        <p className={`mt-5 ${stepLabel}`}>{t.search.stepWhere}</p>
+        <div className={`mt-5 flex items-center justify-between gap-2 ${stepLabel}`}>
+          {t.search.stepWhere}
+          {nearButton}
+        </div>
         <Dropdown
+          key={`${near ? "near" : "district"}-${whereNudge}`}
+          defaultOpen={whereNudge > 0}
           ariaLabel={t.search.where}
           placeholder={t.search.all(cityName)}
-          value={districtSlug ?? "all"}
+          value={near ? NEAR : (districtSlug ?? "all")}
           options={[
+            ...(near ? [{ value: NEAR, label: t.search.nearYou, icon: <MapPinIcon className="h-4 w-4 text-brand-blue" /> }] : []),
             { value: "all", label: t.search.all(cityName), icon: <MapPinIcon className="h-4 w-4 text-foreground/50" /> },
             ...districts.map((d) => ({ value: d.slug, label: d.label })),
           ]}
-          onChange={(v) => setDistrictSlug(v === "all" ? null : v)}
+          onChange={(v) => (v === NEAR ? undefined : pickDistrict(v === "all" ? null : v))}
           className="mt-2"
         />
+        {geoMessage && <p className="mt-2 px-1 text-sm text-foreground/70">{geoMessage}</p>}
 
         <button
           type="button"
@@ -194,7 +269,10 @@ export function HomeSearch({
           <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
         </button>
 
-        <p className={`mt-4 ${stepLabel}`}>{t.search.stepWhere}</p>
+        <div className={`mt-4 flex items-center justify-between gap-2 ${stepLabel}`}>
+          {t.search.stepWhere}
+          {nearButton}
+        </div>
         <button
           type="button"
           onClick={() => setOverlay("district")}
@@ -206,6 +284,7 @@ export function HomeSearch({
           </span>
           <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
         </button>
+        {geoMessage && <p className="mt-2 px-1 text-sm text-foreground/70">{geoMessage}</p>}
 
         <button
           type="button"
@@ -248,13 +327,20 @@ export function HomeSearch({
         />
         <span aria-hidden="true" className="h-8 w-px bg-line" />
         <Dropdown
+          key={`where-${whereNudge}`}
+          defaultOpen={whereNudge > 0}
           variant="bar"
           label={t.search.where}
           ariaLabel={t.search.where}
-          placeholder={t.search.all(cityName)}
-          value={districtSlug}
-          options={districts.map((d) => ({ value: d.slug, label: d.label }))}
-          onChange={setDistrictSlug}
+          placeholder={geoStatus === "locating" ? t.search.locatingYou : t.search.all(cityName)}
+          value={near ? NEAR : districtSlug}
+          options={[
+            ...(canLocate
+              ? [{ value: NEAR, label: near ? t.search.nearYou : t.search.nearMe, icon: <MapPinIcon className="h-4 w-4 text-brand-blue" /> }]
+              : []),
+            ...districts.map((d) => ({ value: d.slug, label: d.label })),
+          ]}
+          onChange={(v) => (v === NEAR ? locate() : pickDistrict(v))}
           className="min-w-0 flex-[1.1]"
         />
         <button
@@ -269,6 +355,9 @@ export function HomeSearch({
           {t.search.search}
         </button>
       </div>
+      {geoMessage && (
+        <p className="mt-3 hidden px-6 text-left text-sm text-foreground/70 md:block">{geoMessage}</p>
+      )}
 
       {overlay && (
         <StepOverlay
@@ -278,10 +367,11 @@ export function HomeSearch({
           }
           popularSlugs={overlay === "category" ? popularCategorySlugs : popularDistrictSlugs}
           labels={{ close: t.search.close, popular: t.search.popular }}
+          note={overlay === "district" ? geoMessage : null}
           onClose={() => setOverlay(null)}
           onSelect={(slug) => {
             if (overlay === "category") setCategorySlug(slug);
-            else setDistrictSlug(slug || null);
+            else pickDistrict(slug || null);
             setOverlay(null);
           }}
         />
@@ -295,6 +385,7 @@ function StepOverlay({
   options,
   popularSlugs,
   labels,
+  note,
   onClose,
   onSelect,
 }: {
@@ -302,6 +393,7 @@ function StepOverlay({
   options: SearchOption[];
   popularSlugs: string[];
   labels: { close: string; popular: string };
+  note?: string | null;
   onClose: () => void;
   onSelect: (slug: string) => void;
 }) {
@@ -326,6 +418,9 @@ function StepOverlay({
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4">
+        {note && (
+          <p className="mb-4 rounded-[var(--radius-control)] bg-brand-blue-muted px-4 py-3 text-sm text-brand-blue">{note}</p>
+        )}
         {popular.length > 0 && (
           <div className="mb-6">
             <p className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">{labels.popular}</p>

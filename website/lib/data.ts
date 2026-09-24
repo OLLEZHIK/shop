@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "./prisma";
 import type { Business, BusinessCategory, District, City } from "@prisma/client";
 import { CATEGORY_LABELS, categorySlugFromEnum } from "./categories";
@@ -74,11 +75,11 @@ export function publicDescription(notes: string | null): string | null {
   return notes;
 }
 
-export async function getCityBySlug(slug: string) {
+async function getCityBySlugRaw(slug: string) {
   return prisma.city.findUnique({ where: { slug } });
 }
 
-export async function getAllCities() {
+async function getAllCitiesRaw() {
   return prisma.city.findMany();
 }
 
@@ -87,34 +88,32 @@ export async function getAllCities() {
 // docs/design-plan.md 2.2. With one city this is just the first row;
 // once a second city exists, this call site is where routing/geo-IP
 // logic for picking a default would go.
-export async function getDefaultCity() {
+async function getDefaultCityRaw() {
   return prisma.city.findFirst({ orderBy: { id: "asc" } });
 }
 
-export async function getDistrictBySlug(slug: string) {
+async function getDistrictBySlugRaw(slug: string) {
   return prisma.district.findUnique({ where: { slug }, include: { city: true } });
 }
 
 // Real listing counts per district, optionally scoped to one category -
 // used to surface genuinely popular districts (most businesses) instead of
 // a made-up "popular searches" list.
-export async function getDistrictCounts(
+async function getDistrictCountsRaw(
   category?: BusinessCategory
 ): Promise<{ slug: string; name: string; count: number }[]> {
-  const districts = await prisma.district.findMany();
-  const counts = await Promise.all(
-    districts.map((d) =>
-      prisma.business.count({
-        where: {
-          status: "PUBLISHED",
-          districtId: d.id,
-          ...(category ? { category } : {}),
-        },
-      })
-    )
-  );
+  // One query + an in-memory tally (was one count query per district).
+  const [districts, rows] = await Promise.all([
+    prisma.district.findMany(),
+    prisma.business.findMany({
+      where: { status: "PUBLISHED", districtId: { not: null }, ...(category ? { category } : {}) },
+      select: { districtId: true },
+    }),
+  ]);
+  const tally = new Map<number, number>();
+  for (const r of rows) if (r.districtId !== null) tally.set(r.districtId, (tally.get(r.districtId) ?? 0) + 1);
   return districts
-    .map((d, i) => ({ slug: d.slug, name: d.name, count: counts[i] }))
+    .map((d) => ({ slug: d.slug, name: d.name, count: tally.get(d.id) ?? 0 }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -139,7 +138,7 @@ const ALL_BUSINESS_CATEGORIES: BusinessCategory[] = [
 // count, each paired with its single most-listed category there - not
 // geolocation-based (see tasks/cli-redesign-homepage.md), just what
 // the data actually shows for the default city.
-export async function getPopularNearby(limit = 4): Promise<PopularNearby[]> {
+async function getPopularNearbyRaw(limit = 4): Promise<PopularNearby[]> {
   const topDistricts = (await getDistrictCounts()).filter((d) => d.count > 0).slice(0, limit);
 
   // Sequential, not Promise.all: each district picks its best category
@@ -178,7 +177,7 @@ export async function getPopularNearby(limit = 4): Promise<PopularNearby[]> {
   return results;
 }
 
-export async function getAllDistricts() {
+async function getAllDistrictsRaw() {
   return prisma.district.findMany({ orderBy: { name: "asc" } });
 }
 
@@ -191,7 +190,7 @@ export async function getAllDistricts() {
 // (out of this task's scope). The caller is still responsible for checking
 // the city slug resolves to a real City (see getCityBySlug) before calling
 // this, to 404 on typos.
-export async function searchBusinesses(filters: BusinessFilters): Promise<BusinessWithRelations[]> {
+async function searchBusinessesRaw(filters: BusinessFilters): Promise<BusinessWithRelations[]> {
   const where = {
     status: "PUBLISHED" as const,
     category: filters.category,
@@ -207,7 +206,7 @@ export async function searchBusinesses(filters: BusinessFilters): Promise<Busine
   return shuffleDeterministically(businesses) as BusinessWithRelations[];
 }
 
-export async function getAllPublishedBusinessSlugs(): Promise<
+async function getAllPublishedBusinessSlugsRaw(): Promise<
   { slug: string; verifiedAt: Date | null; country: string | null }[]
 > {
   const [rows, districts] = await Promise.all([
@@ -225,7 +224,7 @@ export async function getAllPublishedBusinessSlugs(): Promise<
   }));
 }
 
-export async function getFeaturedBusinesses(limit = 4): Promise<BusinessWithRelations[]> {
+async function getFeaturedBusinessesRaw(limit = 4): Promise<BusinessWithRelations[]> {
   const businesses = await prisma.business.findMany({
     where: { status: "PUBLISHED", featured: true },
     include: BUSINESS_INCLUDE,
@@ -234,36 +233,19 @@ export async function getFeaturedBusinesses(limit = 4): Promise<BusinessWithRela
   return businesses as BusinessWithRelations[];
 }
 
-export async function getBusinessBySlug(slug: string): Promise<BusinessWithRelations | null> {
+async function getBusinessBySlugRaw(slug: string): Promise<BusinessWithRelations | null> {
   return prisma.business.findUnique({
     where: { slug },
     include: BUSINESS_INCLUDE,
   }) as Promise<BusinessWithRelations | null>;
 }
 
-export async function getBusinessCount(): Promise<{ total: number; byCategory: Record<string, number> }> {
-  const categories: BusinessCategory[] = [
-    "GROOMING",
-    "VET_CLINIC",
-    "PET_HOTEL",
-    "PET_SHOP",
-    "DOG_TRAINING",
-    "PET_SITTING",
-  ];
-
-  const counts = await Promise.all(
-    categories.map((category) =>
-      prisma.business.count({ where: { status: "PUBLISHED", category } })
-    )
-  );
-
+async function getBusinessCountRaw(): Promise<{ total: number; byCategory: Record<string, number> }> {
+  const rows = await prisma.business.findMany({ where: { status: "PUBLISHED" }, select: { category: true } });
   const byCategory: Record<string, number> = {};
-  let total = 0;
-  categories.forEach((category, i) => {
-    byCategory[category] = counts[i];
-    total += counts[i];
-  });
-  return { total, byCategory };
+  for (const category of ALL_BUSINESS_CATEGORIES) byCategory[category] = 0;
+  for (const r of rows) byCategory[r.category] = (byCategory[r.category] ?? 0) + 1;
+  return { total: rows.length, byCategory };
 }
 
 export interface CategoryAggregates {
@@ -274,7 +256,7 @@ export interface CategoryAggregates {
   currency: string;
 }
 
-export async function getCategoryAggregates(
+async function getCategoryAggregatesRaw(
   category: BusinessCategory,
   districtSlug?: string
 ): Promise<CategoryAggregates> {
@@ -315,7 +297,7 @@ export async function getCategoryAggregates(
 // with no PriceItem at all are simply absent from the returned map -
 // callers render no price block for them, same as everywhere else data
 // is missing.
-export async function getPriceTierMap(category: BusinessCategory): Promise<Map<number, number>> {
+async function getPriceTierMapRaw(category: BusinessCategory): Promise<[number, number][]> {
   const items = await prisma.priceItem.findMany({
     where: { business: { category, status: "PUBLISHED" } },
     select: { businessId: true, priceFrom: true },
@@ -327,7 +309,7 @@ export async function getPriceTierMap(category: BusinessCategory): Promise<Map<n
     const current = cheapestByBusiness.get(item.businessId);
     if (current === undefined || price < current) cheapestByBusiness.set(item.businessId, price);
   }
-  if (cheapestByBusiness.size === 0) return new Map();
+  if (cheapestByBusiness.size === 0) return [];
 
   const sortedPrices = [...cheapestByBusiness.values()].sort((a, b) => a - b);
   function tierFor(price: number): number {
@@ -340,7 +322,7 @@ export async function getPriceTierMap(category: BusinessCategory): Promise<Map<n
   for (const [businessId, price] of cheapestByBusiness) {
     tierMap.set(businessId, tierFor(price));
   }
-  return tierMap;
+  return [...tierMap.entries()];
 }
 
 export interface DistrictSummary {
@@ -355,7 +337,7 @@ export interface DistrictSummary {
 // lightweight select (a few dozen rows; groupBy doesn't type-check
 // through the Accelerate extension). Districts with no listings are
 // dropped; categories within a district are ranked by count.
-export async function getDistrictSummaries(): Promise<DistrictSummary[]> {
+async function getDistrictSummariesRaw(): Promise<DistrictSummary[]> {
   const [districts, rows] = await Promise.all([
     prisma.district.findMany(),
     prisma.business.findMany({
@@ -400,7 +382,7 @@ export interface CityPoint {
 // its geocoded businesses (City has no coordinates of its own, and this
 // keeps a new city data-only). Cities without geocoded businesses are
 // left out.
-export async function getCityPoints(): Promise<CityPoint[]> {
+async function getCityPointsRaw(): Promise<CityPoint[]> {
   const [cities, districts, rows] = await Promise.all([
     prisma.city.findMany(),
     prisma.district.findMany({ select: { id: true, cityId: true } }),
@@ -433,4 +415,70 @@ export function parseNear(value: string | undefined): { lat: number; lng: number
   const [lat, lng] = value.split(",").map(Number);
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
   return { lat, lng };
+}
+
+// ---------------------------------------------------------------------
+// Cached public API. Every page render used to hit the database directly
+// (~35 operations for one listing page); on Prisma Postgres' metered
+// plan that burned the monthly quota and took the listing pages down
+// (P6003, 2026-09-24). Results are cached for a day across requests
+// and deployments; the data only changes when the CSV seed is re-run.
+// unstable_cache stores JSON, so Dates come back as strings and are
+// revived below; Decimal prices come back as strings (read via
+// Number()/String() everywhere already).
+// ---------------------------------------------------------------------
+const REVALIDATE_SECONDS = 24 * 60 * 60;
+
+function cached<A extends unknown[], R>(fn: (...args: A) => Promise<R>, key: string) {
+  return unstable_cache(fn, ["db", key], { revalidate: REVALIDATE_SECONDS, tags: ["db"] });
+}
+
+function toDate(value: Date | string | null): Date | null {
+  return value === null ? null : new Date(value);
+}
+
+function reviveBusiness(b: BusinessWithRelations): BusinessWithRelations {
+  return {
+    ...b,
+    verifiedAt: toDate(b.verifiedAt),
+    reviews: b.reviews.map((r) => ({ ...r, createdAt: new Date(r.createdAt) })),
+  };
+}
+
+export const getCityBySlug = cached(getCityBySlugRaw, "getCityBySlug");
+export const getAllCities = cached(getAllCitiesRaw, "getAllCities");
+export const getDefaultCity = cached(getDefaultCityRaw, "getDefaultCity");
+export const getDistrictBySlug = cached(getDistrictBySlugRaw, "getDistrictBySlug");
+export const getDistrictCounts = cached(getDistrictCountsRaw, "getDistrictCounts");
+export const getPopularNearby = cached(getPopularNearbyRaw, "getPopularNearby");
+export const getAllDistricts = cached(getAllDistrictsRaw, "getAllDistricts");
+export const getBusinessCount = cached(getBusinessCountRaw, "getBusinessCount");
+export const getCategoryAggregates = cached(getCategoryAggregatesRaw, "getCategoryAggregates");
+export const getDistrictSummaries = cached(getDistrictSummariesRaw, "getDistrictSummaries");
+export const getCityPoints = cached(getCityPointsRaw, "getCityPoints");
+
+const searchBusinessesCached = cached(searchBusinessesRaw, "searchBusinesses");
+export async function searchBusinesses(filters: BusinessFilters): Promise<BusinessWithRelations[]> {
+  return (await searchBusinessesCached(filters)).map(reviveBusiness);
+}
+
+const getFeaturedBusinessesCached = cached(getFeaturedBusinessesRaw, "getFeaturedBusinesses");
+export async function getFeaturedBusinesses(limit = 4): Promise<BusinessWithRelations[]> {
+  return (await getFeaturedBusinessesCached(limit)).map(reviveBusiness);
+}
+
+const getBusinessBySlugCached = cached(getBusinessBySlugRaw, "getBusinessBySlug");
+export async function getBusinessBySlug(slug: string): Promise<BusinessWithRelations | null> {
+  const business = await getBusinessBySlugCached(slug);
+  return business ? reviveBusiness(business) : null;
+}
+
+const getAllPublishedBusinessSlugsCached = cached(getAllPublishedBusinessSlugsRaw, "getAllPublishedBusinessSlugs");
+export async function getAllPublishedBusinessSlugs() {
+  return (await getAllPublishedBusinessSlugsCached()).map((b) => ({ ...b, verifiedAt: toDate(b.verifiedAt) }));
+}
+
+const getPriceTierEntries = cached(getPriceTierMapRaw, "getPriceTierMap");
+export async function getPriceTierMap(category: BusinessCategory): Promise<Map<number, number>> {
+  return new Map(await getPriceTierEntries(category));
 }

@@ -4,10 +4,11 @@ import { config as loadEnv } from "dotenv";
 import Papa from "papaparse";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, BusinessCategory } from "@prisma/client";
+import { directDatabaseUrl } from "./db-url";
 
 loadEnv({ path: path.join(process.cwd(), ".env.local") });
 
-const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL });
+const adapter = new PrismaPg({ connectionString: directDatabaseUrl() });
 const prisma = new PrismaClient({ adapter });
 
 // data/ at the repo root, not website/data/ (that's a stale duplicate copy).

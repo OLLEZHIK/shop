@@ -8,6 +8,7 @@ import {
   getFeaturedBusinesses,
   getBusinessCount,
   getDistrictSummaries,
+  getCityPoints,
 } from "@/lib/data";
 import {
   ALL_CATEGORIES,
@@ -55,13 +56,14 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   if (!isLocale(lang)) notFound();
   const locale = lang;
   const t = getDictionary(locale).home;
-  const [city, districts, popularNearby, featured, counts, districtSummaries] = await Promise.all([
+  const [city, districts, popularNearby, featured, counts, districtSummaries, cityPoints] = await Promise.all([
     getDefaultCity(),
     getAllDistricts(),
     getPopularNearby(),
     getFeaturedBusinesses(),
     getBusinessCount(),
     getDistrictSummaries(),
+    getCityPoints(),
   ]);
 
   const cityName = city?.name ?? "Bratislava";
@@ -128,6 +130,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 popularCategorySlugs={popularCategorySlugs}
                 districts={districtOptions}
                 popularDistrictSlugs={popularNearby.map((p) => p.districtSlug)}
+                cities={cityPoints.map(({ slug, lat, lng }) => ({ slug, lat, lng }))}
               />
             </div>
 

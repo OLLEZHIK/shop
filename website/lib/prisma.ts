@@ -1,16 +1,15 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
-import { withAccelerate } from "@prisma/extension-accelerate";
+import { pooledDatabaseUrl } from "@/prisma/db-url";
 
 function createClient() {
   return new PrismaClient({
-    accelerateUrl: process.env.DATABASE_URL,
-  }).$extends(withAccelerate());
+    adapter: new PrismaPg({ connectionString: pooledDatabaseUrl() }),
+  });
 }
 
-type AcceleratedClient = ReturnType<typeof createClient>;
-
 const globalForPrisma = globalThis as unknown as {
-  prisma: AcceleratedClient | undefined;
+  prisma: PrismaClient | undefined;
 };
 
 // Reuse the client across hot reloads in dev so we don't exhaust connections.
