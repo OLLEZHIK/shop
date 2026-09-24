@@ -313,9 +313,9 @@ const en = {
     emptyTitle: "Nothing here yet",
     emptyBody: "No places match these filters. Try another district or pet.",
     reset: "Reset filters",
-    metaTitle: (label: string, where: string) => `${label} ${where}`,
+    metaTitle: (label: string, where: string) => `${label} ${where} | Pawenn`,
     metaDescription: (count: number, what: string, where: string) =>
-      `Browse ${count} ${what} ${where}, checked and kept up to date.`,
+      `Compare ${count} ${what} ${where}: district, which pets they take, and one tap to call, open the website or get directions.`,
     faqCount: (plural: string, where: string) => `How many ${plural} are there ${where}?`,
     faqCountAnswer: (n: number, singular: string, where: string) =>
       `There are currently ${n} listed ${singular}${n === 1 ? "" : "s"} ${where}.`,
@@ -633,7 +633,7 @@ const sk: Dictionary = {
     emptyTitle: "Zatiaľ tu nič nie je",
     emptyBody: "Týmto filtrom nezodpovedá žiadny podnik. Skúste inú mestskú časť alebo zviera.",
     reset: "Zrušiť filtre",
-    metaTitle: (label: string, where: string) => `${label} ${where}`,
+    metaTitle: (label: string, where: string) => `${label} ${where} | Pawenn`,
     metaDescription: (count: number, what: string, where: string) =>
       `${cap(what)} ${skIn(where)}: ${count} ${plural("sk", count, {
         one: "podnik",

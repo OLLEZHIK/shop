@@ -106,6 +106,44 @@ const SINGULAR: Record<Locale, Record<BusinessCategory, string>> = {
   },
 };
 
+// Plural noun for running copy ("Compare 10 grooming salons..."). The
+// English labels are headings ("Grooming", "Dog Training") and read
+// wrong after a number.
+const PLURAL: Record<Locale, Record<BusinessCategory, string>> = {
+  en: {
+    GROOMING: "grooming salons",
+    VET_CLINIC: "vet clinics",
+    PET_HOTEL: "pet hotels",
+    DOG_TRAINING: "dog trainers",
+    PET_SHOP: "pet shops",
+    PET_SITTING: "pet sitters",
+  },
+  sk: {
+    GROOMING: "psie salóny",
+    VET_CLINIC: "veterinárne ambulancie",
+    PET_HOTEL: "hotely pre zvieratá",
+    DOG_TRAINING: "výcvik psov",
+    PET_SHOP: "chovateľské potreby",
+    PET_SITTING: "opatrovanie zvierat",
+  },
+};
+
+// Page <title> wording: the phrases people actually type. "Grooming in
+// Bratislava" alone also matches barbershops, so the English titles say
+// which animals. Slovak stays on the labels until the keyword research
+// task (tasks/antigravity-slovak-keyword-research.md) says otherwise.
+const SEO_TITLE: Record<Locale, Record<BusinessCategory, string>> = {
+  en: {
+    GROOMING: "Dog & Cat Grooming",
+    VET_CLINIC: "Vets & Veterinary Clinics",
+    PET_HOTEL: "Pet Hotels & Dog Boarding",
+    DOG_TRAINING: "Dog Training & Puppy Classes",
+    PET_SHOP: "Pet Shops",
+    PET_SITTING: "Pet Sitters & Dog Walkers",
+  },
+  sk: LABELS.sk,
+};
+
 const BLURBS: Record<Locale, Record<BusinessCategory, string>> = {
   en: {
     GROOMING: CATEGORY_THEME.GROOMING.blurb,
@@ -149,6 +187,14 @@ export function categoryLabel(category: BusinessCategory, locale: Locale): strin
 
 export function categorySingular(category: BusinessCategory, locale: Locale): string {
   return SINGULAR[locale][category];
+}
+
+export function categoryPlural(category: BusinessCategory, locale: Locale): string {
+  return PLURAL[locale][category];
+}
+
+export function categorySeoTitle(category: BusinessCategory, locale: Locale): string {
+  return SEO_TITLE[locale][category];
 }
 
 export function categoryBlurb(category: BusinessCategory, locale: Locale): string {
