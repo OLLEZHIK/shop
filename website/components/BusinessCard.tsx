@@ -6,9 +6,7 @@ import { getDictionary, type Locale } from "@/lib/i18n";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { PartnerBadge } from "./PartnerBadge";
 import { QuickActions } from "./QuickActions";
-import { PhotoGallery } from "./PhotoGallery";
 import { BusinessAvatar } from "./BusinessAvatar";
-import { AnimalIcon } from "./AnimalIcon";
 import { ArrowRightIcon, MapPinIcon, RouteIcon } from "./icons";
 
 interface BusinessCardProps {
@@ -17,14 +15,16 @@ interface BusinessCardProps {
   locale: Locale;
   /** Distance from the visitor, when the list is sorted by "near me". */
   distanceKm?: number | null;
+  /** The category eyebrow only helps in mixed lists; a category page
+   *  already says what every card is. */
+  showCategory?: boolean;
 }
 
-export function BusinessCard({ business, priceTier = null, locale, distanceKm = null }: BusinessCardProps) {
+export function BusinessCard({ business, priceTier = null, locale, distanceKm = null, showCategory = true }: BusinessCardProps) {
   const t = getDictionary(locale);
   const rating = averageRating(business.reviews);
   const description = publicDescription(business.notes);
   const accent = CATEGORY_THEME[business.category].accent;
-  const hasPhotos = business.photoUrls.length > 0;
 
   return (
     <article
@@ -33,24 +33,19 @@ export function BusinessCard({ business, priceTier = null, locale, distanceKm = 
     >
       <Link href={businessPath(locale, business.slug)} className="absolute inset-0 z-0 rounded-[var(--radius-card)]" aria-label={business.name} />
 
-      {hasPhotos ? (
-        <PhotoGallery
-          photoUrls={business.photoUrls}
-          alt={business.name}
-          variant="card"
-          className="pointer-events-none w-24 shrink-0 self-start sm:w-36"
-        />
-      ) : (
-        <BusinessAvatar name={business.name} category={business.category} className="h-14 w-14 shrink-0 text-lg sm:h-16 sm:w-16" />
-      )}
+      {/* Card format (owner, 2026-09-24): the business's logo, or its
+          initials until logos are collected; photos live on the place page. */}
+      <BusinessAvatar name={business.name} category={business.category} className="h-14 w-14 shrink-0 text-lg sm:h-16 sm:w-16" />
 
       <div className="pointer-events-none relative z-10 min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: accent }}>
-              {categoryLabel(business.category, locale)}
-            </p>
-            <h3 className="mt-0.5 font-heading text-lg font-bold leading-snug text-foreground transition group-hover:text-brand-blue md:text-xl">
+            {showCategory && (
+              <p className="mb-0.5 text-xs font-semibold uppercase tracking-wider" style={{ color: accent }}>
+                {categoryLabel(business.category, locale)}
+              </p>
+            )}
+            <h3 className="font-heading text-lg font-bold leading-snug text-foreground transition group-hover:text-brand-blue md:text-xl">
               {business.name}
             </h3>
           </div>
@@ -83,15 +78,6 @@ export function BusinessCard({ business, priceTier = null, locale, distanceKm = 
               <span className="text-foreground/25">{"€".repeat(5 - priceTier)}</span>
             </span>
           )}
-          {business.animals.map((animal) => (
-            <span
-              key={animal}
-              className="inline-flex items-center gap-1 rounded-[var(--radius-pill)] bg-surface-sunken px-2 py-0.5 text-xs text-foreground/70"
-            >
-              <AnimalIcon animal={animal} className="h-3.5 w-3.5" />
-              {t.animalSingular[animal] ?? animal}
-            </span>
-          ))}
         </div>
 
         {description && <p className="mt-2 line-clamp-2 text-sm text-foreground/70">{description}</p>}

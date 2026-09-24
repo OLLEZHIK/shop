@@ -10,7 +10,7 @@ import {
 } from "@/lib/data";
 import type { BusinessWithRelations } from "@/lib/data";
 import { CATEGORY_THEME, businessPath, categoryLabel, listingPath } from "@/lib/categories";
-import { formatDate as formatLocaleDate, getDictionary, localesForCountry, type Locale } from "@/lib/i18n";
+import { formatDate as formatLocaleDate, getDictionary, localePath, localesForCountry, type Locale } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -81,7 +81,10 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
       : `${business.address}${business.district ? `, ${business.district.name}` : ""}`;
 
   const breadcrumbItems = [
-    ...(citySlug ? [{ label: business.district!.city.name, href: listingPath(locale, business.category, citySlug) }] : []),
+    // Home -> category list -> district -> place. The city is part of
+    // the category list's own title, so it doesn't get a crumb that would
+    // point at the same URL as the category.
+    { label: t.listing.home, href: localePath(locale, "/") },
     ...(citySlug
       ? [{ label, href: listingPath(locale, business.category, citySlug) }]
       : [{ label }]),
@@ -406,7 +409,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
           </div>
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             {similar.map((b) => (
-              <BusinessCard key={b.id} business={b} priceTier={priceTiers.get(b.id) ?? null} locale={locale} />
+              <BusinessCard key={b.id} business={b} priceTier={priceTiers.get(b.id) ?? null} locale={locale} showCategory={false} />
             ))}
           </div>
         </section>

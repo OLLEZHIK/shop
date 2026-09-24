@@ -140,7 +140,7 @@ const en = {
     statAds: "ads or sign-ups",
     browseEyebrow: "Browse by service",
     browseTitle: "What does your pet need today?",
-    browseBody: "Six kinds of pet care, each with its own list of places - checked and kept up to date.",
+    browseBody: "Six kinds of pet care, each with its own list of places and a source for every listing.",
     places: (n: number) => `${n} ${n === 1 ? "place" : "places"}`,
     listed: (n: number) => `${n} listed`,
     collageCenter: "places to explore",
@@ -284,7 +284,7 @@ const en = {
   listing: {
     home: "Home",
     browseCount: (count: number, what: string, where: string) =>
-      `Browse ${count} ${what} ${where}, checked and kept up to date.`,
+      `Browse ${count} ${what} ${where}, with a source for every listing.`,
     listed: "listed",
     verified: "verified",
     priceRange: "price range",
@@ -325,7 +325,6 @@ const en = {
     faqVerified: (plural: string, where: string) => `Which ${plural} ${where} are verified?`,
     faqVerifiedAnswer: (v: number, n: number, pct: number) =>
       `${v} out of ${n} listings (${pct}%) have had their details manually verified.`,
-    faqNoneVerified: "None of the current listings have been manually verified yet.",
   },
   card: {
     priceLevel: (tier: number) => `Price level ${tier} of 5`,
@@ -335,7 +334,7 @@ const en = {
   business: {
     metaTitle: (name: string, label: string, where: string) => `${name} - ${label}${where ? ` ${where}` : ""}`,
     metaDescription: (name: string, where: string) =>
-      `Contact details, prices and reviews for ${name}${where ? ` ${where}` : ""}.`,
+      `${name}${where ? ` ${where}` : ""}: address, contact details and directions.`,
     about: "About",
     welcomes: "Welcomes",
     specialties: "Specialties",
@@ -439,11 +438,11 @@ const sk: Dictionary = {
   home: {
     metaTitle: (city: string) => `pawenn - Služby pre zvieratá v meste ${city}`,
     metaDescription: (city: string) =>
-      `Overené služby pre zvieratá v meste ${city} - psie salóny, veterinári, hotely pre zvieratá, výcvik a ďalšie`,
-    h1Before: "Nájdite overené",
+      `Služby pre zvieratá v meste ${city} - psie salóny, veterinári, hotely pre zvieratá, výcvik a ďalšie, s kontaktom na jeden dotyk`,
+    h1Before: "Nájdite spoľahlivé",
     h1Highlight: "služby pre zvieratá",
     subtitle: (city: string) =>
-      `Psie salóny, veterinári, hotely pre zvieratá a cvičitelia v meste ${city} - s overenými údajmi, jasnými zdrojmi a kontaktom na jeden dotyk.`,
+      `Psie salóny, veterinári, hotely pre zvieratá a cvičitelia v meste ${city} - s poctivými údajmi, jasnými zdrojmi a kontaktom na jeden dotyk.`,
     popular: "Obľúbené:",
     statPlaces: "podnikov v zozname",
     statDistricts: "mestských častí",
@@ -451,7 +450,7 @@ const sk: Dictionary = {
     statAds: "reklám a registrácií",
     browseEyebrow: "Podľa služby",
     browseTitle: "Čo dnes potrebuje váš miláčik?",
-    browseBody: "Šesť druhov starostlivosti, každý s vlastným zoznamom podnikov - overeným a aktuálnym.",
+    browseBody: "Šesť druhov starostlivosti, každý s vlastným zoznamom podnikov a zdrojom pri každom zázname.",
     places: (n: number) => `${n} ${plural("sk", n, { one: "podnik", few: "podniky", other: "podnikov" })}`,
     listed: (n: number) => `${n} v zozname`,
     collageCenter: "podnikov na preskúmanie",
@@ -604,7 +603,7 @@ const sk: Dictionary = {
         one: "podnik",
         few: "podniky",
         other: "podnikov",
-      })} - overené a priebežne aktualizované.`,
+      })} a pri každom uvádzame zdroj údajov.`,
     listed: "v zozname",
     verified: "overených",
     priceRange: "cenové rozpätie",
@@ -639,7 +638,7 @@ const sk: Dictionary = {
         one: "podnik",
         few: "podniky",
         other: "podnikov",
-      })} s overenými kontaktmi, cenami a zdrojmi údajov.`,
+      })} s kontaktmi, mapou a zdrojmi údajov.`,
     faqCount: (pluralLabel: string, where: string) =>
       `Koľko podnikov v kategórii „${cap(pluralLabel)}“ je ${skIn(where)}?`,
     faqCountAnswer: (n: number, _singular: string, where: string) =>
@@ -655,7 +654,6 @@ const sk: Dictionary = {
       `Ktoré podniky v kategórii „${cap(pluralLabel)}“ ${skIn(where)} sú overené?`,
     faqVerifiedAnswer: (v: number, n: number, pct: number) =>
       `${v} z ${n} záznamov (${pct} %) má ručne overené údaje.`,
-    faqNoneVerified: "Zatiaľ nemá ručne overené údaje žiadny zo záznamov.",
   },
   card: {
     priceLevel: (tier: number) => `Cenová úroveň ${tier} z 5`,
@@ -665,7 +663,7 @@ const sk: Dictionary = {
   business: {
     metaTitle: (name: string, label: string, where: string) => `${name} - ${label}${where ? ` ${where}` : ""}`,
     metaDescription: (name: string, where: string) =>
-      `Kontakt, ceny a recenzie: ${name}${where ? ` ${where}` : ""}.`,
+      `${name}${where ? ` ${where}` : ""}: adresa, kontakt a trasa.`,
     about: "O podniku",
     welcomes: "Prijíma",
     specialties: "Špecializácie",

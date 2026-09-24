@@ -205,6 +205,7 @@ export async function CategoryListing({
                   priceTier={priceTiers.get(business.id) ?? null}
                   locale={locale}
                   distanceKm={km}
+                  showCategory={false}
                 />
               ))
             )}
@@ -227,6 +228,7 @@ export async function CategoryListing({
                     priceTier={priceTiers.get(business.id) ?? null}
                     locale={locale}
                     distanceKm={km}
+                    showCategory={false}
                   />
                 ))}
               </div>
@@ -388,14 +390,13 @@ function buildFaqs({
     faqs.push({ question: t.faqPrice(singular, where, label), answer: t.faqPriceAnswer(range) });
   }
 
-  if (aggregates.count > 0) {
+  // Only asked once something is verified: "none are verified" next to
+  // listings reads as a contradiction (SEO audit, 2026-09-24).
+  if (aggregates.verifiedCount > 0) {
     const pct = Math.round((aggregates.verifiedCount / aggregates.count) * 100);
     faqs.push({
       question: t.faqVerified(label, where),
-      answer:
-        aggregates.verifiedCount > 0
-          ? t.faqVerifiedAnswer(aggregates.verifiedCount, aggregates.count, pct)
-          : t.faqNoneVerified,
+      answer: t.faqVerifiedAnswer(aggregates.verifiedCount, aggregates.count, pct),
     });
   }
 
