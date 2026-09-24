@@ -33,6 +33,10 @@ async function main() {
   // Host only, never the credentials: shows in the Vercel build log which
   // database this build is about to touch.
   console.log(`db-setup: database host ${new URL(url).hostname} (${process.env.VERCEL_ENV})`);
+  const neonVars = Object.entries(process.env)
+    .filter(([, value]) => value?.includes(".neon.tech"))
+    .map(([key, value]) => `${key}${value?.includes("-pooler.") ? " (pooled)" : ""}`);
+  console.log(`db-setup: Neon variables: ${neonVars.join(", ") || "none"}`);
 
   const client = new Client({ connectionString: url });
   await client.connect();

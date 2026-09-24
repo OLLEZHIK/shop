@@ -10,10 +10,16 @@ function isPostgres(value: string | undefined): value is string {
   return !!value && /^postgres(ql)?:\/\//.test(value);
 }
 
+// Neon's integration also adds *_NO_SSL variants, which Neon refuses
+// ("denied access"), so those are skipped and SSL is forced on the rest.
 function neonUrls(): string[] {
-  return Object.values(process.env).filter(
-    (value): value is string => isPostgres(value) && value.includes(".neon.tech")
-  );
+  return Object.entries(process.env)
+    .filter(([key, value]) => !key.includes("NO_SSL") && isPostgres(value) && value.includes(".neon.tech"))
+    .map(([, value]) => {
+      const url = new URL(value as string);
+      url.searchParams.set("sslmode", "verify-full");
+      return url.toString();
+    });
 }
 
 /** Pooled connection for the running app. */
