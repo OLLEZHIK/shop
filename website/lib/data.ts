@@ -421,13 +421,13 @@ export function parseNear(value: string | undefined): { lat: number; lng: number
 // Cached public API. Every page render used to hit the database directly
 // (~35 operations for one listing page); on Prisma Postgres' metered
 // plan that burned the monthly quota and took the listing pages down
-// (P6003, 2026-09-24). Results are cached for an hour across requests
+// (P6003, 2026-09-24). Results are cached for a day across requests
 // and deployments; the data only changes when the CSV seed is re-run.
 // unstable_cache stores JSON, so Dates come back as strings and are
 // revived below; Decimal prices come back as strings (read via
 // Number()/String() everywhere already).
 // ---------------------------------------------------------------------
-const REVALIDATE_SECONDS = 60 * 60;
+const REVALIDATE_SECONDS = 24 * 60 * 60;
 
 function cached<A extends unknown[], R>(fn: (...args: A) => Promise<R>, key: string) {
   return unstable_cache(fn, ["db", key], { revalidate: REVALIDATE_SECONDS, tags: ["db"] });
