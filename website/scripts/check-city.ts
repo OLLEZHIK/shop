@@ -47,7 +47,9 @@ const logoOk = (r: Row) => has(r, "logo_file") && fs.existsSync(path.join(logosD
 const CHECKS: { field: string; target: number; ok: (r: Row) => boolean; evidence?: string }[] = [
   { field: "short_description + _local", target: 1, ok: (r) => has(r, "short_description") && has(r, "short_description_local") },
   { field: "description + _local", target: 1, ok: (r) => has(r, "description") && has(r, "description_local") },
-  { field: "lat / lng", target: 1, ok: (r) => has(r, "lat") && has(r, "lng") },
+  // Mobile services with no premises have no coordinates, only a
+  // "coords: none (mobile service ...)" note (docs/card-spec.md, section 3).
+  { field: "lat / lng", target: 1, ok: (r) => (has(r, "lat") && has(r, "lng")) || noted(r, "coords") },
   { field: "phone / email / website", target: 1, ok: (r) => has(r, "phone") || has(r, "email") || has(r, "website") },
   { field: "google_maps_url", target: 0.95, ok: (r) => has(r, "google_maps_url") },
   { field: "logo", target: 0.8, ok: logoOk, evidence: "logo" },
@@ -92,6 +94,25 @@ if (falseNonstop.length) {
   failed = true;
   console.log(`\nemergency_24_7=yes without 24h hours on all 7 days (${falseNonstop.length}):`);
   for (const r of falseNonstop) console.log(`  ${r.slug}: ${r.opening_hours || "(no hours)"}`);
+}
+
+// Coordinates at the city centre are a placeholder, not a place: they put
+// a pin where the business is not (docs/card-spec.md, section 3).
+const cityMeta = fs.existsSync(path.join(dir, "city.json"))
+  ? (JSON.parse(fs.readFileSync(path.join(dir, "city.json"), "utf-8")) as { lat?: number; lng?: number })
+  : {};
+const atCentre = rows.filter(
+  (r) =>
+    cityMeta.lat !== undefined &&
+    cityMeta.lng !== undefined &&
+    has(r, "lat") &&
+    Math.abs(Number(r.lat) - cityMeta.lat) < 0.0005 &&
+    Math.abs(Number(r.lng) - cityMeta.lng) < 0.0005
+);
+if (atCentre.length) {
+  failed = true;
+  console.log(`\nCoordinates at the city centre - placeholder, not the place (${atCentre.length}):`);
+  for (const r of atCentre) console.log(`  ${r.slug}: ${r.lat}, ${r.lng}`);
 }
 
 // Review summaries are a second pass; reported, not enforced here.
