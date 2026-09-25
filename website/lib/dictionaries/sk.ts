@@ -319,6 +319,9 @@ export const sk: Dictionary = {
   },
   card: {
     priceLevel: (tier: number) => `Cenová úroveň ${tier} z 5`,
+    vsMarket: (pct: number, marketBand: boolean) =>
+      marketBand ? "Trhová cena" : pct < 0 ? `o ${-pct} % pod trhom` : `o ${pct} % nad trhom`,
+    vsMarketHint: "V porovnaní s mediánom cien rovnakých služieb v meste",
   },
   rating: {
     countGoogle: (count: string) => `${count} · Google`,
@@ -390,6 +393,8 @@ export const sk: Dictionary = {
     priceList: "cenník",
     perUnit: { per_hour: "/ hod.", per_km: "/ km" },
     notCompared: "neporovnávame s inými podnikmi",
+    cityMedian: (price: string, places: number) =>
+      `Medián v meste ${price} · ${places} ${plural("sk", places, { one: "podnik", few: "podniky", other: "podnikov" })}`,
     pricesDisclaimer: "Ceny tak, ako ich podnik zverejnil k uvedenému dátumu. Môžu sa zmeniť - pred objednaním si ich overte.",
   },
   reviewForm: {

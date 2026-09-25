@@ -4,6 +4,7 @@ import type { Business, BusinessCategory, District, City } from "@prisma/client"
 import { CATEGORY_LABELS, categorySlugFromEnum } from "./categories";
 import type { Locale } from "./i18n";
 import { SERVICES } from "./services";
+import { marketPrices, priceLevels, type ComparablePrice, type MarketPrice, type PriceLevel } from "./priceMarket";
 
 export type BusinessWithRelations = Business & {
   district: (District & { city: City }) | null;
@@ -27,10 +28,11 @@ export type BusinessWithRelations = Business & {
   reviews: { id: number; rating: number; authorName: string; comment: string; createdAt: Date }[];
 };
 
-// Only whole-service prices are compared (ranges, tiers): not per hour or
-// per km, not partial ones like surgery without anaesthesia
-// (docs/card-spec.md, "Цены").
-const COMPARABLE_PRICE = { partial: false, unit: null } as const;
+// Only whole-service prices are compared (ranges, market, tiers): not per
+// hour or per km, not partial ones like surgery without anaesthesia, and
+// not ones that include more than the standard (a `note` such as "incl.
+// hospitalisation") - docs/card-spec.md, "Цены".
+const COMPARABLE_PRICE = { partial: false, unit: null, note: null } as const;
 
 const PUBLISHED_REVIEWS = { where: { status: "PUBLISHED" as const } };
 
@@ -281,44 +283,27 @@ async function getCategoryAggregatesRaw(
   };
 }
 
-// Price tier (1-5 "$" signs) per business, relative to other businesses
-// in the *same category* - quintiles of each business's cheapest
-// priceFrom, not fixed EUR thresholds (those would be made up; nothing
-// says what counts as "cheap" for pet hotels vs. grooming). Businesses
-// with no PriceItem at all are simply absent from the returned map -
-// callers render no price block for them, same as everywhere else data
-// is missing.
-async function getPriceTierMapRaw(category: BusinessCategory, citySlug: string): Promise<[number, number][]> {
+// Prices against the city market: market price per service (median of
+// places) and each place's level, "+40 % above market" and 1-5 € signs.
+// Logic and thresholds: lib/priceMarket.ts, docs/card-spec.md
+// ("Сравнение с рынком города"). All 6 services of the category count,
+// not only the headline one.
+async function getPriceMarketRaw(
+  category: BusinessCategory,
+  citySlug: string
+): Promise<{ market: [string, MarketPrice][]; levels: [number, PriceLevel][] }> {
   const items = await prisma.priceItem.findMany({
     where: {
       business: { category, status: "PUBLISHED", ...inCityWhere(citySlug) },
-      service: { code: mainServiceCode(category) },
+      service: { code: { in: (SERVICES[category] ?? []).map((s) => s.code) } },
       ...COMPARABLE_PRICE,
     },
-    select: { businessId: true, priceFrom: true },
+    select: { businessId: true, priceFrom: true, currency: true, service: { select: { code: true } } },
   });
-
-  const cheapestByBusiness = new Map<number, number>();
-  for (const item of items) {
-    const price = Number(item.priceFrom);
-    const current = cheapestByBusiness.get(item.businessId);
-    if (current === undefined || price < current) cheapestByBusiness.set(item.businessId, price);
-  }
-  // Tiers compare places with each other: meaningless for one or two.
-  if (cheapestByBusiness.size < 3) return [];
-
-  const sortedPrices = [...cheapestByBusiness.values()].sort((a, b) => a - b);
-  function tierFor(price: number): number {
-    const rank = sortedPrices.filter((p) => p <= price).length;
-    const percentile = rank / sortedPrices.length;
-    return Math.min(5, Math.max(1, Math.ceil(percentile * 5)));
-  }
-
-  const tierMap = new Map<number, number>();
-  for (const [businessId, price] of cheapestByBusiness) {
-    tierMap.set(businessId, tierFor(price));
-  }
-  return [...tierMap.entries()];
+  const prices: ComparablePrice[] = items
+    .filter((i) => i.service.code)
+    .map((i) => ({ businessId: i.businessId, code: i.service.code!, priceFrom: Number(i.priceFrom), currency: i.currency }));
+  return { market: [...marketPrices(prices)], levels: [...priceLevels(prices)] };
 }
 
 export interface DistrictSummary {
@@ -503,7 +488,12 @@ export async function getAllPublishedBusinessSlugs() {
   return (await getAllPublishedBusinessSlugsCached()).map((b) => ({ ...b, verifiedAt: toDate(b.verifiedAt) }));
 }
 
-const getPriceTierEntries = cached(getPriceTierMapRaw, "getPriceTierMap");
-export async function getPriceTierMap(category: BusinessCategory, citySlug: string): Promise<Map<number, number>> {
-  return new Map(await getPriceTierEntries(category, citySlug));
+const getPriceMarketCached = cached(getPriceMarketRaw, "getPriceMarket");
+/** Price level per place against the city market (only places with a comparable price). */
+export async function getPriceTierMap(category: BusinessCategory, citySlug: string): Promise<Map<number, PriceLevel>> {
+  return new Map((await getPriceMarketCached(category, citySlug)).levels);
+}
+/** Market price per service code in the city (only services with enough places). */
+export async function getMarketPrices(category: BusinessCategory, citySlug: string): Promise<Map<string, MarketPrice>> {
+  return new Map((await getPriceMarketCached(category, citySlug)).market);
 }

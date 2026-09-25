@@ -10,10 +10,11 @@ import { BusinessAvatar } from "./BusinessAvatar";
 import { GoogleRating } from "./GoogleRating";
 import { ArrowRightIcon, MapPinIcon, RouteIcon } from "./icons";
 import { PriceTier } from "./PriceTier";
+import type { PriceLevel } from "@/lib/priceMarket";
 
 interface BusinessCardProps {
   business: BusinessWithRelations;
-  priceTier?: number | null;
+  priceTier?: PriceLevel | null;
   locale: Locale;
   /** Distance from the visitor, when the list is sorted by "near me". */
   distanceKm?: number | null;
@@ -81,7 +82,7 @@ export function BusinessCard({ business, priceTier = null, locale, distanceKm = 
               {t.listing.kmAway(distanceKm < 10 ? distanceKm.toFixed(1) : distanceKm.toFixed(0))}
             </span>
           )}
-          {priceTier !== null && <PriceTier tier={priceTier} currency={business.city?.currency} locale={locale} />}
+          {priceTier !== null && <PriceTier level={priceTier} currency={business.city?.currency} locale={locale} />}
         </div>
 
         {description && <p className="mt-2 line-clamp-2 text-sm text-foreground/70">{description}</p>}

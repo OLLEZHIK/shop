@@ -1,4 +1,5 @@
 import { getDictionary, type Locale } from "@/lib/i18n";
+import type { PriceLevel } from "@/lib/priceMarket";
 
 /** The currency's own sign: € for EUR, $ for USD, Kč for CZK. */
 function currencySign(locale: Locale, currency: string): string {
@@ -12,25 +13,32 @@ function currencySign(locale: Locale, currency: string): string {
   }
 }
 
-// Price level 1-5 against the same category in the same city
-// (lib/data.ts, getPriceTierMap), shown as filled and faded signs.
+// Price level against the city market (lib/priceMarket.ts): € signs like
+// Google Maps plus the words - "Market price", "40% above market" - so
+// the signs mean something. `withLabel` off: signs only (tight spots).
 export function PriceTier({
-  tier,
+  level,
   currency,
   locale,
+  withLabel = true,
   className = "",
 }: {
-  tier: number;
+  level: PriceLevel;
   currency: string | null | undefined;
   locale: Locale;
+  withLabel?: boolean;
   className?: string;
 }) {
   const sign = currencySign(locale, currency ?? "EUR");
-  const label = getDictionary(locale).card.priceLevel(tier);
+  const t = getDictionary(locale).card;
+  const words = t.vsMarket(level.pct, level.tier === 3);
   return (
-    <span role="img" aria-label={label} title={label} className={className}>
-      <span className="font-semibold text-brand-green">{sign.repeat(tier)}</span>
-      <span className="text-foreground/25">{sign.repeat(5 - tier)}</span>
+    <span title={t.vsMarketHint} className={`inline-flex items-baseline gap-1.5 ${className}`}>
+      <span role="img" aria-label={`${t.priceLevel(level.tier)}: ${words}`}>
+        <span className="font-semibold text-brand-green">{sign.repeat(level.tier)}</span>
+        <span className="text-foreground/25">{sign.repeat(5 - level.tier)}</span>
+      </span>
+      {withLabel && <span className="text-xs font-medium text-foreground/60">{words}</span>}
     </span>
   );
 }
