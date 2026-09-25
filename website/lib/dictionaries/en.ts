@@ -255,14 +255,7 @@ export const en = {
     openNowFilter: "Open now",
     allServices: "All services",
     geoOff: "Location is off - showing all places.",
-    nonstopFilter: "Nonstop 24/7",
     hiddenNoHours: (n: number) => `${n} without opening hours hidden`,
-    nonstopCrumb: "Nonstop",
-    nonstopH1: (where: string) => `Nonstop vets ${where}`,
-    nonstopIntro: "Vet clinics open 24 hours a day, 7 days a week. Call before you go.",
-    nonstopMetaTitle: (where: string) => `Nonstop vets ${where} – 24/7 emergency | Pawenn`,
-    nonstopMetaDescription: (n: number, where: string) =>
-      `${n} vet ${n === 1 ? "clinic" : "clinics"} ${where} open nonstop, 24 hours a day, 7 days a week: address, phone and directions.`,
     kmAway: (km: string) => `${km} km away`,
     goodToKnow: "Good to know",
     faqTitle: "Frequently asked questions",
@@ -382,6 +375,52 @@ export const en = {
     title: "This trail went cold",
     body: "We sniffed around but couldn't find that page. It may have moved, or the link has a typo.",
     back: "Back to home",
+  },
+  // Attribute pages (lib/attributePages.ts): chip label, crumb, H1, the
+  // one-sentence answer (n of total places), title and description.
+  attributes: {
+    nonstop: {
+      chip: "Nonstop 24/7",
+      h1: (where: string) => `Nonstop vets ${where}`,
+      lead: (n: number, total: number) =>
+        `${n} of ${total} vet clinics take patients 24 hours a day, 7 days a week. Call before you go.`,
+      metaTitle: (where: string) => `Nonstop vets ${where} – 24/7 emergency | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} vet ${n === 1 ? "clinic" : "clinics"} ${where} open nonstop, 24 hours a day, 7 days a week: address, phone and directions.`,
+    },
+    saturday: {
+      chip: "Open Saturday",
+      h1: (where: string) => `Vets open on Saturday ${where}`,
+      lead: (n: number, total: number) => `${n} of ${total} vet clinics are open on Saturday. Hours below, checked with each clinic.`,
+      metaTitle: (where: string) => `Vets open on Saturday ${where} | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} vet ${n === 1 ? "clinic" : "clinics"} ${where} open on Saturday, with hours, phone and directions.`,
+    },
+    sunday: {
+      chip: "Open Sunday",
+      h1: (where: string) => `Vets open on Sunday ${where}`,
+      lead: (n: number, total: number) => `${n} of ${total} vet clinics are open on Sunday. Hours below, checked with each clinic.`,
+      metaTitle: (where: string) => `Vets open on Sunday ${where} | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} vet ${n === 1 ? "clinic" : "clinics"} ${where} open on Sunday, with hours, phone and directions.`,
+    },
+    exotics: {
+      chip: "Exotic animals",
+      h1: (where: string) => `Vets for exotic animals ${where}`,
+      lead: (n: number, total: number) =>
+        `${n} of ${total} vet clinics treat exotic animals - reptiles, birds, rodents. Call ahead to check your species.`,
+      metaTitle: (where: string) => `Exotic animal vets ${where} | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} vet ${n === 1 ? "clinic" : "clinics"} ${where} that treat exotic animals: reptiles, birds, rodents. Hours, phone and directions.`,
+    },
+    "home-visits": {
+      chip: "Home visits",
+      h1: (where: string) => `Vets who come to your home ${where}`,
+      lead: (n: number, total: number) => `${n} of ${total} vet clinics offer home visits.`,
+      metaTitle: (where: string) => `Vet home visits ${where} | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} vet ${n === 1 ? "clinic" : "clinics"} ${where} with home visits: phone, hours and what they offer.`,
+    },
   },
   // Price pages (lib/pricePages.ts): one per service and city, plus an
   // overview per category. Numbers come preformatted (money, dates).

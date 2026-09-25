@@ -276,14 +276,7 @@ export const sk: Dictionary = {
     openNowFilter: "Otvorené teraz",
     allServices: "Všetky služby",
     geoOff: "Poloha je vypnutá - zobrazujeme všetky podniky.",
-    nonstopFilter: "Nonstop 24/7",
     hiddenNoHours: (n: number) => `skryté bez otváracích hodín: ${n}`,
-    nonstopCrumb: "Nonstop",
-    nonstopH1: (where: string) => `Veterinár nonstop ${where}`,
-    nonstopIntro: "Veterinárne ambulancie otvorené 24 hodín denne, 7 dní v týždni. Pred cestou zavolajte.",
-    nonstopMetaTitle: (where: string) => `Veterinár nonstop ${where} – pohotovosť 24/7 | Pawenn`,
-    nonstopMetaDescription: (n: number, where: string) =>
-      `Nonstop veterinárne ambulancie ${where}: ${n} ${plural("sk", n, { one: "ambulancia", few: "ambulancie", other: "ambulancií" })} otvorených 24 hodín denne, 7 dní v týždni – adresa, telefón a trasa.`,
     kmAway: (km: string) => `${km} km od vás`,
     goodToKnow: "Dobré vedieť",
     faqTitle: "Časté otázky",
@@ -413,6 +406,52 @@ export const sk: Dictionary = {
     title: "Stopa sa stratila",
     body: "Všetko sme prečuchali, no túto stránku sme nenašli. Možno sa presunula alebo je v odkaze preklep.",
     back: "Späť na úvod",
+  },
+  attributes: {
+    nonstop: {
+      chip: "Nonstop 24/7",
+      h1: (where: string) => `Veterinár nonstop ${skIn(where)}`,
+      lead: (n: number, total: number) =>
+        `${n} z ${total} veterinárnych ambulancií prijíma pacientov 24 hodín denne, 7 dní v týždni. Pred cestou zavolajte.`,
+      metaTitle: (where: string) => `Veterinár nonstop ${skIn(where)} – pohotovosť 24/7 | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `Nonstop veterinárne ambulancie ${skIn(where)}: ${n} ${plural("sk", n, { one: "ambulancia", few: "ambulancie", other: "ambulancií" })} otvorených 24 hodín denne, 7 dní v týždni – adresa, telefón a trasa.`,
+    },
+    saturday: {
+      chip: "Otvorené v sobotu",
+      h1: (where: string) => `Veterinár otvorený v sobotu ${skIn(where)}`,
+      lead: (n: number, total: number) =>
+        `V sobotu má otvorené ${n} z ${total} veterinárnych ambulancií. Otváracie hodiny nižšie, overené pri každej ambulancii.`,
+      metaTitle: (where: string) => `Veterinár v sobotu ${skIn(where)} | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} ${plural("sk", n, { one: "veterinárna ambulancia", few: "veterinárne ambulancie", other: "veterinárnych ambulancií" })} ${skIn(where)} otvorených v sobotu – hodiny, telefón a trasa.`,
+    },
+    sunday: {
+      chip: "Otvorené v nedeľu",
+      h1: (where: string) => `Veterinár otvorený v nedeľu ${skIn(where)}`,
+      lead: (n: number, total: number) =>
+        `V nedeľu má otvorené ${n} z ${total} veterinárnych ambulancií. Otváracie hodiny nižšie, overené pri každej ambulancii.`,
+      metaTitle: (where: string) => `Veterinár v nedeľu ${skIn(where)} | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} ${plural("sk", n, { one: "veterinárna ambulancia", few: "veterinárne ambulancie", other: "veterinárnych ambulancií" })} ${skIn(where)} otvorených v nedeľu – hodiny, telefón a trasa.`,
+    },
+    exotics: {
+      chip: "Exotické zvieratá",
+      h1: (where: string) => `Veterinár pre exotické zvieratá ${skIn(where)}`,
+      lead: (n: number, total: number) =>
+        `Exotické zvieratá – plazy, vtáky, hlodavce – ošetruje ${n} z ${total} veterinárnych ambulancií. Pred návštevou si overte váš druh.`,
+      metaTitle: (where: string) => `Veterinár pre exoty ${skIn(where)} | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} ${plural("sk", n, { one: "veterinárna ambulancia", few: "veterinárne ambulancie", other: "veterinárnych ambulancií" })} ${skIn(where)} pre exotické zvieratá: plazy, vtáky, hlodavce. Hodiny, telefón a trasa.`,
+    },
+    "home-visits": {
+      chip: "Výjazd domov",
+      h1: (where: string) => `Veterinár s výjazdom domov ${skIn(where)}`,
+      lead: (n: number, total: number) => `Výjazd k vám domov ponúka ${n} z ${total} veterinárnych ambulancií.`,
+      metaTitle: (where: string) => `Veterinár domov ${skIn(where)} – výjazd | Pawenn`,
+      metaDescription: (n: number, where: string) =>
+        `${n} ${plural("sk", n, { one: "veterinárna ambulancia", few: "veterinárne ambulancie", other: "veterinárnych ambulancií" })} ${skIn(where)} s výjazdom domov – telefón, hodiny a služby.`,
+    },
   },
   prices: {
     crumb: "Ceny",

@@ -11,7 +11,6 @@ import { AnimalIcon } from "./AnimalIcon";
 import { Dropdown } from "./Dropdown";
 import { MapPinIcon, StarIcon } from "./icons";
 import { MIN_RATINGS, type ListingSort, type MinRating } from "@/lib/listingSort";
-import { NONSTOP_SEGMENT } from "@/lib/districts";
 
 // No district picker (owner, 2026-09-25): location is "Near me" (sort by
 // distance); district pages stay for SEO and are linked from place texts.
@@ -20,7 +19,7 @@ interface FilterPanelProps {
   /** null: the city page listing every service. */
   category: BusinessCategory | null;
   citySlug: string;
-  /** District page the visitor is on (or "nonstop"), kept by the filters. */
+  /** District or attribute page the visitor is on, kept by the filters. */
   currentDistrictSlug?: string;
   currentAnimal?: string;
   /** "lat,lng" when the list is sorted by distance - kept across filters. */
@@ -31,10 +30,9 @@ interface FilterPanelProps {
   /** Some place in the list has opening hours (else the chip would only
    *  ever show an empty list). */
   showOpenNow?: boolean;
-  /** On the nonstop page (currentDistrictSlug is then "nonstop"). */
-  nonstopPage?: boolean;
-  /** The city has 24/7 vets: offer the chip that leads to their page. */
-  showNonstop?: boolean;
+  /** Attribute pages to offer (lib/attributePages.ts): links to their own
+   *  indexable URLs, not query filters; the active one leads back. */
+  attributes?: { key: string; label: string; href: string; active: boolean }[];
   /** Pets to offer (ones with at least one place in the category). */
   animals?: string[];
 }
@@ -50,8 +48,7 @@ export function FilterPanel({
   minRating,
   openNow = false,
   showOpenNow = true,
-  nonstopPage = false,
-  showNonstop = false,
+  attributes = [],
   animals,
 }: FilterPanelProps) {
   const router = useRouter();
@@ -141,8 +138,8 @@ export function FilterPanel({
         })}
       </div>
 
-      {/* Near me, Open now (all categories) and Nonstop 24/7 (vets: a link
-          to the indexable /nonstop page rather than a query filter). */}
+      {/* Near me, Open now (all categories) and attribute pages (vets:
+          Nonstop, Saturday, Sunday, exotics, home visits). */}
       <div className="flex flex-wrap items-center gap-2">
         <button type="button" onClick={toggleNear} aria-pressed={!!near} className={toggle(!!near, "bg-brand-blue")}>
           <MapPinIcon className={`h-4 w-4 ${locating ? "animate-pulse" : ""}`} />
@@ -159,17 +156,18 @@ export function FilterPanel({
             {t.listing.openNowFilter}
           </Link>
         )}
-        {(showNonstop || nonstopPage) && (
+        {/* Attribute chips look like every other filter (owner, 2026-09-25:
+            no extra colours); only the active one is filled. */}
+        {attributes.map((a) => (
           <Link
-            href={withQuery(listingPath(locale, category ?? "VET_CLINIC", citySlug, nonstopPage ? null : NONSTOP_SEGMENT))}
-            aria-current={nonstopPage ? "page" : undefined}
-            className={`inline-flex min-h-10 items-center rounded-[var(--radius-pill)] border px-3.5 text-sm font-semibold transition ${
-              nonstopPage ? "border-transparent bg-red-600 text-white" : "border-line bg-surface text-red-700 hover:border-red-300"
-            }`}
+            key={a.key}
+            href={withQuery(a.href)}
+            aria-current={a.active ? "page" : undefined}
+            className={toggle(a.active, "bg-ink")}
           >
-            {t.listing.nonstopFilter}
+            {a.label}
           </Link>
-        )}
+        ))}
         {geoOff && <span className="text-sm text-foreground/60">{t.listing.geoOff}</span>}
       </div>
 

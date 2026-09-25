@@ -6,9 +6,6 @@ import type { BusinessCategory } from "@prisma/client";
 // visitors to a near-empty list.
 export const MIN_DISTRICT_LISTINGS = 3;
 
-/** /<vets>/<city>/nonstop - a listing page in the district URL slot. No
- *  district may use this slug. */
-export const NONSTOP_SEGMENT = "nonstop";
 
 export interface DistrictCounts {
   slug: string;
