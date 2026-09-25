@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { BusinessCategory } from "@prisma/client";
+import type { BusinessCategory, City } from "@prisma/client";
 import {
   searchBusinesses,
   getCategoryAggregates,
@@ -22,7 +22,7 @@ import { animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
 import { FilterPanel } from "./FilterPanel";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
-import { hoursFromStored, isOpenAt, localNow, timezoneFor } from "@/lib/hours";
+import { cityTimezone, hoursFromStored, isOpenAt, localNow } from "@/lib/hours";
 import { meetsMinRating, parseMinRating, parseSort, sortByListing } from "@/lib/listingSort";
 import { EmptyState } from "./EmptyState";
 import { Breadcrumbs } from "./Breadcrumbs";
@@ -33,8 +33,7 @@ import { ArrowRightIcon, RouteIcon } from "./icons";
 interface CategoryListingProps {
   locale: Locale;
   category: BusinessCategory;
-  citySlug: string;
-  cityName: string;
+  city: City;
   districtSlug?: string;
   districtName?: string;
   animal?: string;
@@ -47,17 +46,17 @@ interface CategoryListingProps {
   nonstopPage?: boolean;
 }
 
-/** "in Bratislava" / "v Bratislave", or "Petržalka, Bratislava" for a district. */
-export function whereLabel(locale: Locale, citySlug: string, cityName: string, districtName?: string): string {
-  if (!districtName) return inCity(locale, citySlug, cityName);
-  return locale === "en" ? `in ${districtName}, ${cityName}` : `– ${districtName}, ${cityName}`;
+/** "in Bratislava" / "v Bratislave" (city.json in_city), or
+ *  "in Petržalka, Bratislava" / "– Petržalka, Bratislava" for a district. */
+export function whereLabel(locale: Locale, city: City, districtName?: string): string {
+  if (!districtName) return inCity(locale, city);
+  return locale === "en" ? `in ${districtName}, ${city.name}` : `– ${districtName}, ${city.name}`;
 }
 
 export async function CategoryListing({
   locale,
   category,
-  citySlug,
-  cityName,
+  city,
   districtSlug,
   districtName,
   near,
@@ -68,6 +67,8 @@ export async function CategoryListing({
   nonstopPage = false,
 }: CategoryListingProps) {
   const openNowOnly = open === "1";
+  const citySlug = city.slug;
+  const cityName = city.name;
   const sort = parseSort(requestedSort);
   const minRating = parseMinRating(requestedRating);
   // Ignore a pet this service isn't for (e.g. ?animal=bird on dog training).
@@ -79,8 +80,8 @@ export async function CategoryListing({
   // labelled group instead of vanishing from an empty result.
   const [all, aggregates, priceTiers, nonstopCount, animalsPresent] = await Promise.all([
     searchBusinesses({ category, citySlug, districtSlug }),
-    getCategoryAggregates(category, districtSlug),
-    getPriceTierMap(category),
+    getCategoryAggregates(category, citySlug, districtSlug),
+    getPriceTierMap(category, citySlug),
     category === "VET_CLINIC" ? getNonstopVetCount(citySlug) : Promise.resolve(0),
     getAnimalsInCategory(category, citySlug),
   ]);
@@ -88,7 +89,7 @@ export async function CategoryListing({
   const t = getDictionary(locale);
   const label = categoryLabel(category, locale);
   const theme = CATEGORY_THEME[category];
-  const where = whereLabel(locale, citySlug, cityName, districtName);
+  const where = whereLabel(locale, city, districtName);
   const resetHref = listingPath(locale, category, citySlug, districtSlug);
 
   // "Near me": sort by distance from the visitor, places without
@@ -97,7 +98,7 @@ export async function CategoryListing({
   // Rating filter first (Google rating as collected), then the pet split.
   // Open now: judged in the city's time zone at request time; a nonstop
   // clinic counts as open; places without hours are hidden and counted.
-  const cityNow = localNow(timezoneFor(all[0]?.city?.country ?? all[0]?.district?.city.country));
+  const cityNow = localNow(cityTimezone(city));
   const openState = (b: (typeof all)[number]) => (b.emergency247 ? true : isOpenAt(hoursFromStored(b.openingHours), cityNow));
   const scoped = nonstopPage ? all.filter((b) => b.emergency247) : all;
   const openFiltered = openNowOnly ? scoped.filter((b) => openState(b) === true) : scoped;

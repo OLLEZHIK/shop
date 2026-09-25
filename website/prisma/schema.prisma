@@ -19,6 +19,14 @@ model City {
   // City centre from city.json (docs/playbooks/add-city.md).
   lat        Float?
   lng        Float?
+  // Everything that differs between cities and countries lives here, not
+  // in code (docs/architecture/multi-city.md): IANA time zone for "Open
+  // now", currency for prices, the city's languages besides English, and
+  // "in <city>" per language ({"en": "in Košice", "sk": "v Košiciach"}).
+  timezone   String?
+  currency   String?
+  locales    String[]   @default([])
+  inPhrases  Json?
   districts  District[]
   businesses Business[]
 }
@@ -27,11 +35,9 @@ model District {
   id         Int        @id @default(autoincrement())
   cityId     Int
   name       String
-  // Meant to be unique within its city only (Košice and Bratislava both
-  // have "stare-mesto"). The global @unique stays until the old seed is
-  // gone from production (additive-only migrations, docs/database.md);
-  // drop it in the PR that adds a second city.
-  slug       String     @unique
+  // Unique within its city only (@@unique below): Košice and Bratislava
+  // both have "stare-mesto".
+  slug       String
   city       City       @relation(fields: [cityId], references: [id])
   businesses Business[]
 

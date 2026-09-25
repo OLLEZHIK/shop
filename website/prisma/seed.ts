@@ -228,13 +228,6 @@ async function seedDistricts(cityId: number, citySlug: string): Promise<District
   const shapes: DistrictShape[] = [];
   for (const f of geo.features) {
     const { name, slug } = f.properties;
-    const clash = await prisma.district.findFirst({ where: { slug, cityId: { not: cityId } }, include: { city: true } });
-    if (clash) {
-      throw new Error(
-        `District slug "${slug}" (${citySlug}) is already used in ${clash.city.slug}. District slugs are meant to be ` +
-          `unique per city, but the old global index on District.slug still exists: drop it first (schema.prisma, District).`
-      );
-    }
     const district = await prisma.district.upsert({
       where: { cityId_slug: { cityId, slug } },
       update: { name },
@@ -326,9 +319,42 @@ interface CityJson {
   name: string;
   slug: string;
   country: string;
+  /** Main local language (ISO 639-1). */
   locale: string;
+  /** All local languages, main first (defaults to [locale]); English is always added by the site. */
+  locales?: string[];
   lat?: number;
   lng?: number;
+  /** IANA time zone, e.g. "Europe/Vienna" - "Open now" is judged in it. */
+  timezone?: string;
+  /** ISO 4217, e.g. "EUR", "CZK", "USD". */
+  currency?: string;
+  /** "in <city>" per language: {"en": "in Košice", "sk": "v Košiciach"}. */
+  in_city?: Record<string, string>;
+}
+
+// City settings shared by city.json and the legacy Bratislava path; see
+// docs/architecture/multi-city.md for what each field drives.
+function cityData(meta: CityJson) {
+  const locales = (meta.locales?.length ? meta.locales : [meta.locale]).map((l) => l.toLowerCase());
+  if (!meta.timezone) throw new Error(`${meta.slug}/city.json: "timezone" is required (e.g. "Europe/Vienna")`);
+  if (!meta.currency) throw new Error(`${meta.slug}/city.json: "currency" is required (e.g. "EUR")`);
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: meta.timezone });
+  } catch {
+    throw new Error(`${meta.slug}/city.json: unknown time zone "${meta.timezone}"`);
+  }
+  return {
+    name: meta.name,
+    country: meta.country.toUpperCase(),
+    locale: locales[0],
+    locales,
+    lat: meta.lat ?? null,
+    lng: meta.lng ?? null,
+    timezone: meta.timezone,
+    currency: meta.currency.toUpperCase(),
+    inPhrases: meta.in_city ?? { en: `in ${meta.name}` },
+  };
 }
 
 async function seedCity(citySlug: string, serviceIds: Map<string, number>) {
@@ -337,10 +363,11 @@ async function seedCity(citySlug: string, serviceIds: Map<string, number>) {
   if (meta.slug !== citySlug) throw new Error(`${dir}/city.json: slug "${meta.slug}" doesn't match the folder name`);
   const rep = report(citySlug);
 
+  const settings = cityData(meta);
   const city = await prisma.city.upsert({
     where: { slug: citySlug },
-    update: { name: meta.name, country: meta.country, locale: meta.locale, lat: meta.lat ?? null, lng: meta.lng ?? null },
-    create: { name: meta.name, slug: citySlug, country: meta.country, locale: meta.locale, lat: meta.lat, lng: meta.lng },
+    update: settings,
+    create: { ...settings, slug: citySlug },
   });
   const shapes = await seedDistricts(city.id, citySlug);
 
@@ -418,10 +445,21 @@ const LEGACY_DISTRICTS: { name: string; slug: string }[] = [
 
 async function seedLegacyBratislava() {
   const rep = report("bratislava (legacy data/*-bratislava.csv)");
+  const settings = cityData({
+    name: "Bratislava",
+    slug: "bratislava",
+    country: "SK",
+    locale: "sk",
+    lat: 48.1486,
+    lng: 17.1077,
+    timezone: "Europe/Bratislava",
+    currency: "EUR",
+    in_city: { en: "in Bratislava", sk: "v Bratislave" },
+  });
   const city = await prisma.city.upsert({
     where: { slug: "bratislava" },
-    update: { name: "Bratislava", country: "SK", locale: "sk" },
-    create: { name: "Bratislava", slug: "bratislava", country: "SK", locale: "sk" },
+    update: settings,
+    create: { ...settings, slug: "bratislava" },
   });
   const districtIds = new Map<string, number>();
   for (const d of LEGACY_DISTRICTS) {

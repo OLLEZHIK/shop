@@ -19,12 +19,16 @@ export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value);
 }
 
-// Local language per country (City.country). English is always available.
-const COUNTRY_LANGUAGE: Record<string, Locale> = { SK: "sk" };
+// A city's languages come from its data (City.locales, from city.json);
+// English is always available. Only languages the site has a dictionary
+// for are used - see docs/playbooks/add-language.md.
+export interface CityLanguages {
+  locales?: string[] | null;
+}
 
-export function localesForCountry(country: string | null | undefined): Locale[] {
-  const local = country ? COUNTRY_LANGUAGE[country.toUpperCase()] : undefined;
-  return local && local !== "en" ? ["en", local] : ["en"];
+export function localesForCity(city: CityLanguages | null | undefined): Locale[] {
+  const local = (city?.locales ?? []).filter((l): l is Locale => isLocale(l) && l !== "en");
+  return ["en", ...new Set(local)];
 }
 
 /** Prefix a locale-neutral path ("/grooming/bratislava/") for a locale. */
@@ -46,18 +50,18 @@ export function plural(locale: Locale, n: number, forms: { one: string; few?: st
   return forms.other;
 }
 
-// Locative city names for "in {city}" phrases in Slovak. Missing city
-// falls back to the "{label} – {city}" nominative pattern, so a new city
-// still renders correctly without an entry here.
-const CITY_LOCATIVE: Partial<Record<Locale, Record<string, string>>> = {
-  sk: { bratislava: "Bratislave" },
-};
+export interface CityPhrases {
+  name: string;
+  /** "in <city>" per language, from city.json (in_city). */
+  inPhrases?: unknown;
+}
 
-/** "in Bratislava" / "v Bratislave" (or "– Bratislava" if unknown). */
-export function inCity(locale: Locale, citySlug: string, cityName: string): string {
-  if (locale === "en") return `in ${cityName}`;
-  const loc = CITY_LOCATIVE[locale]?.[citySlug];
-  return loc ? `v ${loc}` : `– ${cityName}`;
+/** "in Bratislava" / "v Bratislave" from the city's data; without a phrase
+ *  for this language: English "in <name>", others "– <name>". */
+export function inCity(locale: Locale, city: CityPhrases): string {
+  const phrase = (city.inPhrases as Record<string, string> | null | undefined)?.[locale];
+  if (phrase) return phrase;
+  return locale === "en" ? `in ${city.name}` : `– ${city.name}`;
 }
 
 // Slovak sentences need "in <place>" in the locative; `inCity` gives
@@ -95,8 +99,8 @@ const en = {
     { label: "Supplements", blurb: "Joints, skin, coat and digestion" },
   ],
   footer: {
-    tagline: (city: string) =>
-      `A friendly, independent guide to pet services in ${city}. No sign-ups, no ads - just the details you need to pick up the phone.`,
+    tagline: (city: string | null) =>
+      `A friendly, independent guide to pet services${city ? ` in ${city}` : ""}. No sign-ups, no ads - just the details you need to pick up the phone.`,
     sourced: "Every listing links to its source",
     services: "Services",
     about: "pawenn",
@@ -107,7 +111,16 @@ const en = {
     privacy: "Privacy Policy",
     terms: "Terms of Use",
     englishOnly: "",
-    madeWithCare: (city: string) => `Made with care for pets in ${city}`,
+    madeWithCare: (city: string | null) => `Made with care for pets${city ? ` in ${city}` : ""}`,
+    cities: "Cities",
+  },
+  cityHub: {
+    metaTitle: (where: string) => `Pet services ${where} – vets, grooming, pet hotels | Pawenn`,
+    metaDescription: (n: number, where: string) =>
+      `${n} pet ${n === 1 ? "service" : "services"} ${where}: vets, groomers, pet hotels, dog trainers, pet shops and sitters, with opening hours, prices and one-tap contact.`,
+    h1Before: "Pet services",
+    intro: "Choose a service to see every place, with opening hours, prices where published and a source for each listing.",
+    nonstop: "Nonstop 24/7 vets",
   },
   animals: {
     any: "Any pet",
@@ -462,8 +475,8 @@ const sk: Dictionary = {
     { label: "Doplnky výživy", blurb: "Kĺby, koža, srsť a trávenie" },
   ],
   footer: {
-    tagline: (city: string) =>
-      `Priateľský a nezávislý sprievodca službami pre zvieratá v meste ${city}. Bez registrácie a bez reklám - len informácie, ktoré potrebujete, aby ste mohli zavolať.`,
+    tagline: (city: string | null) =>
+      `Priateľský a nezávislý sprievodca službami pre zvieratá${city ? ` v meste ${city}` : ""}. Bez registrácie a bez reklám - len informácie, ktoré potrebujete, aby ste mohli zavolať.`,
     sourced: "Každý záznam odkazuje na svoj zdroj",
     services: "Služby",
     about: "pawenn",
@@ -474,7 +487,16 @@ const sk: Dictionary = {
     privacy: "Ochrana osobných údajov",
     terms: "Podmienky používania",
     englishOnly: " (EN)",
-    madeWithCare: (city: string) => `S láskou k zvieratám v meste ${city}`,
+    madeWithCare: (city: string | null) => `S láskou k zvieratám${city ? ` v meste ${city}` : ""}`,
+    cities: "Mestá",
+  },
+  cityHub: {
+    metaTitle: (where: string) => `Služby pre zvieratá ${where} – veterinári, psie salóny, hotely | Pawenn`,
+    metaDescription: (n: number, where: string) =>
+      `Služby pre zvieratá ${where}: ${n} ${plural("sk", n, { one: "podnik", few: "podniky", other: "podnikov" })} – veterinári, psie salóny, hotely pre zvieratá, výcvik, chovateľské potreby a opatrovanie, s otváracími hodinami, cenami a kontaktom na jeden dotyk.`,
+    h1Before: "Služby pre zvieratá",
+    intro: "Vyberte si službu a uvidíte všetky podniky s otváracími hodinami, cenami (ak ich zverejňujú) a zdrojom pri každom zázname.",
+    nonstop: "Veterinár nonstop 24/7",
   },
   animals: {
     any: "Všetky zvieratá",

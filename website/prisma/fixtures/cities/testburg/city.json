@@ -1,0 +1,13 @@
+{
+  "name": "Testburg",
+  "slug": "testburg",
+  "country": "US",
+  "locale": "en",
+  "lat": 40.5,
+  "lng": -74.5,
+  "timezone": "America/New_York",
+  "currency": "USD",
+  "in_city": { "en": "in Testburg" },
+  "sources": ["fixture"],
+  "observed_at": "2026-09-25"
+}

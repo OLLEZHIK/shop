@@ -13,7 +13,7 @@ import {
 import { isDistrictLinkable } from "@/lib/districts";
 import type { BusinessWithRelations } from "@/lib/data";
 import { CATEGORY_THEME, businessPath, categoryLabel, categorySingular, listingPath } from "@/lib/categories";
-import { formatDate as formatLocaleDate, getDictionary, localePath, localesForCountry, type Locale } from "@/lib/i18n";
+import { formatDate as formatLocaleDate, getDictionary, localePath, inCity, localesForCity, type Locale } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -30,7 +30,7 @@ import { ReviewInsightsSection } from "@/components/ReviewInsightsSection";
 import { OpeningHoursTable } from "@/components/OpeningHoursTable";
 import { OpenNowBadge } from "@/components/OpenNowBadge";
 import { PriceTable } from "@/components/PriceTable";
-import { hoursFromStored, timezoneFor } from "@/lib/hours";
+import { cityTimezone, hoursFromStored } from "@/lib/hours";
 import { specialtyLabel } from "@/lib/vet";
 import { parseReviewInsights } from "@/lib/reviewInsights";
 import {
@@ -48,7 +48,7 @@ import { AnimalIcon } from "@/components/AnimalIcon";
 // /{locale}/{localized segment}/{slug}/ (e.g. /sk/podnik/{slug}/).
 
 function availableLocales(business: BusinessWithRelations): Locale[] {
-  return localesForCountry(business.district?.city.country);
+  return localesForCity(business.city ?? business.district?.city);
 }
 
 export async function businessMetadata(locale: Locale, slug: string): Promise<Metadata> {
@@ -56,9 +56,12 @@ export async function businessMetadata(locale: Locale, slug: string): Promise<Me
   if (!business || !availableLocales(business).includes(locale)) return {};
 
   const t = getDictionary(locale).business;
-  const where = business.district
-    ? `${locale === "en" ? "in" : "–"} ${business.district.name}, ${business.district.city.name}`
-    : "";
+  const city = business.city ?? business.district?.city ?? null;
+  const where = business.district && city
+    ? `${locale === "en" ? "in" : "–"} ${business.district.name}, ${city.name}`
+    : city
+      ? inCity(locale, city)
+      : "";
   return {
     title: t.metaTitle(business.name, categoryLabel(business.category, locale), where),
     description: t.metaDescription(business.name, where),
@@ -75,17 +78,18 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
 
   const t = getDictionary(locale);
   const label = categoryLabel(business.category, locale);
-  const citySlug = business.district?.city.slug;
+  const city = business.city ?? business.district?.city ?? null;
+  const citySlug = city?.slug;
   const rating = averageRating(business.reviews);
   const sourceUrl = business.sourceUrls[0];
   const description = aboutDescription(business, locale);
   const insights = parseReviewInsights(business.reviewInsights);
-  const timeZone = timezoneFor(business.city?.country ?? business.district?.city.country);
+  const timeZone = cityTimezone(business.city ?? business.district?.city);
 
   const [similarRaw, priceTiers, districtSummaries] = await Promise.all([
     citySlug ? searchBusinesses({ category: business.category, citySlug }) : Promise.resolve([]),
-    getPriceTierMap(business.category),
-    getDistrictSummaries(),
+    getPriceTierMap(business.category, citySlug ?? ""),
+    getDistrictSummaries(citySlug ?? ""),
   ]);
   const similar = similarRaw.filter((b) => b.id !== business.id).slice(0, 4);
 
@@ -125,9 +129,8 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
     address: {
       "@type": "PostalAddress",
       streetAddress: business.address,
-      ...(business.district ? { addressLocality: business.district.city.name } : {}),
+      ...(city ? { addressLocality: city.name, addressCountry: city.country } : {}),
       ...(business.district ? { addressRegion: business.district.name } : {}),
-      ...(business.district ? { addressCountry: business.district.city.country } : {}),
     },
   };
   if (business.phone) jsonLd.telephone = business.phone;
@@ -273,7 +276,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
                   ) : (
                     business.district.name
                   )}
-                  , {business.district.city.name}
+                  , {city?.name}
                 </p>
               )}
               {description && <p className="mt-3 text-foreground/80">{description}</p>}

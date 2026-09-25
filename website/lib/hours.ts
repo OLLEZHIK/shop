@@ -66,10 +66,10 @@ export function hoursFromStored(stored: unknown): OpeningHours | null {
   return typeof stored === "string" ? parseOpeningHours(stored).hours : null;
 }
 
-const TIMEZONE_BY_COUNTRY: Record<string, string> = { SK: "Europe/Bratislava", CZ: "Europe/Prague", AT: "Europe/Vienna" };
-
-export function timezoneFor(country: string | null | undefined): string {
-  return TIMEZONE_BY_COUNTRY[(country ?? "").toUpperCase()] ?? "Europe/Bratislava";
+/** The city's IANA time zone (City.timezone from city.json; the seed
+ *  requires it). "UTC" only if a place somehow has no city. */
+export function cityTimezone(city: { timezone?: string | null } | null | undefined): string {
+  return city?.timezone ?? "UTC";
 }
 
 /** Day of week and minutes since midnight in the city's time zone. */
