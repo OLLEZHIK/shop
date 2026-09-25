@@ -5,7 +5,7 @@ docs/card-spec.md) for testing `prisma/seed.ts` without real data. It covers
 districts from polygons (including a hole), a split `businesses-*.csv`,
 opening hours, vet fields, prices with weight ranges and the validation
 warnings (bad hours, unknown specialty, rating under 5, missing logo,
-wrong price code, price without source).
+wrong price code, price without source, a price per hour, a partial price with and without its note, an unknown unit).
 
 - `testville` — SK, Slovak + English, Europe/Bratislava, EUR;
 - `testburg` — US, English only, America/New_York, USD. Its districts

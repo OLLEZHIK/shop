@@ -183,6 +183,13 @@ model PriceItem {
   currency     String     @default("EUR")
   sourceUrl    String
   observedAt   DateTime
+  // Comparability (docs/card-spec.md, "Цены"): a price per hour/km
+  // ("per_hour", "per_km") or one missing part of the standard service
+  // (partial) is shown with its note but left out of comparisons.
+  unit         String?
+  partial      Boolean    @default(false)
+  note         String?
+  noteLocal    String?
   business     Business   @relation(fields: [businessId], references: [id])
   service      Service    @relation(fields: [serviceId], references: [id])
   breed        Breed?     @relation(fields: [breedId], references: [id])

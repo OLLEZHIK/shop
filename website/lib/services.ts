@@ -66,3 +66,23 @@ export function serviceLabel(category: BusinessCategory, code: string, locale: s
   if (!def) return code;
   return def[locale as Locale] ?? def.en;
 }
+
+// What a price must include to be compared with other places'
+// (docs/card-spec.md, "Что считать"), shown under the service name so
+// visitors know what they are comparing.
+const INCLUDES: Record<string, Record<Locale, string>> = {
+  "GROOMING:full_groom": { en: "Bath, haircut and nails", sk: "Kúpanie, strih a pazúriky" },
+  "GROOMING:hand_stripping": { en: "Whole procedure", sk: "Celá procedúra" },
+  "VET_CLINIC:exam": { en: "Basic exam, no tests", sk: "Základné vyšetrenie bez testov" },
+  "VET_CLINIC:vaccination_dog": { en: "Combined vaccine + rabies", sk: "Kombinovaná vakcína + besnota" },
+  "VET_CLINIC:microchip": { en: "Chip, implanting and registration", sk: "Čip, aplikácia a registrácia" },
+  "VET_CLINIC:neuter_cat": { en: "Surgery + anaesthesia", sk: "Operácia + anestézia" },
+  "VET_CLINIC:spay_cat": { en: "Surgery + anaesthesia", sk: "Operácia + anestézia" },
+  "VET_CLINIC:spay_dog": { en: "Surgery + anaesthesia", sk: "Operácia + anestézia" },
+  "PET_HOTEL:pickup": { en: "One way", sk: "Jedným smerom" },
+};
+
+export function serviceIncludes(category: BusinessCategory, code: string, locale: Locale): string | null {
+  const text = INCLUDES[serviceSlug(category, code)];
+  return text ? (text[locale] ?? text.en) : null;
+}
