@@ -30,7 +30,7 @@
    сайте тоже подходит).
 2. Создать `data/vet-prices-bratislava.csv` со столбцами:
 
-   `clinic_name, service, species, size_class, price_from, price_to, currency, source_url, observed_at, notes`
+   `clinic_name, service, species, weight_from_kg, weight_to_kg, price_from, price_to, currency, source_url, observed_at, notes`
 
    - `clinic_name` — **точно** как `name` в `data/vet-clinics-bratislava.csv` (по нему будет связка при сиде).
    - `service` — одно из значений ниже. Единый набор нужен, чтобы сравнивать клиники между собой:
@@ -50,7 +50,7 @@
 
      Не натягивать: если позицию нельзя однозначно отнести к одному значению, ставить `other` и объяснять в `notes`.
    - `species` — `dog`, `cat` или пусто (если цена общая для всех).
-   - `size_class` — `MINI/SMALL/MEDIUM/LARGE/XL`, только если клиника сама делит цену по весу собаки. Сопоставление веса — как в `docs/concept.md`, раздел 6. Если вес на сайте не ложится на классы ровно, оставить пусто и указать вес в `notes`.
+   - `weight_from_kg` / `weight_to_kg` — только если клиника сама делит цену по весу животного (частый случай для кастрации и наркоза): границы диапазона ровно как на сайте. «do 10 kg» — `weight_from_kg` пусто, `weight_to_kg=10`; «nad 40 kg» — `weight_from_kg=40`, `weight_to_kg` пусто. Не переводить в классы `MINI…XL`: единой таблицы «вес → класс» в проекте нет, а у клиник разные границы. Если цена от веса не зависит — оба поля пустые.
    - `price_from` / `price_to` — числа в EUR без символа валюты. Фиксированная цена — одно значение в обоих полях. «od 30 €» — `price_from=30`, `price_to` пусто.
    - `currency` — `EUR`.
    - `source_url` — прямая ссылка на страницу (или PDF) с ценой, не на главную.
