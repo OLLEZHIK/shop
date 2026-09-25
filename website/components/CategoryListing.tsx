@@ -8,6 +8,7 @@ import {
   getAnimalsInCategory,
   distanceKm,
   parseNear,
+  getMarketPrices,
 } from "@/lib/data";
 import {
   ALL_CATEGORIES,
@@ -23,6 +24,7 @@ import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
 import { ANIMALS, animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
 import { SITE_URL } from "@/lib/site";
+import { pricesPath } from "@/lib/pricePages";
 import { FilterPanel } from "./FilterPanel";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
 import { cityTimezone, hoursFromStored, isOpenAt, localNow } from "@/lib/hours";
@@ -106,6 +108,7 @@ export async function CategoryListing({
     !category || category === "VET_CLINIC" ? getNonstopVetCount(citySlug) : Promise.resolve(0),
     category ? getAnimalsInCategory(category, citySlug) : Promise.resolve(null),
   ]);
+  const hasPricePages = category ? (await getMarketPrices(category, citySlug)).size > 0 : false;
   const aggregates = categoryAggregates ?? {
     count: all.length,
     verifiedCount: all.filter((b) => b.verifiedAt !== null).length,
@@ -231,6 +234,17 @@ export async function CategoryListing({
           <dl className="mt-6 flex flex-wrap gap-2">
             <Stat label={t.listing.listed} value={String(nonstopPage ? scoped.length : aggregates.count)} />
             {aggregates.verifiedCount > 0 && <Stat label={t.listing.verified} value={String(aggregates.verifiedCount)} />}
+            {/* The city's price pages for this category, once any service
+                has a market price (lib/pricePages.ts). */}
+            {category && hasPricePages && (
+              <Link
+                href={pricesPath(locale, category, citySlug)}
+                prefetch={false}
+                className="inline-flex items-center gap-1.5 self-center rounded-[var(--radius-pill)] border border-line bg-surface px-3.5 py-2 text-sm font-semibold text-brand-blue hover:border-brand-blue"
+              >
+                {t.prices.linkFromListing(inCity(locale, city))} →
+              </Link>
+            )}
           </dl>
 
           {/* Switch service, keep the location */}

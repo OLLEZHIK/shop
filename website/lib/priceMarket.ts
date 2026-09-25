@@ -31,6 +31,9 @@ export interface ComparablePrice {
 
 export interface MarketPrice {
   median: number;
+  /** Cheapest and dearest place price (each place's "from" price). */
+  min: number;
+  max: number;
   /** How many places the median is based on. */
   places: number;
   currency: string;
@@ -74,7 +77,13 @@ export function marketPrices(prices: ComparablePrice[]): Map<string, MarketPrice
   const market = new Map<string, MarketPrice>();
   for (const [code, values] of byCode) {
     if (values.length >= MIN_PLACES) {
-      market.set(code, { median: median(values), places: values.length, currency: currencyByCode.get(code) ?? "EUR" });
+      market.set(code, {
+        median: median(values),
+        min: Math.min(...values),
+        max: Math.max(...values),
+        places: values.length,
+        currency: currencyByCode.get(code) ?? "EUR",
+      });
     }
   }
   return market;

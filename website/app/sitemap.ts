@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getAllCities, getAllDistricts, getCategoryAggregates, getAllPublishedBusinessSlugs, getBusinessCount, getNonstopVetCount } from "@/lib/data";
+import { getAllCities, getAllDistricts, getCategoryAggregates, getAllPublishedBusinessSlugs, getBusinessCount, getMarketPrices, getNonstopVetCount } from "@/lib/data";
+import { getPriceSummary, pricesPath } from "@/lib/pricePages";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
 import { ALL_CATEGORIES, businessPath, cityPath, listingPath } from "@/lib/categories";
 import { localePath, localesForCity, type Locale } from "@/lib/i18n";
@@ -64,6 +65,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.8,
           })
         );
+      }
+
+      // Price pages: the overview and each service with a market price
+      // (at least 3 comparable prices) - lib/pricePages.ts.
+      const market = await getMarketPrices(category, city.slug);
+      if (market.size > 0) {
+        const summaries = await Promise.all([...market.keys()].map((code) => getPriceSummary(category, city.slug, code)));
+        const checked = summaries.map((s) => s.checked).filter((d): d is Date => d !== null);
+        entries.push(
+          ...localized(locales, (l) => pricesPath(l, category, city.slug), {
+            lastModified: checked.length ? new Date(Math.max(...checked.map((d) => d.getTime()))) : undefined,
+            changeFrequency: "weekly",
+            priority: 0.8,
+          })
+        );
+        [...market.keys()].forEach((code, i) => {
+          entries.push(
+            ...localized(locales, (l) => pricesPath(l, category, city.slug, code), {
+              lastModified: summaries[i].checked ?? undefined,
+              changeFrequency: "weekly",
+              priority: 0.8,
+            })
+          );
+        });
       }
 
       for (const district of districts.filter((d) => d.cityId === city.id)) {
