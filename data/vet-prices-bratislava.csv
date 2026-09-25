@@ -1,0 +1,139 @@
+clinic_name,service,species,weight_from_kg,weight_to_kg,price_from,price_to,currency,source_url,observed_at,notes
+SIBRA centrum veterinárnej medicíny,exam,,,,21,21,EUR,https://www.sibra.sk/cennik/zakladne-ukony,2026-09-25,Konzultácia bez iného výkonu do 30 min. (21 € s DPH)
+SIBRA centrum veterinárnej medicíny,pet_passport,,,,35.80,35.80,EUR,https://www.sibra.sk/cennik/zakladne-ukony,2026-09-25,"Vystavenie pasu s registráciou, pas (35,80 € s DPH)"
+SIBRA centrum veterinárnej medicíny,emergency_fee,,,,55,55,EUR,https://www.sibra.sk/cennik/zakladne-ukony,2026-09-25,Nočná hospitalizácia (55 € s DPH)
+SIBRA centrum veterinárnej medicíny,vaccination_rabies,,,,56.20,56.20,EUR,https://www.sibra.sk/cennik/vakcinacie,2026-09-25,"Besnota so zápisom do CRSZ (56,20 € s DPH, interval raz za 3 roky)"
+SIBRA centrum veterinárnej medicíny,vaccination_rabies,cat,,,45.70,45.70,EUR,https://www.sibra.sk/cennik/vakcinacie,2026-09-25,"Besnota – mačka, fretka (45,70 € s DPH)"
+SIBRA centrum veterinárnej medicíny,vaccination_combo,dog,,,56.60,,EUR,https://www.sibra.sk/cennik/vakcinacie,2026-09-25,"Infekčné ochorenia – pes (od 56,60 € s DPH; psinka, parvoviróza, hepatitída, parainfluenza, leptospiróza)"
+SIBRA centrum veterinárnej medicíny,vaccination_combo,dog,,,70.60,,EUR,https://www.sibra.sk/cennik/vakcinacie,2026-09-25,"Kompletná vakcinácia – pes (+ proti besnote a zápisom do CRSZ, od 70,60 € s DPH)"
+SIBRA centrum veterinárnej medicíny,vaccination_combo,cat,,,56.20,,EUR,https://www.sibra.sk/cennik/vakcinacie,2026-09-25,"Infekčné ochorenia – mačka (od 56,20 € s DPH; caliciviróza, panleukopénia, rhinotracheitída)"
+SIBRA centrum veterinárnej medicíny,vaccination_combo,cat,,,73.80,,EUR,https://www.sibra.sk/cennik/vakcinacie,2026-09-25,"Kompletná vakcinácia – mačka (od 73,80 € s DPH)"
+SIBRA centrum veterinárnej medicíny,castration,cat,,,150,,EUR,https://www.sibra.sk/cennik/ceny-vybranych-operacii,2026-09-25,Kastrácia kocúra (od 150 € s DPH)
+SIBRA centrum veterinárnej medicíny,castration,dog,,,360,,EUR,https://www.sibra.sk/cennik/ceny-vybranych-operacii,2026-09-25,Kastrácia pes (od 360 € s DPH)
+SIBRA centrum veterinárnej medicíny,sterilization,cat,,,178,,EUR,https://www.sibra.sk/cennik/ceny-vybranych-operacii,2026-09-25,Sterilizácia mačky (od 178 € s DPH)
+SIBRA centrum veterinárnej medicíny,sterilization,dog,,,410,,EUR,https://www.sibra.sk/cennik/ceny-vybranych-operacii,2026-09-25,Sterilizácia sučky v inhalačnej anestézii (od 410 € s DPH)
+SIBRA centrum veterinárnej medicíny,dental_cleaning,,,,220,,EUR,https://www.sibra.sk/cennik/ceny-vybranych-operacii,2026-09-25,"Ošetrenie parodontu, stomatologické vyšetrenie, bez RTG – zubný kameň, leštenie zubov (od 220 € s DPH)"
+Vetline Veterinárna nemocnica,exam,dog,,,39.15,39.15,EUR,https://vetline.sk/sluzby/fyzioterapia,2026-09-25,"Ortopedické vyšetrenie – vstupné zhodnotenie pohybového aparátu (39,15 €)"
+Vetline Veterinárna nemocnica,other,dog,,,27,,EUR,https://vetline.sk/sluzby/fyzioterapia,2026-09-25,"Hydroterapia, podvodný bežiaci pás – jedno sedenie, cena podľa hmotnosti psa (od 27 €)"
+VetPoint veterinárna klinika,exam,,,,33,33,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,Klinické vyšetrenie polysystémové (33 €)
+VetPoint veterinárna klinika,microchip,,,,10,10,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,Čipovanie + mikročip (10 €; registrácia/zmeny v CRSZ 25 €)
+VetPoint veterinárna klinika,pet_passport,,,,30,30,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,Vystavenie petpasu + petpas (výsledná suma 30 €)
+VetPoint veterinárna klinika,vaccination_rabies,,,,56,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Besnota* pes/mačka, fretka vrátane zápisu do CRSZ (od 56 €; Nobivac R na 3 roky)"
+VetPoint veterinárna klinika,vaccination_combo,dog,,,60,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Infekčné choroby pes – psinka, parvoviróza, inf. hepatitída, parainfluenza, leptospiróza (od 60 €)"
+VetPoint veterinárna klinika,vaccination_combo,dog,,,79,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Kompletná vakcinácia* pes – psinka, parvoviróza, hepatitída, parainfluenza, lepto + besnota (od 79 €)"
+VetPoint veterinárna klinika,vaccination_combo,cat,,,70,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Infekčné choroby mačka – rhinotracheitída, caliciviróza, panleukopénia, chlamydióza (od 70 €)"
+VetPoint veterinárna klinika,vaccination_combo,cat,,,89,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Kompletná vakcinácia* mačka – rhinotracheitída, calici, panleukopénia, chlamydióza + besnota (od 89 €)"
+VetPoint veterinárna klinika,castration,cat,,,160,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Kastrácia kocúr – celková cena zahŕňa klinické vyšetrenie, anestéziu, úkon, materiál a hospitalizáciu (od 160 €)"
+VetPoint veterinárna klinika,castration,dog,,,580,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Kastrácia pes-samec – celková cena zahŕňa vyšetrenie, krv, anestéziu, úkon, hospitalizáciu (od 580 €)"
+VetPoint veterinárna klinika,sterilization,cat,,,270,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Sterilizácia mačka – celková cena zahŕňa vyšetrenie, anestéziu, úkon, hospitalizáciu (od 270 €)"
+VetPoint veterinárna klinika,sterilization,dog,,,680,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Sterilizácia sučka – celková cena zahŕňa vyšetrenie, krv, inhalačnú anestéziu, úkon, hospitalizáciu (od 680 €)"
+VetPoint veterinárna klinika,dental_cleaning,,,,480,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Stomatologické ošetrenie s odstránením zubného kameňa – zahŕňa vyšetrenie, krv, inhalačnú anestéziu, úkon (od 480 €)"
+VetPoint veterinárna klinika,emergency_fee,,,,20,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/699474d7e467a3fcf5a2c6ba_cenni%CC%81k_na%CC%81stenkovy%CC%81_202602_POHOTOVOST%CC%8C.pdf,2026-09-25,Pohotovostný predaj liečiva alebo krmiva – jednorazový príplatok (od 20 €)
+Veterinárna klinika PrimaVet,emergency_fee,,,,20,20,EUR,https://www.primavet.sk/sk/novinky/detail/upozornenie-priplatok-pocas-vikendov-a-sviatkov-1,2026-09-25,"Príplatok počas víkendov a sviatkov (20,00 €, a to aj počas ordinačných hodín)"
+Veterinárna poliklinika BAJVET,exam,,,,30,30,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Klinické vyšetrenie a konzultácia (30 €)
+Veterinárna poliklinika BAJVET,vaccination_rabies,,,,25,,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Vakcinácia besnota (od 25 €)
+Veterinárna poliklinika BAJVET,vaccination_combo,dog,,,36,,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Komplexná vakcína pes (od 36 €)
+Veterinárna poliklinika BAJVET,vaccination_combo,cat,,,36,,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Komplexná vakcína mačka (od 36 €)
+Veterinárna poliklinika BAJVET,castration,cat,,,80,80,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia kocúr (80 €)
+Veterinárna poliklinika BAJVET,castration,dog,,10,160,160,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia pes do 10 kg (160 €)
+Veterinárna poliklinika BAJVET,castration,dog,10,20,170,170,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia pes 10–20 kg (170 €)
+Veterinárna poliklinika BAJVET,castration,dog,20,40,190,190,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia pes 20–40 kg (190 €)
+Veterinárna poliklinika BAJVET,castration,dog,40,,220,220,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia pes nad 40 kg (220 €)
+Veterinárna poliklinika BAJVET,sterilization,cat,,,120,120,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – mačka (120 €)
+Veterinárna poliklinika BAJVET,sterilization,dog,,5,180,180,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka do 5 kg (180 €)
+Veterinárna poliklinika BAJVET,sterilization,dog,5,10,200,200,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka 5–10 kg (200 €)
+Veterinárna poliklinika BAJVET,sterilization,dog,10,20,220,220,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka 10–20 kg (220 €)
+Veterinárna poliklinika BAJVET,sterilization,dog,20,40,240,240,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka 20–40 kg (240 €)
+Veterinárna poliklinika BAJVET,sterilization,dog,40,,270,270,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka nad 40 kg (270 €)
+Veterinárna poliklinika BAJVET,dental_cleaning,,,,100,,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Odstránenie zubného kameňa (od 100 €)
+MyPet Clinic,exam,,,,39,39,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Základné klinické vyšetrenie (39,00 €)"
+MyPet Clinic,vaccination_rabies,,,,27.80,27.80,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Očkovanie Nobivac besnota (27,80 €)"
+MyPet Clinic,vaccination_combo,dog,,,39.50,39.50,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Očkovanie pes Nobivac Kompletka (39,50 €)"
+MyPet Clinic,vaccination_combo,cat,,,43.90,43.90,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Očkovanie mačka Nobivac kompletka (43,90 €)"
+MyPet Clinic,microchip,,,,29,29,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Čip a čipovanie (29,00 €)"
+MyPet Clinic,pet_passport,,,,29,29,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Vystavenie pasu (29,00 €)"
+MyPet Clinic,dental_cleaning,dog,,,89,89,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Dentálna hygiena pes (89,00 €)"
+MyPet Clinic,dental_cleaning,cat,,,74,74,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Dentálna hygiena prevencia – mačka (74,00 €)"
+MyPet Clinic,castration,cat,,,78,78,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Kastrácia kocúr (78,00 €)"
+MyPet Clinic,sterilization,cat,,,114,114,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Sterilizácia mačka (114,00 €)"
+MyPet Clinic,castration,dog,,10,108,108,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Kastrácia pes do 10 kg (108,00 €)"
+MyPet Clinic,castration,dog,10,20,127,127,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Kastrácia pes do 20 kg (127,00 €)"
+MyPet Clinic,sterilization,dog,,10,169,169,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Sterilizácia pes do 10 kg (169,00 €)"
+MyPet Clinic,sterilization,dog,10,20,198,198,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Sterilizácia pes do 20 kg (198,00 €)"
+MyPet Clinic,emergency_fee,,,,59,59,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Pohotovostný príplatok až po 20:00 (59,00 €; sviatok 79,00 €)"
+VET-SVET veterinárna ambulancia,microchip,dog,,,27,27,EUR,https://vetsvet.sk/povinne-cipovanie-psov/,2026-09-25,"Povinné čipovanie psov na počkanie (27,- EUR)"
+VET-SVET veterinárna ambulancia,other,,,,24,24,EUR,https://vetsvet.sk/laser-terapia/,2026-09-25,"Laser terapia – vstupné vyšetrenie a konzultácia (24,00 €)"
+Super zoo veterina,exam,,,,28,28,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Klinické vyšetrenie pes, mačka (28,00 €)"
+Super zoo veterina,vaccination_rabies,,,,30,,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Vakcinácia besnota (od 30,00 €)"
+Super zoo veterina,vaccination_combo,dog,,,35,,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Vakcinácia pes infekčné ochorenia (od 35,00 €)"
+Super zoo veterina,vaccination_combo,cat,,,35,,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Vakcinácia mačka infekčné ochorenia (od 35,00 €)"
+Super zoo veterina,microchip,,,,33.90,33.90,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Čipovanie a registrácia v CRSZ (33,90 €)"
+Super zoo veterina,pet_passport,,,,25.50,25.50,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Vystavenie Pasu (25,50 €)"
+Super zoo veterina,dental_cleaning,,,,126,,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Dentálna hygiena pes, mačka (od 126,00 € vrátane anestézy)"
+Super zoo veterina,castration,dog,,,105,105,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Kastrácia pes – operačný úkon bez anestézy (105,00 €)"
+Super zoo veterina,sterilization,dog,,,130,130,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Sterilizácia fena – operačný úkon bez anestézy (130,00 €)"
+Super zoo veterina,castration,cat,,,42,42,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Kastrácia kocúr – operačný úkon bez anestézy (42,00 €)"
+Super zoo veterina,sterilization,cat,,,79,79,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Sterilizácia mačka – operačný úkon bez anestézy (79,00 €)"
+Super zoo veterina,other,,,,20,39,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"USG vyšetrenie (od 20,00 do 39,00 €)"
+Veterinárna klinika LapVet,exam,,,,25,45,EUR,https://www.lapvet.sk#cennik,2026-09-25,"Bežné vyšetrenie – klinické vyšetrenie, konzultácia (25 € – 45 €)"
+Veterinárna klinika LapVet,vaccination_combo,,,,20,50,EUR,https://www.lapvet.sk#cennik,2026-09-25,Očkovanie – kompletné očkovanie + zápis (20 € – 50 €)
+Veterinárna klinika LapVet,microchip,,,,30,50,EUR,https://www.lapvet.sk#cennik,2026-09-25,Čipovanie + pas – mikročip + medzinárodný pas (30 € – 50 €)
+Veterinárna klinika LapVet,castration,,,,80,200,EUR,https://www.lapvet.sk#cennik,2026-09-25,Kastrácia / Sterilizácia – klasická chirurgia (80 € – 200 €)
+Veterinárna klinika LapVet,sterilization,,,,250,,EUR,https://www.lapvet.sk#cennik,2026-09-25,Laparoskopická sterilizácia – minimálne invazívny zákrok (od 250 €)
+Veterinárna klinika LapVet,dental_cleaning,,,,50,150,EUR,https://www.lapvet.sk#cennik,2026-09-25,Dentálna hygiena – ultrazvukové čistenie + extrakcie (50 € – 150 €)
+Veterinárna klinika LapVet,emergency_fee,,,,60,120,EUR,https://www.lapvet.sk#cennik,2026-09-25,Pohotovostný príplatok – mimo ordinačných hodín (60 € – 120 €)
+Veterinárna klinika LapVet,other,,,,40,90,EUR,https://www.lapvet.sk#cennik,2026-09-25,"RTG vyšetrenie – digitálny RTG, 1–2 projekcie (40 € – 90 €)"
+Veterinárna klinika LapVet,other,,,,35,80,EUR,https://www.lapvet.sk#cennik,2026-09-25,Ultrazvukové vyšetrenie – abdominálny / kardiálny USG (35 € – 80 €)
+PetVet veterinárna klinika,exam,,,,36.60,36.60,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Konzultácia štandardná do 20 min. (36,60 €; vstupná prehliadka bezplatne)"
+PetVet veterinárna klinika,vaccination_combo,,,,45.30,45.30,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Vakcinácia – základné vakcíny (45,30 €)"
+PetVet veterinárna klinika,microchip,,,,29.50,29.50,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Čipovanie a evidencia v CRSZ (29,50 €)"
+PetVet veterinárna klinika,pet_passport,,,,33,33,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Vystavenie pasu – Petpass (33,00 €)"
+PetVet veterinárna klinika,castration,cat,,,74,74,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Kastrácia – kocúr (74,00 €)"
+PetVet veterinárna klinika,castration,dog,,,165,165,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Kastrácia – pes (165,00 €)"
+PetVet veterinárna klinika,sterilization,cat,,,109,109,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Sterilizácia – mačka (109,00 €)"
+PetVet veterinárna klinika,sterilization,dog,,,222,,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Sterilizácia – fenka (od 222,00 €)"
+PetVet veterinárna klinika,dental_cleaning,,,,91,,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Dentálna hygiena v anestéze (od 91,00 €)"
+PetVet veterinárna klinika,other,,,,80,80,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Základné vyšetrenie krvi s interpretáciou (80,00 €)"
+Veterinárna ambulancia SpektraVet,exam,,,,17,17,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Klinické vyšetrenie (17 €; kontrolné vyšetrenie 10 €)
+Veterinárna ambulancia SpektraVet,vaccination_rabies,dog,,,22,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Vakcinácia – besnota + zápis do CRSZ (od 22 €)
+Veterinárna ambulancia SpektraVet,vaccination_rabies,cat,,,32,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Vakcinácia mačka – besnota (od 32 €)
+Veterinárna ambulancia SpektraVet,vaccination_combo,dog,,,32,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Kompletná vakcinácia pes – infekčné ochorenia + besnota + zápis do CRSZ (od 32 €)
+Veterinárna ambulancia SpektraVet,vaccination_combo,cat,,,30,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Kompletná vakcinácia mačka – infekčné ochorenia + besnota (od 30 €)
+Veterinárna ambulancia SpektraVet,microchip,,,,20,20,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Čipovanie + mikročip + registrácia do CRSZ (20 €)
+Veterinárna ambulancia SpektraVet,pet_passport,,,,15,15,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Vystavenie PETPASU – pas pre zvieratá (15 €)
+Veterinárna ambulancia SpektraVet,castration,cat,,,70,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Kastrácia – kocúr (od 70 € v inhalačnej anestézii)
+Veterinárna ambulancia SpektraVet,castration,dog,,,120,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Kastrácia – pes (od 120 € v inhalačnej anestézii)
+Veterinárna ambulancia SpektraVet,sterilization,cat,,,120,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Sterilizácia – mačka (od 120 € v inhalačnej anestézii)
+Veterinárna ambulancia SpektraVet,sterilization,dog,,,150,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Sterilizácia – fena (od 150 € v inhalačnej anestézii)
+Veterinárna ambulancia SpektraVet,dental_cleaning,,,,120,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Stomatologické ošetrenie vrátane extrakcií (od 120 €)
+Veterinárna ambulancia SpektraVet,emergency_fee,,,,100,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Hospitalizácia nočná (od 100 €)
+VetPetržalka veterinárna ambulancia,exam,,,,30.82,30.82,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Klinické vyšetrenie základné (30,82 €)"
+VetPetržalka veterinárna ambulancia,vaccination_rabies,,,,28.01,28.01,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Besnota pes/mačka, fretka vrátane zápisu do CRSZ (28,01 €)"
+VetPetržalka veterinárna ambulancia,vaccination_combo,dog,,,45.85,45.85,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Kompletná vakcinácia – pes: psinka, parvoviróza, inf. hepatitída, parainfluenza, lepto + besnota (45,85 €)"
+VetPetržalka veterinárna ambulancia,vaccination_combo,cat,,,43.45,43.45,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Kompletná vakcinácia – mačka: rhinotracheitída, calici, panleukopénia + besnota (43,45 €)"
+VetPetržalka veterinárna ambulancia,microchip,,,,5,5,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Čipovanie + mikročip výsledná suma (5,00 €; registrácia v CRSZ 25,42 €)"
+VetPetržalka veterinárna ambulancia,pet_passport,,,,32.42,32.42,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Vystavenie petpasu + petpas výsledná suma (32,42 €)"
+VetPetržalka veterinárna ambulancia,castration,cat,,,99,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Kastrácia kocúra (od 99 €)
+VetPetržalka veterinárna ambulancia,castration,dog,,,195,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Kastrácia psa (od 195 €)
+VetPetržalka veterinárna ambulancia,sterilization,cat,,,120,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Sterilizácia mačky (od 120 €)
+VetPetržalka veterinárna ambulancia,sterilization,dog,,,240,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Sterilizácia fenky (od 240 €)
+VetPetržalka veterinárna ambulancia,dental_cleaning,,,,105,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Odstránenie zubného kameňa (od 105 €)
+VetPetržalka veterinárna ambulancia,other,,,,33,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Ultrasonografické vyšetrenie (od 33 €)
+DermaVet veterinárna ambulancia,exam,,,,22,22,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Klinické vyšetrenie (22 € s DPH)
+DermaVet veterinárna ambulancia,vaccination_rabies,,,,30,30,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Besnota – zo zákona povinná (30 €)
+DermaVet veterinárna ambulancia,vaccination_combo,dog,,,40,,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Kompletná vakcinácia psa – besnota + infekčné ochorenia psov (od 40 €)
+DermaVet veterinárna ambulancia,vaccination_combo,cat,,,40,,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Kompletná vakcinácia mačky – besnota + infekčné ochorenie mačiek (od 40 €)
+DermaVet veterinárna ambulancia,microchip,,,,25,25,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Čipovanie + registrácia do CRSZ (25 €)
+DermaVet veterinárna ambulancia,pet_passport,,,,25,25,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Vystavenie petpasu + registrácia do CRSZ (25 €)
+DermaVet veterinárna ambulancia,castration,cat,,,100,,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Kastrácia – kocúr s anestéziou (od 100 €)
+DermaVet veterinárna ambulancia,castration,dog,,,200,,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Kastrácia – pes s anestéziou (od 200 €)
+DermaVet veterinárna ambulancia,dental_cleaning,,,,150,,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Čistenie zubného kameňa – ultrazvukom so sedáciou (od 150 €)
+DermaVet veterinárna ambulancia,emergency_fee,,,,150,,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Hospitalizácia nočná (od 150 €)
+DermaVet veterinárna ambulancia,other,,,,35,35,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Dermatologické vyšetrenie (35 €)
+Tvoja Veterina,other,,,,153,153,EUR,https://tvojaveterina.sk,2026-09-25,"Preventívny balíček Basic: klinické vyšetrenie, biochemické vyšetrenie krvi 6 parametrov, hematológia, urológia, USG brucha (zvýhodnená cena 153,00 €, pôvodná 191,00 €)"
+Tvoja Veterina,other,,,,266,266,EUR,https://tvojaveterina.sk,2026-09-25,"Preventívny balíček Medium: klinické vyšetrenie, komplexná biochémia, hematológia, urológia, USG brucha, RTG hrudníka 3 snímky (zvýhodnená cena 266,00 €, pôvodná 333,00 €)"
+Veterinárna ambulancia MVDr. Pavol Čech,exam,,,,30,,EUR,https://veterinalamac.sk/cennik,2026-09-25,Vstupné klinické vyšetrenie nový klient (Od 30 €)
+Veterinárna ambulancia MVDr. Pavol Čech,other,,,,40,,EUR,https://veterinalamac.sk/cennik,2026-09-25,Sonografické vyšetrenie (Od 40 €)
+Veterinárna ambulancia MVDr. Pavol Čech,other,,,,20,,EUR,https://veterinalamac.sk/cennik,2026-09-25,Elektrokardiogram vyšetrenie (Od 20 €)
+Veterinárna ambulancia MVDr. Pavol Čech,other,,,,45,,EUR,https://veterinalamac.sk/cennik,2026-09-25,Laserová akupunktúra – 1. sedenie (Od 45 €; 2. sedenie 35 €)
+Veterinárna ambulancia MVDr. Pavol Čech,other,,,,40,,EUR,https://veterinalamac.sk/cennik,2026-09-25,Klinické vyšetrenie + poradenstvo onkologických pacientov (Od 40 €)
