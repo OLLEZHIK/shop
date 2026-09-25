@@ -2,7 +2,9 @@ import type { BusinessCategory } from "@prisma/client";
 import type { BusinessWithRelations } from "@/lib/data";
 import { SERVICES, serviceIncludes, serviceLabel } from "@/lib/services";
 import { formatDate, getDictionary, type Locale } from "@/lib/i18n";
+import Link from "next/link";
 import { TagIcon } from "./icons";
+import { pricesPath } from "@/lib/pricePages";
 import { MARKET_BAND, pctAgainst, type MarketPrice } from "@/lib/priceMarket";
 
 type PriceRow = BusinessWithRelations["priceItems"][number];
@@ -17,12 +19,15 @@ export function PriceTable({
   category,
   locale,
   market,
+  citySlug,
 }: {
   items: PriceRow[];
   category: BusinessCategory;
   locale: Locale;
   /** City market price per service code (lib/priceMarket.ts). */
   market?: Map<string, MarketPrice>;
+  /** With a city: services that have a price page link to it. */
+  citySlug?: string;
 }) {
   const t = getDictionary(locale).business;
   const card = getDictionary(locale).card;
@@ -94,7 +99,13 @@ export function PriceTable({
           return (
             <li key={item.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-2.5 text-sm">
               <span className="text-foreground/80">
-                {serviceLabel(category, code, locale)}
+                {firstOfService && citySlug && market?.has(code) ? (
+                  <Link href={pricesPath(locale, category, citySlug, code)} prefetch={false} className="hover:text-brand-blue hover:underline">
+                    {serviceLabel(category, code, locale)}
+                  </Link>
+                ) : (
+                  serviceLabel(category, code, locale)
+                )}
                 {w && <span className="text-foreground/50"> · {w}</span>}
                 {includes && <span className="block text-xs text-foreground/50">{includes}</span>}
               </span>

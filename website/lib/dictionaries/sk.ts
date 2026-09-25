@@ -414,4 +414,34 @@ export const sk: Dictionary = {
     body: "Všetko sme prečuchali, no túto stránku sme nenašli. Možno sa presunula alebo je v odkaze preklep.",
     back: "Späť na úvod",
   },
+  prices: {
+    crumb: "Ceny",
+    overviewH1: (label: string, where: string) => `${cap(label)} ${skIn(where)} – ceny`,
+    overviewMetaTitle: (label: string, where: string) => `${cap(label)} ${skIn(where)} – koľko čo stojí | Pawenn`,
+    overviewIntro:
+      "Koľko stojí ktorá služba – porovnanie podnikov, ktoré zverejňujú cenník. Medián je stredná cena: polovica podnikov je lacnejšia, polovica drahšia.",
+    overviewMetaDescription: (label: string, where: string, services: number) =>
+      `${cap(label)} ${skIn(where)}: ceny ${services} ${plural("sk", services, { one: "služby", few: "služieb", other: "služieb" })} porovnané medzi podnikmi, s mediánom a rozpätím. Zo zverejnených cenníkov, s dátumom.`,
+    serviceH1: (service: string, where: string) => `${service} ${skIn(where)} – ceny`,
+    serviceMetaTitle: (service: string, where: string, from: string) => `${service} ${skIn(where)} – od ${from} | Pawenn`,
+    answer: (from: string, to: string, median: string, places: number, date: string) =>
+      `Stojí od ${from} do ${to}, medián ${median}. Porovnali sme ${places} ${plural("sk", places, { one: "podnik", few: "podniky", other: "podnikov" })}, ceny overené ${date}.`,
+    fewPlaces: (places: number) =>
+      `Túto cenu zatiaľ ${plural("sk", places, { one: "zverejnil", few: "zverejnili", other: "zverejnilo" })} len ${places} ${plural("sk", places, { one: "podnik", few: "podniky", other: "podnikov" })} – na porovnanie je to málo.`,
+    question: (service: string, where: string) => `Koľko stojí ${service.toLowerCase()} ${skIn(where)}?`,
+    includes: "Čo zahŕňa cena",
+    place: "Podnik",
+    price: "Cena",
+    vsMarket: "Oproti trhu",
+    notComparedTitle: "Ďalšie ceny (neporovnávame)",
+    notComparedIntro: "Čiastočné ceny, ceny za hodinu či kilometer alebo ceny, ktoré zahŕňajú viac ako štandard.",
+    otherServices: "Ďalšie ceny",
+    service: "Služba",
+    range: "Rozpätie",
+    median: "Medián",
+    places: "Podniky",
+    seeAll: (label: string) => `Všetky: ${label.toLowerCase()}`,
+    linkFromListing: (where: string) => `Ceny ${skIn(where)}`,
+    source: "cenník",
+  },
 };

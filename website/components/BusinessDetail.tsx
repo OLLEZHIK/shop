@@ -293,7 +293,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
 
           {/* Prices right after contact (owner, 2026-09-25): the price is what
               people come to compare, each row against the city median. */}
-          <PriceTable items={business.priceItems} category={business.category} locale={locale} market={marketPrices} />
+          <PriceTable items={business.priceItems} category={business.category} locale={locale} market={marketPrices} citySlug={citySlug} />
 
           {hasAbout && (
             <section className="rounded-[var(--radius-card)] bg-surface p-6 shadow-[var(--shadow-card)]">

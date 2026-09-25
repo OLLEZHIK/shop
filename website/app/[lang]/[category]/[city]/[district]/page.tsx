@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { categoryFromSlug, categoryLabel, categoryPlural, categorySeoTitle, categorySingular, listingPath } from "@/lib/categories";
-import { getCityBySlug, getDistrictBySlug, getCategoryAggregates, getNonstopVetCount } from "@/lib/data";
+import { getCityBySlug, getDistrictBySlug, getCategoryAggregates, getMarketPrices, getNonstopVetCount } from "@/lib/data";
+import { PRICES_SEGMENT, pricesPath } from "@/lib/pricePages";
+import { PriceOverviewPage } from "@/components/PricePages";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
-import { getDictionary, isLocale, localesForCity } from "@/lib/i18n";
+import { getDictionary, inCity, isLocale, localesForCity } from "@/lib/i18n";
 import { localeAlternates, socialMeta } from "@/lib/seo";
 import { CategoryListing, whereLabel } from "@/components/CategoryListing";
 
@@ -21,14 +23,20 @@ async function resolve(params: Promise<PageParams>) {
   if (!category) return null;
   const city = await getCityBySlug(citySlug);
   if (!city || !localesForCity(city).includes(lang)) return null;
+  // /<category>/<city>/prices: price overview, while any service has a
+  // market price (at least 3 places) - lib/pricePages.ts.
+  if (districtSlug === PRICES_SEGMENT[lang]) {
+    if ((await getMarketPrices(category, citySlug)).size === 0) return null;
+    return { locale: lang, category, city, citySlug, district: null, districtSlug, nonstop: false as const, prices: true as const };
+  }
   // /<vets>/<city>/nonstop: the 24/7 clinics page, while the city has any.
   if (districtSlug === NONSTOP_SEGMENT) {
     if (category !== "VET_CLINIC" || (await getNonstopVetCount(citySlug)) === 0) return null;
-    return { locale: lang, category, city, citySlug, district: null, districtSlug, nonstop: true as const };
+    return { locale: lang, category, city, citySlug, district: null, districtSlug, nonstop: true as const, prices: false as const };
   }
   const district = await getDistrictBySlug(citySlug, districtSlug);
   if (!district) return null;
-  return { locale: lang, category, city, citySlug, district, districtSlug, nonstop: false as const };
+  return { locale: lang, category, city, citySlug, district, districtSlug, nonstop: false as const, prices: false as const };
 }
 
 // Rendered per request (filters come from the query string) with data
@@ -43,6 +51,21 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const { locale, category, city } = resolved;
   const t = getDictionary(locale).listing;
   const locales = localesForCity(city);
+
+  if (resolved.prices) {
+    const tp = getDictionary(locale).prices;
+    const where = inCity(locale, city);
+    const label = categoryLabel(category, locale);
+    const services = (await getMarketPrices(category, city.slug)).size;
+    const title = tp.overviewMetaTitle(label, where);
+    const description = tp.overviewMetaDescription(label, where, services);
+    return {
+      alternates: localeAlternates(locale, Object.fromEntries(locales.map((l) => [l, pricesPath(l, category, city.slug)]))),
+      title: { absolute: title },
+      description,
+      ...socialMeta({ title, description, path: pricesPath(locale, category, city.slug), locale, image: { title: tp.overviewH1(label, where), category } }),
+    };
+  }
 
   if (resolved.nonstop) {
     const where = whereLabel(locale, city);
@@ -97,6 +120,9 @@ export default async function CategoryCityDistrictPage({
 }) {
   const resolved = await resolve(params);
   if (!resolved) notFound();
+  if (resolved.prices) {
+    return <PriceOverviewPage locale={resolved.locale} category={resolved.category} city={resolved.city} />;
+  }
 
   const { animal, near, sort, rating, open } = await searchParams;
   const { locale, category, city } = resolved;

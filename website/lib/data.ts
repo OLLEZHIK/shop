@@ -322,6 +322,67 @@ async function getPriceMarketRaw(
   return { market: [...marketPrices(prices)], levels: [...priceLevels(prices)] };
 }
 
+export interface ServicePriceRow {
+  priceFrom: number;
+  priceTo: number | null;
+  currency: string;
+  weightFromKg: number | null;
+  weightToKg: number | null;
+  unit: string | null;
+  partial: boolean;
+  note: string | null;
+  noteLocal: string | null;
+  observedAt: Date;
+  sourceUrl: string;
+  business: { id: number; name: string; slug: string; phone: string | null; districtName: string | null };
+}
+
+// Every published price of one service in one city, with its place -
+// the price page of that service (lib/pricePages.ts). Comparable or not:
+// the page shows all, compares only whole-service prices.
+async function getServicePriceRowsRaw(category: BusinessCategory, citySlug: string, code: string): Promise<ServicePriceRow[]> {
+  const items = await prisma.priceItem.findMany({
+    where: {
+      business: { category, status: "PUBLISHED", ...inCityWhere(citySlug) },
+      service: { code },
+    },
+    select: {
+      priceFrom: true,
+      priceTo: true,
+      currency: true,
+      weightFromKg: true,
+      weightToKg: true,
+      unit: true,
+      partial: true,
+      note: true,
+      noteLocal: true,
+      observedAt: true,
+      sourceUrl: true,
+      business: { select: { id: true, name: true, slug: true, phone: true, district: { select: { name: true } } } },
+    },
+  });
+  return items.map((i) => ({
+    priceFrom: Number(i.priceFrom),
+    priceTo: i.priceTo === null ? null : Number(i.priceTo),
+    currency: i.currency,
+    weightFromKg: i.weightFromKg === null ? null : Number(i.weightFromKg),
+    weightToKg: i.weightToKg === null ? null : Number(i.weightToKg),
+    unit: i.unit,
+    partial: i.partial,
+    note: i.note,
+    noteLocal: i.noteLocal,
+    observedAt: i.observedAt,
+    sourceUrl: i.sourceUrl,
+    business: {
+      id: i.business.id,
+      name: i.business.name,
+      slug: i.business.slug,
+      phone: i.business.phone,
+      districtName: i.business.district?.name ?? null,
+    },
+  }));
+}
+
 export interface DistrictSummary {
   slug: string;
   name: string;
@@ -512,4 +573,9 @@ export async function getPriceTierMap(category: BusinessCategory, citySlug: stri
 /** Market price per service code in the city (only services with enough places). */
 export async function getMarketPrices(category: BusinessCategory, citySlug: string): Promise<Map<string, MarketPrice>> {
   return new Map((await getPriceMarketCached(category, citySlug)).market);
+}
+
+const getServicePriceRowsCached = cached(getServicePriceRowsRaw, "getServicePriceRows");
+export async function getServicePriceRows(category: BusinessCategory, citySlug: string, code: string): Promise<ServicePriceRow[]> {
+  return (await getServicePriceRowsCached(category, citySlug, code)).map((r) => ({ ...r, observedAt: new Date(r.observedAt) }));
 }

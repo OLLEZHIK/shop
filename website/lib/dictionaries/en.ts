@@ -383,6 +383,38 @@ export const en = {
     body: "We sniffed around but couldn't find that page. It may have moved, or the link has a typo.",
     back: "Back to home",
   },
+  // Price pages (lib/pricePages.ts): one per service and city, plus an
+  // overview per category. Numbers come preformatted (money, dates).
+  prices: {
+    crumb: "Prices",
+    overviewH1: (label: string, where: string) => `${label} ${where}: prices`,
+    overviewMetaTitle: (label: string, where: string) => `${label} ${where}: what things cost | Pawenn`,
+    overviewIntro:
+      "What each service costs, compared across the places that publish a price list. The median is the middle price: half the places charge less, half more.",
+    overviewMetaDescription: (label: string, where: string, services: number) =>
+      `${label} ${where}: prices of ${services} services compared across places, with the median and range for each. From published price lists, with dates.`,
+    serviceH1: (service: string, where: string) => `${service} ${where}: prices`,
+    serviceMetaTitle: (service: string, where: string, from: string) => `${service} ${where} – from ${from} | Pawenn`,
+    answer: (from: string, to: string, median: string, places: number, date: string) =>
+      `Costs from ${from} to ${to}, median ${median}. We compared ${places} ${places === 1 ? "place" : "places"}; prices checked ${date}.`,
+    fewPlaces: (places: number) =>
+      `Only ${places} ${places === 1 ? "place publishes" : "places publish"} this price so far - too few to compare.`,
+    question: (service: string, where: string) => `How much does ${service.toLowerCase()} cost ${where}?`,
+    includes: "What the price includes",
+    place: "Place",
+    price: "Price",
+    vsMarket: "Against the market",
+    notComparedTitle: "Other prices (not compared)",
+    notComparedIntro: "Partial prices, prices per hour or per km, or ones that include more than the standard.",
+    otherServices: "Other prices",
+    service: "Service",
+    range: "Range",
+    median: "Median",
+    places: "Places",
+    seeAll: (label: string) => `All ${label.toLowerCase()}`,
+    linkFromListing: (where: string) => `Prices ${where}`,
+    source: "price list",
+  },
 };
 
 export type Dictionary = typeof en;
