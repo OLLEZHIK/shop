@@ -82,6 +82,18 @@ if (silent.length) {
   for (const s of silent) console.log(`  ${s}`);
 }
 
+// Nonstop 24/7 is shown as "open now" at any hour: only for places whose
+// hours are 24h all week (docs/card-spec.md, section 8, "Nonstop 24/7").
+const DAYS = ["mo", "tu", "we", "th", "fr", "sa", "su"];
+const allDay = (hours: string) =>
+  DAYS.every((d) => new RegExp(`(^|;)\\s*${d}\\s+24h\\s*(;|$)`).test(hours ?? ""));
+const falseNonstop = rows.filter((r) => /^yes$/i.test((r.emergency_24_7 ?? "").trim()) && !allDay(r.opening_hours));
+if (falseNonstop.length) {
+  failed = true;
+  console.log(`\nemergency_24_7=yes without 24h hours on all 7 days (${falseNonstop.length}):`);
+  for (const r of falseNonstop) console.log(`  ${r.slug}: ${r.opening_hours || "(no hours)"}`);
+}
+
 // Review summaries are a second pass; reported, not enforced here.
 const rated = rows.filter((r) => Number(r.google_rating_count) >= 10);
 const withInsights = rated.filter((r) => insights.has(r.slug)).length;

@@ -136,7 +136,10 @@ export async function CategoryListing({
   const listItems = ordered(withDistance);
   const unconfirmedList = ordered(unconfirmedItems);
 
-  const faqs = category ? buildFaqs({ locale, category, where, aggregates }) : [];
+  // The nonstop page gets no category FAQ: its answers (how many clinics,
+  // price range) are about all vets, not the 24/7 ones, and repeat the
+  // category page.
+  const faqs = category && !nonstopPage ? buildFaqs({ locale, category, where, aggregates }) : [];
 
   return (
     <main style={{ "--accent": accent } as React.CSSProperties}>
@@ -192,7 +195,7 @@ export async function CategoryListing({
           </div>
 
           <dl className="mt-6 flex flex-wrap gap-2">
-            <Stat label={t.listing.listed} value={String(aggregates.count)} />
+            <Stat label={t.listing.listed} value={String(nonstopPage ? scoped.length : aggregates.count)} />
             {aggregates.verifiedCount > 0 && <Stat label={t.listing.verified} value={String(aggregates.verifiedCount)} />}
           </dl>
 

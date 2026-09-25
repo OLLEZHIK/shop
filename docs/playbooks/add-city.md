@@ -98,6 +98,11 @@ category,name,slug,address,lat,lng,phone,email,website,instagram,facebook,short_
 
 Столбцы `emergency_24_7`, `emergency_note`, `home_visits`,
 `specialties` заполняются только у `VET_CLINIC`, у остальных пустые.
+`emergency_24_7=yes` — только по правилу «Nonstop 24/7» из
+`docs/card-spec.md` (раздел 8): заведение само прямо пишет, что
+принимает круглосуточно, и часы `24h` все 7 дней. Дежурный телефон,
+ночная или выходная неотложка — это `emergency_note`, не nonstop.
+`check-city` такие ошибки не пропускает.
 Столбцы, которых нет в таблице ниже, описаны в `docs/card-spec.md`.
 
 | Столбец | Что | Правила |
