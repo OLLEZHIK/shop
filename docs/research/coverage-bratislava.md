@@ -1,123 +1,140 @@
-# Исследование покрытия Братиславы: кандидаты на добавление и потенциально закрытые заведения
+# Исследование покрытия Братиславы: кандидаты на добавление и аудит каталога
 
 > Дата исследования: 2026-09-25  
 > Исполнитель: Antigravity (Data & Research Agent)  
-> Цель: анализ полноты каталога в Братиславе по 6 ключевым категориям и аудит актуальности текущей базы (76 записей в `data/*.csv`).
+> Цель: анализ полноты каталога в Братиславе по 6 ключевым категориям и строгий аудит актуальности текущей базы (76 записей в `data/*.csv`).
 
 ---
 
 ## Сводка результатов
 
-- **Всего кандидатов на добавление (Раздел A):** 32 проверенных заведения
-  - Ветклиники (`veterinary`): 7
-  - Салоны груминга (`grooming`): 7
-  - Отели для животных (`hotel`): 3
-  - Дрессировка и кинология (`training`): 4
-  - Зоомагазины и корма (`shop`): 8
-  - Передержка и присмотр (`sitting`): 3
-- **Потенциально проблемных / закрытых из текущей базы (Раздел B):** 6 заведений (из 76 проверенных).
+- **Всего кандидатов на добавление (Раздел A):** 29 строго проверенных заведений
+  - Ветклиники (`veterinary`): 6 (при целевых 5–7)
+  - Салоны груминга (`grooming`): 6 (при целевых 5–6)
+  - Отели для животных (`hotel`): 3 (при целевых 3)
+  - Дрессировка и кинология (`training`): 3 (при целевых 3)
+  - Зоомагазины и корма (`shop`): 8 (при целевых 5–8)
+  - Передержка и присмотр (`sitting`): 3 (при целевых 2–3)
+- **Подтверждённые проблемные кейсы из текущей базы (Раздел B):** 3 заведения из 76 проверенных (1 навсегда закрыт, 1 закрыл физическую точку и работает только online, 1 имеет упавший сайт HTTP 502 при активной карточке).
+- **Снятые подозрения (ложные срабатывания):** `AHAvet`, `EuroVet` и `Ako doma` проверены и признаны полностью действующими.
 
 ---
 
-## A. Кого у нас нет в Братиславе
+## Методология и инструменты строгой верификации
 
-Все кандидаты отобраны через независимые источники (Google Maps, официальные сайты заведений, социальные сети) с использованием каталогов (`tippytaps.sk`, `zoznam.sk`, `chovatelahospodar.sk`) исключительно как источников названий. Каждый кандидат верифицирован на наличие карточки Google Maps и действующего официального сайта/соцсети.
+Каждая запись в разделах A и B прошла трёхэтапную инструментальную проверку:
+1. **Проверка DNS и домена:** Вызов системного резолвера `socket.gethostbyname` для исключения неразрешимых доменов (`ENOTFOUND`) и заброшенных адресов.
+2. **Проверка HTTP-доступности и заголовков:** Запросы через `curl.exe -s -I -L --max-time 10` для валидации кодов ответа (HTTP 200/301/302) и извлечения точного содержимого тега `<title>`.
+3. **Прямая верификация карточки Google Maps:** Запросы к Google Places API (`Place.searchByText` и `Place.fetchFields` через автономный браузер Playwright Chromium) с извлечением прямого Place ID, статуса работы бизнеса (`businessStatus: OPERATIONAL / CLOSED_PERMANENTLY`), точного названия в карточке и прямой ссылки на карточку с параметром CID (`https://maps.google.com/?cid=<cid>`).
+
+В соответствии с требованиями задачи, рейтинги и количество отзывов из Раздела A исключены (не требуются для исследования покрытия).
+
+---
+
+## A. Кандидаты на добавление в Братиславе
+
+Все кандидаты верифицированы на независимых источниках, имеют подтверждённый статус `OPERATIONAL` в Google Maps и действующий сайт или официальную страницу в соцсети.
 
 ### 1. Ветеринарные клиники (`veterinary`)
 
-| name | category | address | district | official website / соцсеть | где нашли | проверено: работает? (как проверили) |
+| name | category | address | district | official website / соцсеть | google_maps_url | evidence |
 |---|---|---|---|---|---|---|
-| AhojVET | veterinary | Hummelova 4, 811 03 Bratislava | stare-mesto | https://ahojvet.sk | tippytaps.sk / Google Maps | Карточка Google Maps активна (4.8★, 122 отзыва), статус OPERATIONAL; сайт активен, часы работы Пн–Пт 9:00–19:00, Сб 9:00–12:00. |
-| DN-VET (Veterinárna ambulancia) | veterinary | Istrijská 17, 841 07 Bratislava | devinska-nova-ves | https://dn-vet.sk | tippytaps.sk / Google Maps | Карточка Google Maps активна (4.7★, 202 отзыва), статус OPERATIONAL; сайт активен, специализация по домашним и экзотическим животным. |
-| Veterina Inak Centrum | veterinary | Račianska 80, 831 02 Bratislava | nove-mesto | https://veterinainakcentrum.sk | tippytaps.sk / Google Maps | Карточка Google Maps активна (5.0★), статус OPERATIONAL; сайт и онлайн-запись через Bookio активны (физиотерапия и общая ветеринария). |
-| Veterinárna klinika AMIS | veterinary | Kostlivého 17, 821 03 Bratislava | ruzinov | https://amisveterina.sk | tippytaps.sk / Google Maps | Карточка Google Maps активна (4.8★, 243 отзыва), статус OPERATIONAL; сайт активен, приём Пн–Пт 8:30–19:00, Сб–Вс 9:00–12:00. |
-| X-VET Veterinárna klinika | veterinary | M. Schneidera-Trnavského 8, 841 01 Bratislava | dubravka | https://x-vet.sk | Google Maps / Zoznam.sk | Карточка Google Maps активна (5.0★, 60 отзывов), статус OPERATIONAL; сайт активен, часы приёма Пн–Пт 9:00–19:00. |
-| Veterinárna ambulancia Čunovo | veterinary | Hraničiarska 2, 851 10 Bratislava | cunovo | https://www.facebook.com/veterinacunovo | Google Maps / Oma.sk | Карточка Google Maps активна (5.0★, 131 отзыв), статус OPERATIONAL; активные публикации в соцсети, плановые операции и вакцинации. |
-| Veterinárna ambulancia MVDr. Alexander Baxa | veterinary | Nejedlého 6, 841 02 Bratislava | dubravka | https://www.facebook.com/p/Veterin%C3%A1rna-ambulancia-MVDr-Alexander-Baxa-100064095431627/ | Google Maps / ZZZ.sk | Карточка Google Maps активна (4.9★, 369 отзывов), статус OPERATIONAL; стабильный поток свежих отзывов пациентов за 2026 год. |
+| AhojVET | veterinary | Hummelova 4, 811 03 Bratislava | stare-mesto | https://ahojvet.sk | https://maps.google.com/?cid=12735830244754532698 | Google Maps: `AhojVet` (OPERATIONAL); Web `<title>`: `AhojVet – Veterinárna ambulancia` (2026-09-25) |
+| Veterinárna klinika AMIS | veterinary | Kostlivého 17, 821 03 Bratislava | ruzinov | http://www.amisveterina.sk | https://maps.google.com/?cid=7506715500111079492 | Google Maps: `Amis - Veterinárna klinika - MVDr. Róbert Furenda` (OPERATIONAL); Web `<title>`: `Amis veterinárna klinika` (2026-09-25) |
+| Veterina Inak Centrum | veterinary | Račianska 80, 831 02 Bratislava | nove-mesto | https://veterinainakcentrum.sk | https://maps.google.com/?cid=11718839467295605915 | Google Maps: `Veterina Inak Centrum` (OPERATIONAL); Web `<title>`: `Domov \| Veterinainak Centrum` (2026-09-25) |
+| X-VET Veterinárna klinika | veterinary | M. Schneidera-Trnavského 8, 841 01 Bratislava | dubravka | https://x-vet.sk | https://maps.google.com/?cid=7145937462506657939 | Google Maps: `Veterinárna klinika X-VET` (OPERATIONAL); Web `<title>`: `Vaša veterinárna klinika Bratislava \| X - vet` (2026-09-25) |
+| Veterinárna ambulancia Čunovo | veterinary | Hraničiarska 2, 851 10 Bratislava | cunovo | https://veterinacunovo.sk | https://maps.google.com/?cid=15170159783201861596 | Google Maps: `Veterinárna Ambulancia` (OPERATIONAL); Web `<title>`: `Veterina Čunovo — Rodinná veterinárna ambulancia` (2026-09-25) |
+| Veterinárna ambulancia MVDr. Alexander Baxa | veterinary | Nejedlého 6, 841 02 Bratislava | dubravka | https://www.facebook.com/p/Veterin%C3%A1rna-ambulancia-MVDr-Alexander-Baxa-100064095431627/ | https://maps.google.com/?cid=10556217261036128073 | Google Maps: `MVDr. Alexander Baxa` (OPERATIONAL); Офиц. страница Facebook активна (2026-09-25) |
 
 ### 2. Салоны груминга (`grooming`)
 
-| name | category | address | district | official website / соцсеть | где нашли | проверено: работает? (как проверили) |
+| name | category | address | district | official website / соцсеть | google_maps_url | evidence |
 |---|---|---|---|---|---|---|
-| Biele Labky | grooming | Agátová 7C, 841 01 Bratislava | dubravka | https://salon.bielelabky.sk | Google Maps / tippytaps.sk | Карточка Google Maps активна (4.9★, 65 отзывов), статус OPERATIONAL; сайт активен, предлагает онлайн-бронирование, стрижку и озонотерапию. |
-| Hafanana psí salón | grooming | Rustaveliho 11, 831 06 Bratislava | raca | https://hafanana.sk | Google Maps / tippytaps.sk | Карточка Google Maps активна (4.6★, 76 отзывов), статус OPERATIONAL; салон при клинике PrimaVet, сайт с прайсом и записью работает. |
-| Dogbar & Lounge | grooming | Ružinovská 44, 821 03 Bratislava | ruzinov | https://dogbar.sk | Google Maps / tippytaps.sk | Карточка Google Maps активна (4.6★, 228 отзывов), статус OPERATIONAL; сайт активен, онлайн-запись на стрижки и спа-процедуры. |
-| Psí salón Westík | grooming | Krížna 14, 811 07 Bratislava | stare-mesto | https://salonprepsy.sk | Google Maps / Firmy.sk | Карточка Google Maps активна (4.9★, 36 отзывов), статус OPERATIONAL; старейший салон города (основан в 1972 г.), сайт активен. |
-| YellowDog psí salón | grooming | Bradáčová 1, 851 02 Bratislava | petrzalka | https://yellowdog.sk | Google Maps | Карточка Google Maps активна (5.0★, 93 отзыва), статус OPERATIONAL; современный салон в Петржалке, сайт и запись активны. |
-| Psí salón Arisa | grooming | Kladnianska 18, 821 05 Bratislava | ruzinov | https://arisa.sk | Google Maps / Zoznam.sk | Карточка Google Maps активна, статус OPERATIONAL; телефон и приём клиентов функционируют. |
-| Andrea Strihanie psíkov (mobilný salón) | grooming | Bratislava (výjazdové služby) | ruzinov | https://andrea-strihaniepsov.sk | Google Maps / Web search | Карточка Google Maps активна (5.0★, 77 отзывов), статус OPERATIONAL; мобильный груминг на дому по всей Братиславе, сайт активен. |
+| Fluffy Puffy | grooming | Obchodná 66, 811 06 Bratislava | stare-mesto | https://fluffypuffygrooming.com | https://maps.google.com/?cid=14730884322721278512 | Google Maps: `Fluffy Puffy-Dog Grooming Bratislava` (OPERATIONAL); Web `<title>`: `Fluffy Puffy - psí salón v centre Bratislavy` (2026-09-25) |
+| Biele Labky | grooming | Agátová 7C, 841 01 Bratislava | dubravka | https://salon.bielelabky.sk | https://maps.google.com/?cid=17332156112998361121 | Google Maps: `Biele Labky - psi salon` (OPERATIONAL); Web `<title>`: `Psí salón Bratislava – Strihanie psov \| Biele Labky` (2026-09-25) |
+| Hafanana psí salón | grooming | Rustaveliho 11, 831 06 Bratislava | raca | https://hafanana.sk | https://maps.google.com/?cid=3752316444127014003 | Google Maps: `Hafanana Salón Pre Psov` (OPERATIONAL); Web `<title>`: `Hafanana` (2026-09-25) |
+| Dogbar & Lounge | grooming | Ružinovská 44, 821 03 Bratislava | ruzinov | https://dogbar.sk | https://maps.google.com/?cid=3087978581504618253 | Google Maps: `Dog Bar & DOGBARBERS - Kaviareň, Psia škôlka, psí salón a PUPPY PILATES` (OPERATIONAL); Web `<title>`: `Škôlka pre psov a kaviareň v Bratislave \| Dog Bar & Lounge` (2026-09-25) |
+| Psí salón Westík | grooming | Krížna 14, 811 07 Bratislava | stare-mesto | https://salonprepsy.sk | https://maps.google.com/?cid=2162680275828222725 | Google Maps: `Psí salón Westík` (OPERATIONAL); Web `<title>`: `Najväčší zoznam salónov pre psov — Salonprepsy.sk` (2026-09-25) |
+| YellowDog psí salón | grooming | Bradáčová 1, 851 02 Bratislava | petrzalka | https://yellowdog.sk | https://maps.google.com/?cid=5204644865443937071 | Google Maps: `Yellow Dog - Salón pre psov a mačky v Bratislave` (OPERATIONAL); Web `<title>`: `Psí salón Bratislava (psí salón Petržalka) \| YellowDog` (2026-09-25) |
 
 ### 3. Отели для животных (`hotel`)
 
-| name | category | address | district | official website / соцсеть | где нашли | проверено: работает? (как проверили) |
+| name | category | address | district | official website / соцсеть | google_maps_url | evidence |
 |---|---|---|---|---|---|---|
-| Prepsahotel.sk | hotel | Röntgenova 18, 851 01 Bratislava | petrzalka | https://prepsahotel.sk | Google Maps / Web search | Карточка Google Maps активна (4.9★, 35 отзывов), статус OPERATIONAL; домашнее содержание и передержка в квартире, сайт активен. |
-| DOGSTAR (Hotel a škôlka pre psov) | hotel | Bulharská 121, 821 04 Bratislava | ruzinov | https://dogstar.sk | Google Maps / Chovateľ a hospodár | Карточка Google Maps активна, сайт с описанием условий передержки и дневной школы функционирует. |
-| Hotel pre psov HAPPY | hotel | Plánky 10A, 841 03 Bratislava | lamac | https://www.facebook.com/hotelprepsovhappy | Google Maps / Otváracie hodiny | Карточка Google Maps и страница Facebook активны, приём собак на передержку в Ламаче. |
-
-*Примечание:* Популярный ранее отель для кошек **Happy Cat** (Na Baránku 38, Devínska Nová Ves) в ходе проверки на Google Maps оказался помечен как **CLOSED_PERMANENTLY**, поэтому в список рекомендуемых кандидатов не включён.
+| Pamlskovo - Psia škôlka a Hotel | hotel | Studená 2, 821 04 Bratislava | ruzinov | https://www.instagram.com/pamlskovo.skolka/ | https://maps.google.com/?cid=3702790171089170717 | Google Maps: `Pamlskovo - Psia škôlka a Hotel` (OPERATIONAL); Офиц. Instagram @pamlskovo.skolka активен (2026-09-25) |
+| Hotel pre psy u Zuzany | hotel | Devínske jazero 6825, 841 07 Bratislava | devinska-nova-ves | http://www.hotelprepsov.wbl.sk/ | https://maps.google.com/?cid=2869637406214030649 | Google Maps: `Hotel pre psy u Zuzany` (OPERATIONAL); Web `<title>`: `Vitajte u nás... : \| hotel pre psov` (2026-09-25) |
+| Hotelprepsa.sk | hotel | Javorová 936, 900 46 Most pri Bratislave | ruzinov | https://hotelprepsa.sk | https://maps.google.com/?cid=263924419891654096 | Google Maps: `Hotelprepsa.sk - Hotel pre psov` (OPERATIONAL, довоз по Братиславе); Web `<title>`: `Hotel pre psa pri Bratislave – rodinný pobyt bez klietok \| Hotelprepsa.sk` (2026-09-25) |
 
 ### 4. Дрессировка и кинологические клубы (`training`)
 
-| name | category | address | district | official website / соцсеть | где нашли | проверено: работает? (как проверили) |
+| name | category | address | district | official website / соцсеть | google_maps_url | evidence |
 |---|---|---|---|---|---|---|
-| Kynologický klub Matis | training | Betliarska 22, 851 07 Bratislava | petrzalka | https://www.vycvikpsov-matis.sk | Google Maps / Zoznam.sk | Площадка в Петржалке активна, курсы для щенков и послушание, сайт и контакты обновляются. |
-| Bratislavská kynologická záchranárska brigáda (BKZB) | training | Čierny les, 821 07 Bratislava | vrakuna | https://www.bkzb.sk | Google Maps / Dogforum.sk | Официальная кинологическая организация спасателей, действующие тренинги и курсы для общественности, сайт активен. |
-| Agility AllStars Bratislava | training | Mlynské nivy 77, 821 05 Bratislava | ruzinov | https://www.agilityallstars.sk | Google Maps / Zoznam.sk | Действующий клуб аджилити и послушания, активная страница Facebook и регулярные тренировки на площадке. |
-| Neposlušný psík (Peter Juhás) | training | Herlianska 45, 821 03 Bratislava | ruzinov | https://www.neposlusnypsik.sk | Google Maps / Zoznam.sk | Карточка Google Maps активна (4.4★, 16 отзывов), статус OPERATIONAL; курсы позитивной дрессировки и консультации в городской среде. |
+| Kynologický klub Matis | training | Betliarska 22, 851 07 Bratislava | petrzalka | https://www.vycvikpsov-matis.sk | https://maps.google.com/?cid=15764869637021504621 | Google Maps: `KK Matis` (OPERATIONAL); Web `<title>`: `kkmatis` (2026-09-25) |
+| Bratislavská kynologická záchranárska brigáda (BKZB) | training | Ružinovská 15941, 821 02 Bratislava | ruzinov | https://zachranarskypes.sk | https://maps.google.com/?cid=16682522855993305993 | Google Maps: `Bratislavská kynologická záchranárska brigáda` (OPERATIONAL); Web `<title>`: `Záchranársky pes - BKZB` (2026-09-25) |
+| Výcviková škola pre vodiace a asistenčné psy | training | Rovniankova 1668/16, 851 02 Bratislava | petrzalka | https://vodiacipes.sk | https://maps.google.com/?cid=13204862865141201253 | Google Maps: `Výcviková škola pre vodiace a asistenčné psy.` (OPERATIONAL); Web `<title>`: `Aktuality \| Výcviková škola pre vodiace a asistenčné psy` (2026-09-25) |
 
 ### 5. Зоомагазины и специализированные корма (`shop`)
 
-| name | category | address | district | official website / соцсеть | где нашли | проверено: работает? (как проверили) |
+| name | category | address | district | official website / соцсеть | google_maps_url | evidence |
 |---|---|---|---|---|---|---|
-| Barfdog | shop | Hradská 3G, 821 07 Bratislava | vrakuna | https://barfdog.sk | Google Maps / Web search | Карточка Google Maps активна (4.8★, 110 отзывов), статус OPERATIONAL; специализированный магазин сырого корма (BARF), сайт активен. |
-| BARFuj s Dobym | shop | Holíčska 48, 851 05 Bratislava | petrzalka | https://barfujsdobym.sk | Google Maps / Web search | Карточка Google Maps активна (5.0★, 18 отзывов), статус OPERATIONAL; магазин сырых кормов и натуральных добавок в Петржалке. |
-| Neposlušný psík – Predajňa Fresh Market | shop | Rožňavská 1/A, 831 04 Bratislava | nove-mesto | https://neposlusnypsik.sk | Google Maps / Fresh Market | Карточка Google Maps активна (4.4★, 16 отзывов), статус OPERATIONAL; физическая точка продажи кормов Yoggies на 1 этаже Fresh Market. |
-| Super zoo – Avion Shopping Park | shop | Ivanská cesta 16, 821 04 Bratislava | ruzinov | https://www.superzoo.sk | Google Maps | Карточка Google Maps активна (4.5★, 353 отзыва), статус OPERATIONAL; один из крупнейших флагманских магазинов сети. |
-| Super zoo – Bory Mall | shop | Lamač 6780, 841 06 Bratislava | lamac | https://www.superzoo.sk | Google Maps | Карточка Google Maps активна (4.2★, 77 отзывов), статус OPERATIONAL; крупный филиал в ТЦ Bory Mall. |
-| Super zoo – OC Danubia | shop | Panónska cesta 16, 851 04 Bratislava | petrzalka | https://www.superzoo.sk | Google Maps | Карточка Google Maps активна (4.4★, 340 отзывов), статус OPERATIONAL; гипермаркет зоотоваров в Петржалке. |
-| PetCenter – Avion Shopping Park | shop | Ivanská cesta 16, 821 04 Bratislava | ruzinov | https://www.petcenter.sk | Google Maps | Карточка Google Maps активна (4.5★, 353 отзыва), статус OPERATIONAL; сетевой магазин в Avion. |
-| PetCenter – VIVO! | shop | Vajnorská 100, 831 04 Bratislava | nove-mesto | https://www.petcenter.sk | Google Maps | Карточка Google Maps активна (4.2★, 180 отзывов), статус OPERATIONAL; филиал в ТЦ VIVO! (бывший Polus). |
+| Barfdog | shop | Hradská 3G, 821 07 Bratislava | vrakuna | https://barfdog.sk | https://maps.google.com/?cid=14911859903442797212 | Google Maps: `Barf Dog` (OPERATIONAL); Web `<title>`: `BARF strava - najlepšia strava pre psa – Barfovanie \| Barfdog.sk` (2026-09-25) |
+| BARFuj s Dobym | shop | Holíčska 48, 851 05 Bratislava | petrzalka | https://barfujsdobym.sk | https://maps.google.com/?cid=16251737557253060530 | Google Maps: `Barfuj s Dobym` (OPERATIONAL); Web `<title>`: `BARF - Kvalitná prirodzená strava pre psov \| BARFuj s Dobym` (2026-09-25) |
+| Super zoo – Avion Shopping Park | shop | Ivanská cesta 16, 821 04 Bratislava | ruzinov | https://www.superzoo.sk | https://maps.google.com/?cid=15200561217822311931 | Google Maps: `Super zoo` (OPERATIONAL, Avion); Web `<title>`: `Chovateľské potreby \| Pretože zvieratká milujeme \| Super zoo` (2026-09-25) |
+| Super zoo – Bory Mall | shop | Lamač 6780, 841 06 Bratislava | lamac | https://www.superzoo.sk | https://maps.google.com/?cid=6934589449029578075 | Google Maps: `Super zoo` (OPERATIONAL, Bory Mall); Web `<title>`: `Chovateľské potreby \| Pretože zvieratká milujeme \| Super zoo` (2026-09-25) |
+| Super zoo – OC Danubia | shop | Panónska cesta 16, 851 04 Bratislava | petrzalka | https://www.superzoo.sk | https://maps.google.com/?cid=13917719751582380906 | Google Maps: `Super zoo` (OPERATIONAL, OC Danubia); Web `<title>`: `Chovateľské potreby \| Pretože zvieratká milujeme \| Super zoo` (2026-09-25) |
+| Pet Center – OC Retro | shop | Nevädzová 6, 821 02 Bratislava | ruzinov | https://www.petcenter.sk | https://maps.google.com/?cid=170648519927289525 | Google Maps: `pet center` (OPERATIONAL, OC Retro); Web `<title>`: `PetCenter.sk - Všetko čo zvieratá milujú` (2026-09-25) |
+| Pet Center – OC Galéria Lamač | shop | Lamačská cesta 1C, 841 04 Bratislava | lamac | https://www.petcenter.sk | https://maps.google.com/?cid=7140689945060948110 | Google Maps: `Pet Center` (OPERATIONAL, OC Galéria Lamač); Web `<title>`: `PetCenter.sk - Všetko čo zvieratá milujú` (2026-09-25) |
+| Pet Center – Shopping Palace | shop | Cesta na Senec 2/A, 821 04 Bratislava | ruzinov | https://www.petcenter.sk | https://maps.google.com/?cid=12146876816184466298 | Google Maps: `Pet Center` (OPERATIONAL, Shopping Palace Zlaté Piesky); Web `<title>`: `PetCenter.sk - Všetko čo zvieratá milujú` (2026-09-25) |
 
-### 6. Передержка, выгул и присмотр (`sitting`)
+### 6. Передержка, выгул и дневной присмотр (`sitting`)
 
-| name | category | address | district | official website / соцсеть | где нашли | проверено: работает? (как проверили) |
+| name | category | address | district | official website / соцсеть | google_maps_url | evidence |
 |---|---|---|---|---|---|---|
-| Hafanamama | sitting | Bratislava (výjazdové domáce stráženie a venčenie) | stare-mesto | https://hafanamama.sk | Google Maps / Instagram / Web search | Действующая служба домашнего присмотра и выгула собак по всей Братиславе, активный сайт и профиль в соцсетях с отзывами 2026 г. |
-| Spokojná mačka | sitting | Bratislava (návštevy a opatrovanie mačiek doma) | ruzinov | https://spokojnamacka.sk | Google Maps / Web search | Специализированный сервис посещения и кормления кошек на дому во время отсутствия хозяев, форма заказа и сайт активны. |
-| Hlídačky.sk (Bratislava Pet Care) | sitting | Bratislava (platforma overených opatrovateľov) | stare-mesto | https://www.hlidacky.sk/strazie-zvierat/bratislava | Web search / Competitors review | Крупнейший словацкий портал проверенных нянь для животных с верификацией профилей, отзывами и бронированием по районам Братиславы. |
+| Pazúrikovo - zvieracia pestúnka | sitting | Švabinského 1063/5, 851 01 Bratislava | petrzalka | https://www.pazurikovo.sk | https://maps.google.com/?cid=18019535218936081643 | Google Maps: `Pazúrikovo - zvieracia pestúnka` (OPERATIONAL); Web `<title>`: `zvieracia pestúnka-stráženie zvierat, strihanie pazúrov, venčenie` (2026-09-25) |
+| Psia škôlka a Caffetéria | sitting | Mánesovo námestie 1, 851 01 Bratislava | petrzalka | https://www.facebook.com/psiaskolkaacaffeteria | https://maps.google.com/?cid=4581277736092077241 | Google Maps: `Psia škôlka a Caffetéria` (OPERATIONAL); Офиц. страница Facebook активна (2026-09-25) |
+| Hlídačky.sk (Bratislava Pet Care) | sitting | Bratislava (pokrýva celú Bratislavu) | stare-mesto | https://www.hlidacky.sk/strazenie-psov-a-domacich-zvieratiek | https://maps.google.com/?cid=8668010904206885259 | Google Maps: `Hlídačky.sk` (OPERATIONAL); Web `<title>`: `Stráženie psov, mačiek a iných domácich maznáčikov \| Hlídačky.sk` (2026-09-25) |
 
 ---
 
-## B. Кто из наших, возможно, закрыт
+## B. Кто из наших заведений проблемный или закрыт
 
-Был проверен статус доступности сайтов (HTTP GET/HEAD) и статус карточек Google Maps (`businessStatus`) для всех **76 записей** из файлов:
+Был проверен статус доступности сайтов (HTTP GET/HEAD) и карточек Google Maps (`businessStatus`) для всех **76 записей** из текущих файлов:
 - `data/salons-bratislava.csv` (10 записей)
 - `data/pet-hotels-bratislava.csv` (11 записей)
 - `data/other-pet-services-bratislava.csv` (21 запись)
 - `data/vet-clinics-bratislava.csv` (34 записи)
 
-Ниже приведена таблица по всем 6 выявленным проблемным заведениям:
+### Подтверждённые проблемные кейсы
 
-| name | файл | что не так | где видно | дата проверки |
-|---|---|---|---|---|
-| Ako doma - Hotel pre psov | data/pet-hotels-bratislava.csv | Карточка на Google Maps помечена как навсегда закрытая (**CLOSED_PERMANENTLY** / «Trvalo zatvorené»). Веб-сайт `akodomahotelprepsov.sk` ещё отдаёт 200 OK, но физический приём животных по адресу Furdekova прекращён. | Google Maps карточка `ChIJpXJz2giJbEcRlNvfIkkyUQg` (Furdekova, Petržalka) | 2026-09-25 |
-| Goio Pet Shop | data/other-pet-services-bratislava.csv | Физический магазин на Bosákova 9 закрыт. Карточка на Google Maps помечена как навсегда закрытая (**CLOSED_PERMANENTLY**). Онлайн-магазин функционирует, но как физическая точка в Братиславе недоступен. | Google Maps карточка `ChIJk6Y5E5WJbEcRSQfQk13q6pY` (Bosákova 9, Petržalka) | 2026-09-25 |
-| Zuzalo – Chovateľské potreby | data/other-pet-services-bratislava.csv | Физическая каменная лавка на Dunajská 64 (Staré Mesto) ликвидирована. Бренд перешёл исключительно в онлайн-режим через e-shop Shoptet (`zuzalo.sk`). Как магазин для посещения клиентами в городе не работает. | Google Maps отзывы / примечания к заведению / официальный сайт | 2026-09-25 |
-| EuroVet veterinárna ambulancia | data/vet-clinics-bratislava.csv | Ветеринарная практика на Strečnianska 4 в Петржалке не ведёт приём (закрыта или объединена). Контактные телефоны и сайт неактивны. | Google Maps карточка / проверка контактных номеров | 2026-09-25 |
-| ERPOL – Výcvik psov Bratislava | data/other-pet-services-bratislava.csv | Официальный веб-сайт `psivycvik.sk` недоступен (серверная ошибка **HTTP 502 Bad Gateway**). При этом на Google Maps карточка тренера (Eva Poľanská - ERPOL, Lipského 17) числится как OPERATIONAL. Требуется обновление контактного сайта или замена на прямую соцсеть/телефон. | HTTP-запрос к `psivycvik.sk` (HTTP 502) | 2026-09-25 |
-| Veterinárna ambulancia AHAvet | data/vet-clinics-bratislava.csv | Официальный домен `ahavet.sk` полностью недоступен (connection timeout / хостинг не отвечает). При этом на Google Maps амбулатория (Ľudovíta Fullu 7, Karlova Ves) отмечена как OPERATIONAL. Требуется актуализация веб-адреса. | HTTP-запрос к `ahavet.sk` (connection timeout) | 2026-09-25 |
+| name | файл | google_maps_url | статус проблемы | доказательство (evidence) | дата проверки |
+|---|---|---|---|---|---|
+| Goio Pet Shop | data/other-pet-services-bratislava.csv | https://maps.google.com/?cid=7890112999246410043 | CLOSED_PERMANENTLY | Карточка Google Maps `Goio Pet Shop` (Bosákova 9, Petržalka) имеет официальный статус `CLOSED_PERMANENTLY`. Интернет-магазин на домене `goiopet.sk` (`Goio Pet – Chovateľské potreby`) продолжает работу, однако физическая торговая точка в Братиславе закрыта навсегда. | 2026-09-25 |
+| Zuzalo – Chovateľské potreby | data/other-pet-services-bratislava.csv | https://maps.google.com/?cid=3489456233210268401 | Физический магазин закрыт (online only) | Физический каменный магазин по адресу Dunajská 2331/64 (Staré Mesto) ликвидирован. Карточка Google Maps `Zuzalo - Chovateľské potreby` активна, однако бренд работает исключительно в режиме онлайн-магазина (`zuzalo.sk`, Shoptet) без оффлайн-приёма посетителей. | 2026-09-25 |
+| ERPOL – Výcvik psov Bratislava | data/other-pet-services-bratislava.csv | https://maps.google.com/?cid=8892529814110688098 | Сайт недоступен (HTTP 502) | Карточка Google Maps `Eva Poľanská - ERPOL` (Lipského 17, Dúbravka) активна (OPERATIONAL). Однако официальный домен `https://psivycvik.sk` выдаёт серверную ошибку `HTTP/1.1 502 Bad Gateway` (сбой origin nginx сервера). Требуется замена ссылки на профиль в соцсетях или актуализация контакта. | 2026-09-25 |
+
+### Снятые подозрения (ложные срабатывания, исключённые из списка закрытых)
+
+В ходе углублённой повторной проверки подтверждена нормальная деятельность следующих заведений, ранее ошибочно подозревавшихся в закрытии:
+1. **Veterinárna ambulancia AHAvet** (`data/vet-clinics-bratislava.csv`):
+   - Домен `https://ahavet.sk` полностью доступен (HTTP 200 OK, время ответа <0.3s).
+   - Карточка Google Maps [cid=13890847067888717291](https://maps.google.com/?cid=13890847067888717291) (`veterinárna klinika`, Ľ. Fullu 7, Karlova Ves) активна со статусом `OPERATIONAL`.
+   - Отсутствие рейтинга в CSV обусловлено малым числом отзывов (<5), само заведение ведёт приём пациентов.
+2. **EuroVet veterinárna ambulancia** (`data/vet-clinics-bratislava.csv`):
+   - Сайт `http://www.eurovet.sk` доступен (HTTP 200 OK, заголовок `EuroVet - Veterinarna ordinacia, veterinar, Petrzalka`).
+   - Карточка Google Maps [cid=9860026320715689021](https://maps.google.com/?cid=9860026320715689021) (`EuroVet - veterinárna ambulancia`, Strečnianska 4, Petržalka) активна со статусом `OPERATIONAL`.
+   - Практика продолжает работу.
+3. **Ako doma - Hotel pre psov** (`data/pet-hotels-bratislava.csv`):
+   - Сайт `http://ako-doma.sk` активен (HTTP 200 OK, заголовок `AKO DOMA – HOTEL PRE PSOV – Stráženie a starostlivosť o vašich domácich miláčikov`).
+   - Представляет собой частную квартирную передержку для собак малых пород до 5 кг в Петržalce. Услуга оказывается на дому без отдельной публичной уличной вывески/карточки. Закрытая карточка на Furdekova относилась к старому юрлицу, текущий сервис полностью функционирует.
 
 ---
 
 ## Рекомендации для владельца проекта и следующих задач
 
-1. **Исключение недействующих физических локаций из каталога:**
-   - `Ako doma - Hotel pre psov` и `Goio Pet Shop` имеют официальный статус `CLOSED_PERMANENTLY` в Google Maps. Рекомендуется удалить их из CSV или пометить специальным флагом / перенести в архив, чтобы не вводить пользователей каталога в заблуждение.
-   - `Zuzalo` и `EuroVet`: подтвердить отсутствие физического приёма в Братиславе и снять с публичного листинга оффлайн-мест.
+1. **Исключение / актуализация недействующих оффлайн-точек в CSV:**
+   - `Goio Pet Shop` имеет статус `CLOSED_PERMANENTLY` в Google Maps — исключить из публичной выдачи физических точек или пометить соответствующим флагом.
+   - `Zuzalo`: физический магазин закрыт — оставить только если каталог поддерживает статус «только онлайн/доставка».
+   - `ERPOL`: временно заменить URL `psivycvik.sk` на прямой телефон или карточку Google Maps до починки хостинга.
 
-2. **Коррекция контактов:**
-   - Для `ERPOL` и `AHAvet` заведения продолжают работать на Google Maps, но их официальные сайты упали. Имеет смысл заменить ссылки на активные профили в соцсетях или обновить URL после восстановления хостинга.
-
-3. **Расширение базы (MVP Братислава):**
-   - Добавление 32 отобранных кандидатов позволит увеличить охват Братиславы со 76 до **108 заведений**, полностью закрыв дефицит в категориях «салоны груминга» (с 10 до 17), «зоомагазины» (с 10 до 18) и доведя число ветеринарных клиник до 41.
+2. **Пополнение каталога проверенными кандидатами:**
+   - 29 верифицированных кандидатов готовы к добавлению в соответствующие CSV-файлы в рамках последующих задач. Они полностью закрывают дефицит в категориях «салоны груминга» (добавление 6 заведений), «зоомагазины» (добавление 8 заведений), расширяют базу ветклиник (+6) и кинологических клубов (+3).
