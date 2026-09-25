@@ -2,6 +2,7 @@ import type { BusinessCategory } from "@prisma/client";
 import { CITY_SEGMENT, categoryFromSlug, categorySlug, businessSegment } from "./categories";
 import { LOCALES, type Locale } from "./i18n";
 import { PRICES_SEGMENT, serviceCodeFromSlug, serviceSlugFor } from "./priceSlugs";
+import { attributeFromSlug, attributeSlug } from "./attributePages";
 
 /** Locale of a browser path: its prefix (/en/..., /sk/...), English if none. */
 export function localeOfPath(pathname: string): Locale {
@@ -9,10 +10,13 @@ export function localeOfPath(pathname: string): Locale {
   return (LOCALES as readonly string[]).includes(first) ? (first as Locale) : "en";
 }
 
-/** Slugs after /<category>/<city>/ that differ per language: the prices
- *  segment and its service slug. Districts and "nonstop" are the same. */
+/** Slugs after /<category>/<city>/ that differ per language: attribute
+ *  pages (sobota -> open-saturday), the prices segment and its service
+ *  slug. District slugs are the same in every language. */
 function switchListingRest(category: BusinessCategory, rest: string[], from: Locale, target: Locale): string[] {
   const [city, segment, service, ...more] = rest;
+  const attribute = segment ? attributeFromSlug(category, segment, from) : null;
+  if (attribute) return [city, attributeSlug(attribute, target), ...rest.slice(2)];
   if (segment !== PRICES_SEGMENT[from]) return rest;
   const code = service ? serviceCodeFromSlug(category, service, from) : null;
   const serviceTarget = code ? serviceSlugFor(category, code, target) : null;

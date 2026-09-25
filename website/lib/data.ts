@@ -4,6 +4,7 @@ import type { Business, BusinessCategory, District, City } from "@prisma/client"
 import { CATEGORY_LABELS, categorySlugFromEnum } from "./categories";
 import type { Locale } from "./i18n";
 import { SERVICES } from "./services";
+import { CATEGORY_ATTRIBUTES, hasAttribute, type AttributeKey } from "./attributePages";
 import { marketPrices, priceLevels, type ComparablePrice, type MarketPrice, type PriceLevel } from "./priceMarket";
 
 export type BusinessWithRelations = Business & {
@@ -383,6 +384,15 @@ async function getServicePriceRowsRaw(category: BusinessCategory, citySlug: stri
   }));
 }
 
+// How many places in the city have each attribute of the category (lib/
+// attributePages.ts): whether a page exists, is indexed, gets a chip.
+async function getAttributeCountsRaw(category: BusinessCategory, citySlug: string): Promise<[AttributeKey, number][]> {
+  const keys = CATEGORY_ATTRIBUTES[category] ?? [];
+  if (keys.length === 0) return [];
+  const places = await searchBusinessesRaw({ category, citySlug });
+  return keys.map((key) => [key, places.filter((b) => hasAttribute(b, key)).length]);
+}
+
 export interface DistrictSummary {
   slug: string;
   name: string;
@@ -507,18 +517,6 @@ function reviveBusiness(b: BusinessWithRelations): BusinessWithRelations {
   };
 }
 
-// Nonstop (24/7) vet clinics in a city: the /<vets>/<city>/nonstop page
-// exists only when there is at least one.
-async function getNonstopVetCountRaw(citySlug: string): Promise<number> {
-  return prisma.business.count({
-    where: {
-      status: "PUBLISHED",
-      category: "VET_CLINIC",
-      emergency247: true,
-      ...inCityWhere(citySlug),
-    },
-  });
-}
 
 // Pets that at least one place in the category says it serves: the pet
 // filter hides the others (animals are no longer collected, so a pet with
@@ -533,7 +531,6 @@ async function getAnimalsInCategoryRaw(category: BusinessCategory, citySlug: str
 
 export const getCityBySlug = cached(getCityBySlugRaw, "getCityBySlug");
 export const getAnimalsInCategory = cached(getAnimalsInCategoryRaw, "getAnimalsInCategory");
-export const getNonstopVetCount = cached(getNonstopVetCountRaw, "getNonstopVetCount");
 export const getAllCities = cached(getAllCitiesRaw, "getAllCities");
 export const getDefaultCity = cached(getDefaultCityRaw, "getDefaultCity");
 export const getDistrictBySlug = cached(getDistrictBySlugRaw, "getDistrictBySlug");
@@ -578,4 +575,10 @@ export async function getMarketPrices(category: BusinessCategory, citySlug: stri
 const getServicePriceRowsCached = cached(getServicePriceRowsRaw, "getServicePriceRows");
 export async function getServicePriceRows(category: BusinessCategory, citySlug: string, code: string): Promise<ServicePriceRow[]> {
   return (await getServicePriceRowsCached(category, citySlug, code)).map((r) => ({ ...r, observedAt: new Date(r.observedAt) }));
+}
+
+const getAttributeCountsCached = cached(getAttributeCountsRaw, "getAttributeCounts");
+/** Places per attribute page of the category in the city (0 = no page). */
+export async function getAttributeCounts(category: BusinessCategory, citySlug: string): Promise<Map<AttributeKey, number>> {
+  return new Map(await getAttributeCountsCached(category, citySlug));
 }

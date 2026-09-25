@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { categoryFromSlug, categoryLabel, categoryPlural, categorySeoTitle, categorySingular, listingPath } from "@/lib/categories";
-import { getCityBySlug, getDistrictBySlug, getCategoryAggregates, getMarketPrices, getNonstopVetCount } from "@/lib/data";
+import { getAttributeCounts, getCityBySlug, getDistrictBySlug, getCategoryAggregates, getMarketPrices } from "@/lib/data";
 import { PRICES_SEGMENT, pricesPath } from "@/lib/pricePages";
 import { PriceOverviewPage } from "@/components/PricePages";
-import { NONSTOP_SEGMENT } from "@/lib/districts";
+import { attributeFromSlug, attributePath, minToIndex } from "@/lib/attributePages";
 import { getDictionary, inCity, isLocale, localesForCity } from "@/lib/i18n";
 import { localeAlternates, socialMeta } from "@/lib/seo";
 import { CategoryListing, whereLabel } from "@/components/CategoryListing";
@@ -27,16 +27,18 @@ async function resolve(params: Promise<PageParams>) {
   // market price (at least 3 places) - lib/pricePages.ts.
   if (districtSlug === PRICES_SEGMENT[lang]) {
     if ((await getMarketPrices(category, citySlug)).size === 0) return null;
-    return { locale: lang, category, city, citySlug, district: null, districtSlug, nonstop: false as const, prices: true as const };
+    return { locale: lang, category, city, citySlug, district: null, districtSlug, attribute: null, prices: true as const };
   }
-  // /<vets>/<city>/nonstop: the 24/7 clinics page, while the city has any.
-  if (districtSlug === NONSTOP_SEGMENT) {
-    if (category !== "VET_CLINIC" || (await getNonstopVetCount(citySlug)) === 0) return null;
-    return { locale: lang, category, city, citySlug, district: null, districtSlug, nonstop: true as const, prices: false as const };
+  // /<vets>/<city>/nonstop, /sobota, /exoticke-zvierata...: attribute
+  // pages, while at least one place has the attribute (lib/attributePages.ts).
+  const attribute = attributeFromSlug(category, districtSlug, lang);
+  if (attribute) {
+    if (((await getAttributeCounts(category, citySlug)).get(attribute) ?? 0) === 0) return null;
+    return { locale: lang, category, city, citySlug, district: null, districtSlug, attribute, prices: false as const };
   }
   const district = await getDistrictBySlug(citySlug, districtSlug);
   if (!district) return null;
-  return { locale: lang, category, city, citySlug, district, districtSlug, nonstop: false as const, prices: false as const };
+  return { locale: lang, category, city, citySlug, district, districtSlug, attribute: null, prices: false as const };
 }
 
 // Rendered per request (filters come from the query string) with data
@@ -67,22 +69,25 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
     };
   }
 
-  if (resolved.nonstop) {
+  if (resolved.attribute) {
+    const key = resolved.attribute;
+    const ta = getDictionary(locale).attributes[key];
     const where = whereLabel(locale, city);
-    const count = await getNonstopVetCount(city.slug);
+    const count = (await getAttributeCounts(category, city.slug)).get(key) ?? 0;
     return {
       alternates: localeAlternates(
         locale,
-        Object.fromEntries(locales.map((l) => [l, listingPath(l, category, city.slug, NONSTOP_SEGMENT)]))
+        Object.fromEntries(locales.map((l) => [l, attributePath(l, category, city.slug, key)]))
       ),
-      title: { absolute: t.nonstopMetaTitle(where) },
-      description: t.nonstopMetaDescription(count, where),
+      title: { absolute: ta.metaTitle(where) },
+      description: ta.metaDescription(count, where),
+      robots: count < minToIndex(key) ? { index: false, follow: true } : undefined,
       ...socialMeta({
-        title: t.nonstopMetaTitle(where),
-        description: t.nonstopMetaDescription(count, where),
-        path: listingPath(locale, category, city.slug, NONSTOP_SEGMENT),
+        title: ta.metaTitle(where),
+        description: ta.metaDescription(count, where),
+        path: attributePath(locale, category, city.slug, key),
         locale,
-        image: { title: t.nonstopH1(where), category },
+        image: { title: ta.h1(where), category },
       }),
     };
   }
@@ -132,10 +137,10 @@ export default async function CategoryCityDistrictPage({
       locale={locale}
       category={category}
       city={city}
-      districtSlug={resolved.nonstop ? undefined : resolved.districtSlug}
-      districtName={resolved.nonstop ? undefined : resolved.district.name}
-      districtInPhrases={resolved.nonstop ? undefined : resolved.district.inPhrases}
-      nonstopPage={resolved.nonstop}
+      districtSlug={resolved.attribute ? undefined : resolved.districtSlug}
+      districtName={resolved.attribute ? undefined : resolved.district.name}
+      districtInPhrases={resolved.attribute ? undefined : resolved.district.inPhrases}
+      attributePage={resolved.attribute ?? undefined}
       open={open}
       animal={animal}
       near={near}

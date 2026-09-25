@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
-import { getAllCities, getAllDistricts, getCategoryAggregates, getAllPublishedBusinessSlugs, getBusinessCount, getMarketPrices, getNonstopVetCount } from "@/lib/data";
+import { getAllCities, getAllDistricts, getCategoryAggregates, getAllPublishedBusinessSlugs, getBusinessCount, getMarketPrices, getAttributeCounts } from "@/lib/data";
 import { getPriceSummary, pricesPath } from "@/lib/pricePages";
-import { NONSTOP_SEGMENT } from "@/lib/districts";
+import { attributePath, minToIndex } from "@/lib/attributePages";
 import { ALL_CATEGORIES, businessPath, cityPath, listingPath } from "@/lib/categories";
 import { localePath, localesForCity, type Locale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
@@ -58,13 +58,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         );
       }
 
-      if (category === "VET_CLINIC" && (await getNonstopVetCount(city.slug)) > 0) {
-        entries.push(
-          ...localized(locales, (l) => listingPath(l, category, city.slug, NONSTOP_SEGMENT), {
-            changeFrequency: "daily",
-            priority: 0.8,
-          })
-        );
+      // Attribute pages (nonstop, Saturday, Sunday, exotics, home visits):
+      // indexed from minToIndex places - lib/attributePages.ts.
+      for (const [key, count] of await getAttributeCounts(category, city.slug)) {
+        if (count >= minToIndex(key)) {
+          entries.push(
+            ...localized(locales, (l) => attributePath(l, category, city.slug, key), {
+              changeFrequency: "daily",
+              priority: 0.8,
+            })
+          );
+        }
       }
 
       // Price pages: the overview and each service with a market price

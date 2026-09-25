@@ -4,7 +4,7 @@ import {
   searchBusinesses,
   getCategoryAggregates,
   getPriceTierMap,
-  getNonstopVetCount,
+  getAttributeCounts,
   getAnimalsInCategory,
   distanceKm,
   parseNear,
@@ -26,7 +26,7 @@ import { BusinessCard } from "./BusinessCard";
 import { SITE_URL } from "@/lib/site";
 import { pricesPath } from "@/lib/priceSlugs";
 import { FilterPanel } from "./FilterPanel";
-import { NONSTOP_SEGMENT } from "@/lib/districts";
+import { CATEGORY_ATTRIBUTES, attributePath, attributeSlug, hasAttribute, type AttributeKey } from "@/lib/attributePages";
 import { cityTimezone, hoursFromStored, isOpenAt, localNow } from "@/lib/hours";
 import { meetsMinRating, parseMinRating, parseSort, sortByListing } from "@/lib/listingSort";
 import { EmptyState } from "./EmptyState";
@@ -50,8 +50,9 @@ interface CategoryListingProps {
   rating?: string;
   /** "1" = only places open right now (their opening hours, city time). */
   open?: string;
-  /** The /<vets>/<city>/nonstop page: only 24/7 clinics. */
-  nonstopPage?: boolean;
+  /** An attribute page (/<vets>/<city>/nonstop, /sobota...): only places
+   *  with the attribute (lib/attributePages.ts). */
+  attributePage?: AttributeKey;
 }
 
 /** "in Bratislava" / "v Bratislave" (city.json in_city), or
@@ -81,7 +82,7 @@ export async function CategoryListing({
   sort: requestedSort,
   rating: requestedRating,
   open,
-  nonstopPage = false,
+  attributePage,
 }: CategoryListingProps) {
   const openNowOnly = open === "1";
   const citySlug = city.slug;
@@ -97,7 +98,7 @@ export async function CategoryListing({
   // labelled group instead of vanishing from an empty result.
   // The city page (no category) lists every service; tiers still compare
   // each place with its own category.
-  const [all, categoryAggregates, priceTiers, nonstopCount, categoryAnimals] = await Promise.all([
+  const [all, categoryAggregates, priceTiers, attributeCounts, categoryAnimals] = await Promise.all([
     searchBusinesses({ category: category ?? undefined, citySlug, districtSlug }),
     category ? getCategoryAggregates(category, citySlug, districtSlug) : Promise.resolve(null),
     category
@@ -105,7 +106,8 @@ export async function CategoryListing({
       : Promise.all(ALL_CATEGORIES.map((c) => getPriceTierMap(c, citySlug))).then(
           (maps) => new Map(maps.flatMap((m) => [...m]))
         ),
-    !category || category === "VET_CLINIC" ? getNonstopVetCount(citySlug) : Promise.resolve(0),
+    // The city page offers only the nonstop chip; a category all of its own.
+    getAttributeCounts(category ?? "VET_CLINIC", citySlug),
     category ? getAnimalsInCategory(category, citySlug) : Promise.resolve(null),
   ]);
   const hasPricePages = category ? (await getMarketPrices(category, citySlug)).size > 0 : false;
@@ -132,7 +134,7 @@ export async function CategoryListing({
   // clinic counts as open; places without hours are hidden and counted.
   const cityNow = localNow(cityTimezone(city));
   const openState = (b: (typeof all)[number]) => (b.emergency247 ? true : isOpenAt(hoursFromStored(b.openingHours), cityNow));
-  const scoped = nonstopPage ? all.filter((b) => b.emergency247) : all;
+  const scoped = attributePage ? all.filter((b) => hasAttribute(b, attributePage)) : all;
   const openFiltered = openNowOnly ? scoped.filter((b) => openState(b) === true) : scoped;
   const hiddenNoHours = openNowOnly ? scoped.filter((b) => openState(b) === null).length : 0;
   const rated = openFiltered.filter((b) => meetsMinRating(b, minRating));
@@ -152,10 +154,22 @@ export async function CategoryListing({
   const listItems = ordered(withDistance);
   const unconfirmedList = ordered(unconfirmedItems);
 
-  // The nonstop page gets no category FAQ: its answers (how many clinics,
-  // price range) are about all vets, not the 24/7 ones, and repeat the
+  // Attribute chips (quiet, like the other filters; the one of the current
+  // page is active and links back to the whole list). City page: nonstop only.
+  const chipCategory = category ?? "VET_CLINIC";
+  const attributeChips = (category ? (CATEGORY_ATTRIBUTES[category] ?? []) : (["nonstop"] as AttributeKey[]))
+    .filter((key) => key === attributePage || (attributeCounts.get(key) ?? 0) > 0)
+    .map((key) => ({
+      key,
+      label: t.attributes[key].chip,
+      active: key === attributePage,
+      href: key === attributePage ? listingPath(locale, chipCategory, citySlug) : attributePath(locale, chipCategory, citySlug, key),
+    }));
+
+  // Attribute pages get no category FAQ: its answers (how many clinics,
+  // price range) are about all vets, not the ones with the attribute, and repeat the
   // category page.
-  const faqs = category && !nonstopPage ? buildFaqs({ locale, category, where, aggregates }) : [];
+  const faqs = category && !attributePage ? buildFaqs({ locale, category, where, aggregates }) : [];
 
   return (
     <main style={{ "--accent": accent } as React.CSSProperties}>
@@ -193,11 +207,11 @@ export async function CategoryListing({
               // City hub: the city is the page itself.
               ...(category ? [{ label: cityName, href: cityPath(locale, citySlug) }] : [{ label: cityName }]),
               ...(category
-                ? nonstopPage || districtName
+                ? attributePage || districtName
                   ? [{ label, href: listingPath(locale, category, citySlug) }]
                   : [{ label }]
                 : []),
-              ...(nonstopPage ? [{ label: t.listing.nonstopCrumb }] : districtName ? [{ label: districtName }] : []),
+              ...(attributePage ? [{ label: t.attributes[attributePage].chip }] : districtName ? [{ label: districtName }] : []),
             ]}
           />
 
@@ -206,10 +220,11 @@ export async function CategoryListing({
               {category ? <CategoryIcon category={category} className="h-7 w-7" /> : <PawIcon className="h-7 w-7" />}
             </span>
             <div>
-              {nonstopPage ? (
+              {attributePage ? (
                 <>
-                  <h1 className="text-3xl font-extrabold text-foreground md:text-5xl">{t.listing.nonstopH1(where)}</h1>
-                  <p className="mt-2 text-lg text-foreground/65">{t.listing.nonstopIntro}</p>
+                  <h1 className="text-3xl font-extrabold text-foreground md:text-5xl">{t.attributes[attributePage].h1(where)}</h1>
+                  {/* The answer in one sentence: n of all places (docs/seo/README.md 2.3). */}
+                  <p className="mt-2 text-lg text-foreground/65">{t.attributes[attributePage].lead(scoped.length, all.length)}</p>
                 </>
               ) : (
                 <>
@@ -232,7 +247,7 @@ export async function CategoryListing({
           </div>
 
           <dl className="mt-6 flex flex-wrap gap-2">
-            <Stat label={t.listing.listed} value={String(nonstopPage ? scoped.length : aggregates.count)} />
+            <Stat label={t.listing.listed} value={String(attributePage ? scoped.length : aggregates.count)} />
             {aggregates.verifiedCount > 0 && <Stat label={t.listing.verified} value={String(aggregates.verifiedCount)} />}
             {/* The city's price pages for this category, once any service
                 has a market price (lib/pricePages.ts). */}
@@ -296,15 +311,14 @@ export async function CategoryListing({
             locale={locale}
             category={category}
             citySlug={citySlug}
-            currentDistrictSlug={nonstopPage ? NONSTOP_SEGMENT : districtSlug}
+            currentDistrictSlug={attributePage ? attributeSlug(attributePage, locale) : districtSlug}
             currentAnimal={animal}
             near={origin ? near : undefined}
             sort={sort}
             minRating={minRating}
             openNow={openNowOnly}
             showOpenNow={openNowOnly || all.some((b) => b.emergency247 || b.openingHours !== null)}
-            nonstopPage={nonstopPage}
-            showNonstop={nonstopCount > 0}
+            attributes={attributeChips}
             animals={servicePets.filter((a) => a === animal || animalsPresent.includes(a))}
           />
 
