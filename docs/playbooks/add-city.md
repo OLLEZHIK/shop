@@ -39,7 +39,7 @@ website/public/logos/kosice/. Когда закончишь — открой PR 
 ## 1. Результат: какие файлы создать
 
 ```
-data/cities/<slug>/city.json          город и его районы
+data/cities/<slug>/city.json          город
 data/cities/<slug>/businesses.csv     все заведения города
 data/cities/<slug>/review-insights/   «что говорят клиенты», файл на заведение
 data/cities/<slug>/prices.csv         цены на 6 главных услуг (docs/card-spec.md, «Цены»)
@@ -59,10 +59,6 @@ website/public/logos/<slug>/          логотипы (если нашлись)
   "locale": "sk",
   "lat": 48.7164,
   "lng": 21.2611,
-  "districts": [
-    { "name": "Staré Mesto", "slug": "stare-mesto" },
-    { "name": "Sídlisko KVP", "slug": "sidlisko-kvp" }
-  ],
   "sources": ["https://sk.wikipedia.org/wiki/Košice"],
   "observed_at": "2026-09-25"
 }
@@ -71,11 +67,9 @@ website/public/logos/<slug>/          логотипы (если нашлись)
 - `country` — код страны ISO из двух букв (`SK`, `CZ`, `AT` …);
   `locale` — код языка города (`sk`, `cs`, `de` …).
 - `lat`/`lng` — центр города.
-- `districts` — официальные городские части (mestské časti и т.п.).
-  Если у города нет официального деления — пустой список `[]`, тогда
-  столбец `district` в CSV пустой у всех.
-- Slug района строится так же, как slug города. Уникален только в
-  пределах города: `stare-mesto` в Košice и в Bratislava — нормально.
+- **Районы не собираем** (решение владельца, 2026-09-25). Район
+  заведения сайт определяет сам по координатам и границам районов из
+  OpenStreetMap. Поэтому точные `lat`/`lng` у каждого заведения важны.
 
 ### 1.2 `businesses.csv`
 
@@ -85,7 +79,7 @@ website/public/logos/<slug>/          логотипы (если нашлись)
 Первая строка — ровно этот заголовок (порядок столбцов важен):
 
 ```
-category,name,slug,address,district,lat,lng,phone,email,website,instagram,facebook,short_description,short_description_local,description,description_local,opening_hours,hours_source_url,hours_observed_at,emergency_24_7,emergency_note,home_visits,specialties,languages_spoken,photo_urls,google_place_id,google_maps_url,google_rating,google_rating_count,rating_observed_at,logo_file,source_url,observed_at,notes
+category,name,slug,address,lat,lng,phone,email,website,instagram,facebook,short_description,short_description_local,description,description_local,opening_hours,hours_source_url,hours_observed_at,emergency_24_7,emergency_note,home_visits,specialties,languages_spoken,photo_urls,google_place_id,google_maps_url,google_rating,google_rating_count,rating_observed_at,logo_file,source_url,observed_at,notes
 ```
 
 Столбцы `emergency_24_7`, `emergency_note`, `home_visits`,
@@ -97,7 +91,6 @@ category,name,slug,address,district,lat,lng,phone,email,website,instagram,facebo
 | `category` | тип заведения | ровно одно из: `GROOMING`, `VET_CLINIC`, `PET_HOTEL`, `DOG_TRAINING`, `PET_SHOP`, `PET_SITTING` |
 | `name` | название | как у самого заведения (вывеска или сайт), без «s.r.o.», если его нет в вывеске |
 | `address` | адрес | улица, номер, индекс, город: `Hlavná 12, 040 01 Košice` |
-| `district` | slug района из `city.json` | или пусто, если не удалось определить |
 | `lat`, `lng` | координаты | 5–6 знаков после точки; из Google Maps или OpenStreetMap по адресу |
 | `phone` | телефон | в международном формате: `+421 905 123 456` |
 | `email` | почта | только публично указанная самим заведением |
@@ -246,16 +239,13 @@ no logo, fb — photo of dog, ig — none)`. Сайт покажет иници�
   Сайт читает все файлы `businesses*.csv` в папке города;
 - **`city.json` создаёт только сессия, у которой в списке есть
   `VET_CLINIC`.** Остальные его не создают и не меняют: иначе будет
-  конфликт при слиянии. Районы для столбца `district` посмотреть в её
-  ветке или взять из официального списка района города (slug — по
-  правилу выше).
+  конфликт при слиянии.
 
 ## 7. Проверка перед PR
 
 - CSV открывается как таблица; в каждой строке столько же столбцов,
   сколько в заголовке.
-- `category` — только из шести значений; `district` — только slug из
-  `city.json` или пусто.
+- `category` — только из шести значений.
 - `short_description` и `short_description_local` не длиннее 100
   символов.
 - Каждый текст есть на двух языках (`docs/card-spec.md`, «Проверка
@@ -280,6 +270,6 @@ no logo, fb — photo of dog, ig — none)`. Сайт покажет иници�
 ## Что происходит после мерджа
 
 Загрузку `data/cities/*/` в базу и показ новых городов на сайте
-(выбор города, районы, страницы) делает облачный Claude Code, «правая
+(выбор города, районы по координатам, страницы) делает облачный Claude Code, «правая
 рука» владельца. До этого данные просто лежат в репозитории и ничего
 не ломают, поэтому собирать города можно уже сейчас.
