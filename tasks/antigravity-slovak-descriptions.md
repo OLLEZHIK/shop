@@ -4,7 +4,7 @@
 **Роль:** Data agent.
 **Тип:** сбор данных/контент, объём средний (76 записей, 4 CSV).
 **Ветка:** `antigravity/slovak-descriptions`
-**Зависимости:** `tasks/antigravity-collect-hours-and-vet-services.md` смёржена (одни и те же `data/*.csv`; порядок задач с CSV — рейтинги → животные → часы работы → эта). Брать от свежего `main`.
+**Зависимости:** `tasks/mac-collect-hours-and-vet-services.md` смёржена (её делает Antigravity Mac; одни и те же `data/*.csv`, порядок — часы работы → эта). Брать от свежего `main`.
 
 > **Не путать с `short_description_sk`** из задачи про рейтинги: там —
 > одна фраза до 100 символов для карточки в списке, здесь —
