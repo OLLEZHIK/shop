@@ -34,22 +34,7 @@
    `clinic_name, service, species, weight_from_kg, weight_to_kg, price_from, price_to, currency, source_url, observed_at, notes`
 
    - `clinic_name` — **точно** как `name` в `data/vet-clinics-bratislava.csv` (по нему будет связка при сиде).
-   - `service` — одно из значений ниже. Единый набор нужен, чтобы сравнивать клиники между собой:
-
-     | `service` | Что это |
-     |---|---|
-     | `exam` | Klinické vyšetrenie, базовый осмотр/консультация |
-     | `vaccination_rabies` | Očkovanie proti besnote |
-     | `vaccination_combo` | Комбинированная вакцина (psinka, parvoviróza… / у кошек — panleukopénia, kaliciviróza…) |
-     | `microchip` | Čipovanie (чипирование) |
-     | `pet_passport` | Vystavenie pasu (паспорт питомца) |
-     | `castration` | Kastrácia samca |
-     | `sterilization` | Kastrácia / sterilizácia samice |
-     | `dental_cleaning` | Odstránenie zubného kameňa (чистка зубов) |
-     | `emergency_fee` | Príplatok za pohotovosť / službu mimo ordinačných hodín |
-     | `other` | Всё остальное, что явно полезно владельцу (например, УЗИ, рентген). Название — в `notes` |
-
-     Не натягивать: если позицию нельзя однозначно отнести к одному значению, ставить `other` и объяснять в `notes`.
+   - `service` — **только 6 кодов ветклиник из `docs/card-spec.md`, раздел «Цены»** (`exam`, `vaccination_dog`, `microchip`, `neuter_cat`, `spay_cat`, `spay_dog`). Решение владельца 2026-09-25: остальной прайс не собирать.
    - `species` — `dog`, `cat` или пусто (если цена общая для всех).
    - `weight_from_kg` / `weight_to_kg` — только если клиника сама делит цену по весу животного (частый случай для кастрации и наркоза): границы диапазона ровно как на сайте. «do 10 kg» — `weight_from_kg` пусто, `weight_to_kg=10`; «nad 40 kg» — `weight_from_kg=40`, `weight_to_kg` пусто. Не переводить в классы `MINI…XL`: единой таблицы «вес → класс» в проекте нет, а у клиник разные границы. Если цена от веса не зависит — оба поля пустые.
    - `price_from` / `price_to` — числа в EUR без символа валюты. Фиксированная цена — одно значение в обоих полях. «od 30 €» — `price_from=30`, `price_to` пусто.
@@ -59,8 +44,8 @@
    - `notes` — **оригинальная строка прайса на словацком** как на сайте (как в `salon-prices-bratislava.csv`), плюс пояснение, если что-то неоднозначно.
 3. Клиники без опубликованных цен («cena po dohode», «podľа rozsahu»,
    только телефон) — **не добавлять** в CSV, перечислить в PR.
-4. Больше ~15 строк на клинику не нужно: приоритет — позиции из таблицы
-   выше, `other` только для самого востребованного.
+4. Только эти 6 услуг. Если у услуги несколько весовых диапазонов —
+   строка на каждый диапазон.
 
 ## Нельзя
 
@@ -74,7 +59,7 @@
 
 - `data/vet-prices-bratislava.csv` создан, у каждой строки есть `source_url` и `observed_at`.
 - Все `clinic_name` точно совпадают с `name` из `data/vet-clinics-bratislava.csv`.
-- Все `service` — из таблицы выше.
+- Все `service` — из 6 кодов ветклиник в `docs/card-spec.md`.
 - CSV корректно парсится: запятые внутри `notes` в кавычках, кодировка UTF-8.
 - В описании PR:
   - сколько клиник дали цены, сколько строк всего;

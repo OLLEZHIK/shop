@@ -126,6 +126,112 @@
 | `observed_at` | Дата сбора `YYYY-MM-DD` |
 | `notes` | Что не нашлось и почему; «possibly closed: …» |
 
+## Цены — 6 главных услуг на категорию
+
+Решение владельца (2026-09-25): цены ищем **не на весь прайс, а только
+на 6 самых востребованных услуг** в каждой категории. Так цены у разных
+заведений можно сравнивать, и агент не тратит время на переписывание
+длинных прайсов.
+
+Выбор услуг — по тому, что владелец питомца чаще всего ищет с
+вопросом «сколько стоит», и что заведения реально публикуют.
+
+### Груминг (`GROOMING`)
+
+| Код | EN | SK | Что считать |
+|---|---|---|---|
+| `full_groom` | Full grooming | Kompletná úprava | Купание + стрижка/оформление + когти. Главная цена салона |
+| `bath_dry` | Bath & blow-dry | Kúpanie a fénovanie | Без стрижки |
+| `hand_stripping` | Hand stripping | Trimovanie | Для жесткошёрстных (терьеры, шнауцеры) |
+| `deshedding` | De-shedding | Vyčesávanie podsady | Для линяющих (хаски, овчарки, золотистые) |
+| `nail_trim` | Nail trim | Strihanie pazúrikov | Отдельная услуга, без полной стрижки |
+| `cat_groom` | Cat grooming | Úprava mačky | Любая комплексная процедура для кошки (купание/стрижка) |
+
+Если цена зависит от размера или веса собаки — **одна строка на каждый
+диапазон**, как у салона (`weight_from_kg` / `weight_to_kg`).
+
+### Ветклиники (`VET_CLINIC`)
+
+| Код | EN | SK | Что считать |
+|---|---|---|---|
+| `exam` | Check-up | Klinické vyšetrenie | Базовый осмотр/консультация, без анализов |
+| `vaccination_dog` | Dog vaccination | Očkovanie psa | Ежегодная комбинированная вакцина; если только бешенство — в `notes` |
+| `microchip` | Microchip | Čipovanie | Чипирование (для собак в SK обязательно). Если в цену входит паспорт — в `notes` |
+| `neuter_cat` | Cat neutering (male) | Kastrácia kocúra | |
+| `spay_cat` | Cat spaying (female) | Kastrácia mačky | |
+| `spay_dog` | Dog spaying (female) | Kastrácia suky | Обычно зависит от веса — строка на каждый диапазон |
+
+Кастрация кошек (обоих полов) — самая частая операция и самый частый
+вопрос о цене; кастрация суки — самая дорогая из рутинных, её сравнивают
+больше всего. Чистку зубов, УЗИ и т.п. не собираем.
+
+### Отели для животных (`PET_HOTEL`)
+
+| Код | EN | SK | Что считать |
+|---|---|---|---|
+| `dog_night` | Dog, per night | Pes, noc | Цена за ночь; если зависит от размера — строка на диапазон веса |
+| `cat_night` | Cat, per night | Mačka, noc | Цена за ночь |
+| `daycare_day` | Dog daycare, per day | Psia škôlka, deň | Дневной присмотр без ночёвки |
+| `daycare_pass` | Daycare pass | Permanentka do škôlky | Абонемент; сколько дней — в `notes` |
+| `pickup` | Pick-up & drop-off | Dovoz a odvoz | Трансфер питомца; если цена за км — в `notes` |
+| `extra_walk` | Extra walk / individual care | Venčenie navyše / individuálna starostlivosť | Доплата за индивидуальный выгул, лекарства и т.п. |
+
+### Дрессировка (`DOG_TRAINING`)
+
+| Код | EN | SK | Что считать |
+|---|---|---|---|
+| `puppy_course` | Puppy course | Šteňacia škôlka | Курс целиком; число занятий — в `notes` |
+| `obedience_course` | Basic obedience course | Kurz základnej poslušnosti | Курс целиком; число занятий — в `notes` |
+| `group_lesson` | Group lesson | Skupinová hodina | Одно занятие |
+| `private_lesson` | Private lesson | Individuálna hodina | Одно занятие |
+| `behavior_consult` | Behaviour consultation | Konzultácia problémového správania | Разбор проблемного поведения |
+| `membership` | Club membership | Členský poplatok | Для кинологических клубов; период — в `notes` |
+
+### Присмотр и выгул (`PET_SITTING`)
+
+| Код | EN | SK | Что считать |
+|---|---|---|---|
+| `walk_30` | Dog walk, 30 min | Venčenie 30 min | |
+| `walk_60` | Dog walk, 60 min | Venčenie 60 min | |
+| `cat_visit` | Cat visit | Návšteva mačky | Один визит к кошке на дом |
+| `house_sitting_night` | Overnight at your home | Stráženie u vás doma, noc | Ситтер ночует у владельца |
+| `boarding_night` | Overnight at sitter's home | Stráženie u opatrovateľa, noc | Питомец ночует у ситтера |
+| `daycare_day` | Day care | Denné stráženie | Дневной присмотр |
+
+### Зоомагазины (`PET_SHOP`)
+
+Цены **не собираем**: в магазине тысячи товаров, и одна-две цены ничего
+не говорят о магазине. Для магазина важнее часы работы, адрес и
+ассортимент (в описании).
+
+### Файл и правила
+
+Для нового города — `data/cities/<город>/prices.csv`:
+
+```
+business_slug,price_code,weight_from_kg,weight_to_kg,price_from,price_to,currency,source_url,observed_at,notes
+```
+
+- `business_slug` — `slug` заведения из `businesses.csv`.
+- `price_code` — **только** коды из таблиц выше. Услуги не из списка не
+  записывать.
+- `weight_from_kg` / `weight_to_kg` — диапазон веса ровно как у
+  заведения («do 10 kg» → пусто / `10`; «nad 40 kg» → `40` / пусто).
+  Цена не зависит от веса — оба пусто.
+- `price_from` / `price_to` — числа в валюте города. Фиксированная цена —
+  одно число в обоих полях. «od 30 €» — `price_from=30`, `price_to` пусто.
+- `source_url` — страница (или PDF) с ценой. Только официальный сайт
+  заведения или его официальная соцсеть (опубликованный прайс).
+  Цены «по телефону», из каталогов и отзывов не брать.
+- `notes` — **строка прайса в оригинале**, как у заведения (на языке
+  города), плюс уточнения. Посетителям не показывается; нужна для
+  проверки.
+- Переводить ничего не нужно: названия услуг на двух языках — в таблицах
+  выше, их подставляет сайт.
+- Услуга есть, а цены нет («cena dohodou», «podľa rozsahu») — строку не
+  добавлять. Заведение вообще не публикует цены — ни одной строки, в
+  `notes` заведения в `businesses.csv`: `prices: not published`.
+
 ## Проверка перед PR (для каждого агента)
 
 - Каждое **обяз.** поле либо заполнено, либо пусто с причиной в `notes`.
@@ -133,5 +239,7 @@
   `short_description_local` и наоборот; то же для `description` и
   review-insights.
 - `slug` уникален в городе; файл review-insights назван тем же slug.
+- В `prices.csv` только коды из раздела «Цены», у каждой строки есть
+  `source_url`.
 - В описании PR — таблица заполненности: сколько записей имеют каждое
-  поле из разделов 1–8.
+  поле из разделов 1–8 и сколько заведений дали хотя бы одну цену.
