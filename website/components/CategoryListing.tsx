@@ -40,6 +40,8 @@ interface CategoryListingProps {
   city: City;
   districtSlug?: string;
   districtName?: string;
+  /** District.inPhrases: "v Petržalke" for Slovak texts. */
+  districtInPhrases?: unknown;
   animal?: string;
   near?: string;
   sort?: string;
@@ -52,9 +54,17 @@ interface CategoryListingProps {
 
 /** "in Bratislava" / "v Bratislave" (city.json in_city), or
  *  "in Petržalka, Bratislava" / "– Petržalka, Bratislava" for a district. */
-export function whereLabel(locale: Locale, city: City, districtName?: string): string {
-  if (!districtName) return inCity(locale, city);
-  return locale === "en" ? `in ${districtName}, ${city.name}` : `– ${districtName}, ${city.name}`;
+/** "in Bratislava" / "v Petržalke, Bratislava": the district's own phrase
+ *  from districts.geojson (District.inPhrases) when there is one. */
+export function whereLabel(
+  locale: Locale,
+  city: City,
+  district?: { name: string; inPhrases?: unknown } | null
+): string {
+  if (!district) return inCity(locale, city);
+  const phrase = (district.inPhrases as Record<string, string> | null | undefined)?.[locale];
+  if (phrase) return `${phrase}, ${city.name}`;
+  return locale === "en" ? `in ${district.name}, ${city.name}` : `– ${district.name}, ${city.name}`;
 }
 
 export async function CategoryListing({
@@ -63,6 +73,7 @@ export async function CategoryListing({
   city,
   districtSlug,
   districtName,
+  districtInPhrases,
   near,
   animal: requestedAnimal,
   sort: requestedSort,
@@ -107,7 +118,7 @@ export async function CategoryListing({
   const t = getDictionary(locale);
   const label = category ? categoryLabel(category, locale) : t.cityHub.h1Before;
   const accent = category ? CATEGORY_THEME[category].accent : "var(--brand-orange)";
-  const where = whereLabel(locale, city, districtName);
+  const where = whereLabel(locale, city, districtName ? { name: districtName, inPhrases: districtInPhrases } : null);
   const resetHref = category ? listingPath(locale, category, citySlug, districtSlug) : cityPath(locale, citySlug);
 
   // "Near me": sort by distance from the visitor, places without

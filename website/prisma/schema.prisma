@@ -41,6 +41,10 @@ model District {
   // Unique within its city only (@@unique below): Košice and Bratislava
   // both have "stare-mesto".
   slug       String
+  // "in <district>" per language, from districts.geojson (properties.in):
+  // {"en": "in Petržalka", "sk": "v Petržalke"}. Slovak needs the locative,
+  // which is data, not something to generate.
+  inPhrases  Json?
   city       City       @relation(fields: [cityId], references: [id])
   businesses Business[]
 
