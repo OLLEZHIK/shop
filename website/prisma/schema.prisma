@@ -11,21 +11,31 @@ datasource db {
 
 // Core entities
 model City {
-  id        Int        @id @default(autoincrement())
-  name      String
-  slug      String     @unique
-  country   String
-  locale    String
-  districts District[]
+  id         Int        @id @default(autoincrement())
+  name       String
+  slug       String     @unique
+  country    String
+  locale     String
+  // City centre from city.json (docs/playbooks/add-city.md).
+  lat        Float?
+  lng        Float?
+  districts  District[]
+  businesses Business[]
 }
 
 model District {
   id         Int        @id @default(autoincrement())
   cityId     Int
   name       String
+  // Meant to be unique within its city only (Košice and Bratislava both
+  // have "stare-mesto"). The global @unique stays until the old seed is
+  // gone from production (additive-only migrations, docs/database.md);
+  // drop it in the PR that adds a second city.
   slug       String     @unique
   city       City       @relation(fields: [cityId], references: [id])
   businesses Business[]
+
+  @@unique([cityId, slug])
 }
 
 model Breed {
@@ -47,26 +57,29 @@ enum SizeClass {
 
 // Business model (generalized from the grooming-only Salon model)
 model Business {
-  id           Int              @id @default(autoincrement())
-  name         String
-  slug         String           @unique
-  category     BusinessCategory
-  address      String
-  districtId   Int?
-  lat          Float?
-  lng          Float?
-  phone        String?
-  email        String?
-  website      String?
-  openingHours Json?
-  animals      String[]
-  specialties  String[]
-  status       BusinessStatus   @default(DRAFT)
-  featured     Boolean          @default(false)
-  verifiedAt   DateTime?
-  sourceUrls   String[]
-  notes        String?
-  photoUrls    String[]         @default([])
+  id                    Int              @id @default(autoincrement())
+  name                  String
+  slug                  String           @unique
+  category              BusinessCategory
+  address               String
+  districtId            Int?
+  // Direct city link: a place outside every district polygon (or in a
+  // city without districts) still belongs to its city.
+  cityId                Int?
+  lat                   Float?
+  lng                   Float?
+  phone                 String?
+  email                 String?
+  website               String?
+  openingHours          Json?
+  animals               String[]
+  specialties           String[]
+  status                BusinessStatus   @default(DRAFT)
+  featured              Boolean          @default(false)
+  verifiedAt            DateTime?
+  sourceUrls            String[]
+  notes                 String?
+  photoUrls             String[]         @default([])
   // Listing-card data (tasks/done/antigravity-collect-ratings-and-review-summaries.md).
   // Texts are our own words; the Google rating is shown with a "Google"
   // label and only with 5+ ratings (the CSV leaves it empty otherwise).
@@ -83,10 +96,22 @@ model Business {
   // (tasks/ide-review-insights.md): our summary of public Google reviews,
   // never shown or marked up as reviews. Validated in lib/reviewInsights.ts.
   reviewInsights        Json?
-  district     District?        @relation(fields: [districtId], references: [id])
-  priceItems   PriceItem[]
-  clickEvents  ClickEvent[]
-  reviews      Review[]
+  // docs/card-spec.md (2026-09-25). openingHours (above) holds the raw
+  // opening_hours string, parsed by lib/hours.ts.
+  descriptionLocal      String?
+  instagram             String?
+  facebook              String?
+  hoursSourceUrl        String?
+  hoursObservedAt       DateTime?
+  emergency247          Boolean          @default(false)
+  emergencyNote         String?
+  homeVisits            Boolean          @default(false)
+  languagesSpoken       String[]         @default([])
+  district              District?        @relation(fields: [districtId], references: [id])
+  city                  City?            @relation(fields: [cityId], references: [id])
+  priceItems            PriceItem[]
+  clickEvents           ClickEvent[]
+  reviews               Review[]
 }
 
 enum BusinessCategory {
@@ -122,27 +147,36 @@ enum ReviewStatus {
 }
 
 // Services and pricing
+// The 6 priced services per category (docs/card-spec.md, "Цены").
+// slug = "<category>:<code>" (daycare_day exists in two categories);
+// labels live in lib/services.ts, name is the English one for reference.
 model Service {
-  id         Int         @id @default(autoincrement())
+  id         Int               @id @default(autoincrement())
   name       String
-  slug       String      @unique
+  slug       String            @unique
+  code       String?
+  category   BusinessCategory?
   priceItems PriceItem[]
 }
 
 model PriceItem {
-  id         Int        @id @default(autoincrement())
-  businessId Int
-  serviceId  Int
-  sizeClass  SizeClass?
-  breedId    Int?
-  priceFrom  Decimal
-  priceTo    Decimal?
-  currency   String     @default("EUR")
-  sourceUrl  String
-  observedAt DateTime
-  business   Business   @relation(fields: [businessId], references: [id])
-  service    Service    @relation(fields: [serviceId], references: [id])
-  breed      Breed?     @relation(fields: [breedId], references: [id])
+  id           Int        @id @default(autoincrement())
+  businessId   Int
+  serviceId    Int
+  // Legacy; replaced by the weight range below. Dropped in a later PR
+  // (additive-only migrations, docs/database.md).
+  sizeClass    SizeClass?
+  weightFromKg Float?
+  weightToKg   Float?
+  breedId      Int?
+  priceFrom    Decimal
+  priceTo      Decimal?
+  currency     String     @default("EUR")
+  sourceUrl    String
+  observedAt   DateTime
+  business     Business   @relation(fields: [businessId], references: [id])
+  service      Service    @relation(fields: [serviceId], references: [id])
+  breed        Breed?     @relation(fields: [breedId], references: [id])
 }
 
 // Analytics

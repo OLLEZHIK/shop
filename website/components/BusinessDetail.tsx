@@ -8,7 +8,9 @@ import {
   logoUrl,
   searchBusinesses,
   getPriceTierMap,
+  getDistrictSummaries,
 } from "@/lib/data";
+import { isDistrictLinkable } from "@/lib/districts";
 import type { BusinessWithRelations } from "@/lib/data";
 import { CATEGORY_THEME, businessPath, categoryLabel, listingPath } from "@/lib/categories";
 import { formatDate as formatLocaleDate, getDictionary, localePath, localesForCountry, type Locale } from "@/lib/i18n";
@@ -25,15 +27,20 @@ import { BusinessCard, StarRow } from "@/components/BusinessCard";
 import { BusinessAvatar } from "@/components/BusinessAvatar";
 import { GoogleRating } from "@/components/GoogleRating";
 import { ReviewInsightsSection } from "@/components/ReviewInsightsSection";
+import { OpeningHoursTable } from "@/components/OpeningHoursTable";
+import { OpenNowBadge } from "@/components/OpenNowBadge";
+import { PriceTable } from "@/components/PriceTable";
+import { hoursFromStored, timezoneFor } from "@/lib/hours";
+import { specialtyLabel } from "@/lib/vet";
 import { parseReviewInsights } from "@/lib/reviewInsights";
 import {
   ArrowRightIcon,
-  ClockIcon,
   GlobeIcon,
+  InstagramIcon,
+  FacebookIcon,
   MailIcon,
   MapPinIcon,
   PhoneIcon,
-  TagIcon,
 } from "@/components/icons";
 import { AnimalIcon } from "@/components/AnimalIcon";
 
@@ -73,10 +80,12 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
   const sourceUrl = business.sourceUrls[0];
   const description = aboutDescription(business, locale);
   const insights = parseReviewInsights(business.reviewInsights);
+  const timeZone = timezoneFor(business.city?.country ?? business.district?.city.country);
 
-  const [similarRaw, priceTiers] = await Promise.all([
+  const [similarRaw, priceTiers, districtSummaries] = await Promise.all([
     citySlug ? searchBusinesses({ category: business.category, citySlug }) : Promise.resolve([]),
     getPriceTierMap(business.category),
+    getDistrictSummaries(),
   ]);
   const similar = similarRaw.filter((b) => b.id !== business.id).slice(0, 4);
 
@@ -93,7 +102,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
     ...(citySlug
       ? [{ label, href: listingPath(locale, business.category, citySlug) }]
       : [{ label }]),
-    ...(business.district && citySlug
+    ...(business.district && citySlug && isDistrictLinkable(districtSummaries, business.district.slug, business.category)
       ? [{ label: business.district.name, href: listingPath(locale, business.category, citySlug, business.district.slug) }]
       : []),
     { label: business.name },
@@ -138,11 +147,16 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
   };
 
   const theme = CATEGORY_THEME[business.category];
+  const hours = hoursFromStored(business.openingHours);
+  const languages = business.languagesSpoken.map((code) => languageName(code, locale));
+  const hasVetInfo = business.emergency247 || Boolean(business.emergencyNote) || business.homeVisits;
   const hasAbout =
     Boolean(description) ||
     business.animals.length > 0 ||
     business.specialties.length > 0 ||
-    hasOpeningHours(business.openingHours);
+    hasVetInfo ||
+    languages.length > 0 ||
+    hours !== null;
   const formatDate = (d: Date) => formatLocaleDate(d, locale);
 
   return (
@@ -165,14 +179,12 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
           <Breadcrumbs items={breadcrumbItems} />
 
           <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-center">
-            {business.photoUrls.length === 0 && (
-              <BusinessAvatar
-                name={business.name}
-                category={business.category}
-                logoUrl={logoUrl(business.logoFile)}
-                className="h-20 w-20 shrink-0 text-2xl shadow-[var(--shadow-card)] md:h-24 md:w-24 md:text-3xl"
-              />
-            )}
+            <BusinessAvatar
+              name={business.name}
+              category={business.category}
+              logoUrl={logoUrl(business.logoFile)}
+              className="h-20 w-20 shrink-0 text-2xl shadow-[var(--shadow-card)] md:h-24 md:w-24 md:text-3xl"
+            />
             <div className="min-w-0">
               <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: theme.accent }}>
                 {label}
@@ -188,6 +200,19 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <VerifiedBadge verifiedAt={business.verifiedAt} locale={locale} />
+                {business.emergency247 && (
+                  <span className="inline-flex items-center rounded-[var(--radius-pill)] bg-red-600 px-2.5 py-1 text-xs font-bold text-white">
+                    {t.business.nonstop}
+                  </span>
+                )}
+                {!business.emergency247 && business.openingHours !== null && (
+                  <OpenNowBadge
+                    hours={business.openingHours}
+                    timeZone={timeZone}
+                    openLabel={t.business.openNow}
+                    closedLabel={t.business.closedNow}
+                  />
+                )}
                 {business.googleRating !== null && business.googleRatingCount !== null && (
                   <GoogleRating
                     rating={business.googleRating}
@@ -230,6 +255,30 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
 
               {description && <p className="mt-3 text-foreground/80">{description}</p>}
 
+              {hasVetInfo && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {business.emergency247 && (
+                    <span className="rounded-[var(--radius-pill)] bg-red-600 px-3 py-1.5 text-sm font-semibold text-white">
+                      {t.business.nonstop}
+                    </span>
+                  )}
+                  {!business.emergency247 && business.emergencyNote && (
+                    <span className="rounded-[var(--radius-pill)] bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-700">
+                      {t.business.emergency}: {business.emergencyNote}
+                    </span>
+                  )}
+                  {business.homeVisits && (
+                    <span className="rounded-[var(--radius-pill)] bg-brand-blue-muted px-3 py-1.5 text-sm font-medium text-brand-blue">
+                      {t.business.homeVisits}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {languages.length > 0 && (
+                <p className="mt-4 text-sm text-foreground/70">{t.business.languages(languages.join(", "))}</p>
+              )}
+
               {business.animals.length > 0 && (
                 <div className="mt-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-foreground/50">{t.business.welcomes}</p>
@@ -256,27 +305,22 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
                         key={specialty}
                         className="rounded-[var(--radius-pill)] bg-brand-blue-muted px-3 py-1.5 text-sm text-brand-blue"
                       >
-                        {specialty}
+                        {specialtyLabel(specialty, locale)}
                       </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {hasOpeningHours(business.openingHours) && (
+              {hours && (
                 <div className="mt-5">
-                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-foreground/50">
-                    <ClockIcon className="h-4 w-4" />
-                    {t.business.openingHours}
-                  </p>
-                  <dl className="mt-2 divide-y divide-line text-sm">
-                    {Object.entries(business.openingHours as Record<string, string>).map(([day, hours]) => (
-                      <div key={day} className="flex justify-between py-2">
-                        <dt className="text-foreground/60">{day}</dt>
-                        <dd className="font-medium text-foreground">{hours}</dd>
-                      </div>
-                    ))}
-                  </dl>
+                  <OpeningHoursTable
+                    hours={business.openingHours}
+                    timeZone={timeZone}
+                    locale={locale}
+                    sourceUrl={business.hoursSourceUrl}
+                    observedAt={business.hoursObservedAt}
+                  />
                 </div>
               )}
             </section>
@@ -284,30 +328,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
 
           {insights && <ReviewInsightsSection insights={insights} locale={locale} />}
 
-          {business.priceItems.length > 0 && (
-            <section className="rounded-[var(--radius-card)] bg-surface p-6 shadow-[var(--shadow-card)]">
-              <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
-                <TagIcon className="h-5 w-5 text-brand-green" />
-                {t.business.prices}
-              </h2>
-              <ul className="mt-3 divide-y divide-line">
-                {business.priceItems.map((item) => (
-                  <li key={item.id} className="flex justify-between py-2.5 text-sm">
-                    <span className="capitalize text-foreground/70">
-                      {item.sizeClass ? t.business.sizes[item.sizeClass] ?? item.sizeClass : t.business.standard}
-                    </span>
-                    <span className="font-semibold text-foreground">
-                      {item.currency === "EUR" ? "€" : item.currency}
-                      {String(item.priceFrom)}
-                      {item.priceTo && String(item.priceTo) !== String(item.priceFrom)
-                        ? `–${item.currency === "EUR" ? "€" : item.currency}${item.priceTo}`
-                        : ""}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <PriceTable items={business.priceItems} category={business.category} locale={locale} />
 
           <section className="overflow-hidden rounded-[var(--radius-card)] bg-surface shadow-[var(--shadow-card)]">
             <div className="flex items-center justify-between gap-3 p-6 pb-4">
@@ -461,6 +482,20 @@ function ContactCard({ business, locale }: { business: BusinessWithRelations; lo
             </a>
           </ContactRow>
         )}
+        {business.instagram && (
+          <ContactRow icon={<InstagramIcon className="h-4 w-4" />} label={t.instagram}>
+            <a href={business.instagram} target="_blank" rel="noopener noreferrer" className="break-all font-medium text-foreground hover:text-brand-blue">
+              {socialHandle(business.instagram)}
+            </a>
+          </ContactRow>
+        )}
+        {business.facebook && (
+          <ContactRow icon={<FacebookIcon className="h-4 w-4" />} label={t.facebook}>
+            <a href={business.facebook} target="_blank" rel="noopener noreferrer" className="break-all font-medium text-foreground hover:text-brand-blue">
+              {socialHandle(business.facebook)}
+            </a>
+          </ContactRow>
+        )}
         {business.email && (
           <ContactRow icon={<MailIcon className="h-4 w-4" />} label={t.email}>
             <a href={`mailto:${business.email}`} className="break-all font-medium text-foreground hover:text-brand-blue">
@@ -510,6 +545,21 @@ function safeHost(url: string): string | null {
   }
 }
 
-function hasOpeningHours(value: unknown): value is Record<string, string> {
-  return typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length > 0;
+
+/** "instagram.com/vetline_sk" style label for a social profile URL. */
+function socialHandle(url: string): string {
+  try {
+    const u = new URL(url);
+    return `${u.hostname.replace(/^www\./, "")}${u.pathname.replace(/\/$/, "")}`;
+  } catch {
+    return url;
+  }
+}
+
+function languageName(code: string, locale: Locale): string {
+  try {
+    return new Intl.DisplayNames([locale], { type: "language" }).of(code) ?? code;
+  } catch {
+    return code;
+  }
 }

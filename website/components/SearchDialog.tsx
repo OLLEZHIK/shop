@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { getDictionary, type Locale } from "@/lib/i18n";
+import type { BusinessCategory } from "@prisma/client";
 import { HomeSearch, type SearchCategory, type SearchOption } from "./HomeSearch";
 import type { CityPointLite } from "@/lib/geo";
 import { CloseIcon, SearchIcon } from "./icons";
@@ -23,9 +24,10 @@ interface SearchDialogProps {
   categories: SearchCategory[];
   districts: SearchOption[];
   cities: CityPointLite[];
+  districtCounts: Record<string, Partial<Record<BusinessCategory, number>>>;
 }
 
-export function SearchDialog({ locale, citySlug, cityName, categories, districts, cities }: SearchDialogProps) {
+export function SearchDialog({ locale, citySlug, cityName, categories, districts, cities, districtCounts }: SearchDialogProps) {
   const [open, setOpen] = useState(false);
   const t = getDictionary(locale);
 
@@ -92,6 +94,7 @@ export function SearchDialog({ locale, citySlug, cityName, categories, districts
             popularCategorySlugs={[]}
             districts={districts}
             popularDistrictSlugs={[]}
+            districtCounts={districtCounts}
             cities={cities}
             onNavigate={() => setOpen(false)}
           />

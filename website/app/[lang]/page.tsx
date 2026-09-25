@@ -19,6 +19,7 @@ import {
 } from "@/lib/categories";
 import { getDictionary, inCity, isLocale, localePath, localesForCountry } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
+import { districtCountMap } from "@/lib/districts";
 import { HomeSearch } from "@/components/HomeSearch";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { BusinessCard } from "@/components/BusinessCard";
@@ -130,6 +131,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 popularCategorySlugs={popularCategorySlugs}
                 districts={districtOptions}
                 popularDistrictSlugs={popularNearby.map((p) => p.districtSlug)}
+                districtCounts={districtCountMap(districtSummaries)}
                 cities={cityPoints.map(({ slug, lat, lng }) => ({ slug, lat, lng }))}
               />
             </div>

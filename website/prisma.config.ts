@@ -4,7 +4,7 @@ import { directDatabaseUrl } from "./prisma/db-url";
 
 // dotenv/config defaults to `.env`; this project follows Next.js
 // convention and keeps secrets in `.env.local` instead.
-loadEnv({ path: ".env.local" });
+loadEnv({ path: ".env.local", quiet: true });
 
 // Prisma 7 removed `datasource.url`/`directUrl` from schema.prisma in favor
 // of this file. The CLI (migrate, generate, `prisma db seed`) needs DDL

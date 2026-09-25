@@ -1,5 +1,6 @@
 "use client";
 
+import { MIN_DISTRICT_LISTINGS } from "@/lib/districts";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { BusinessCategory } from "@prisma/client";
@@ -29,6 +30,9 @@ interface HomeSearchProps {
   popularCategorySlugs: string[];
   districts: SearchOption[];
   popularDistrictSlugs: string[];
+  /** Places per district and category; a district is only used in the
+   *  results URL when it has enough (lib/districts.ts). */
+  districtCounts?: Record<string, Partial<Record<BusinessCategory, number>>>;
   /** "hero" = homepage (pill bar on desktop, card on phones).
    *  "dialog" = the stepped card at every size, for the Find pet care dialog. */
   layout?: "hero" | "dialog";
@@ -51,6 +55,7 @@ export function HomeSearch({
   popularCategorySlugs,
   districts,
   popularDistrictSlugs,
+  districtCounts = {},
   layout = "hero",
   onNavigate,
   cities = [],
@@ -127,7 +132,10 @@ export function HomeSearch({
   function goSearch() {
     if (!categorySlug) return;
     let path = localePath(locale, `/${categorySlug}/${near?.citySlug ?? citySlug}/`);
-    if (districtSlug) path += `${districtSlug}/`;
+    // A thin district (< 3 places of this kind) has no page we link to:
+    // show the whole city instead.
+    const inDistrict = selectedCategory ? (districtCounts[districtSlug ?? ""]?.[selectedCategory.category] ?? 0) : 0;
+    if (districtSlug && !near && inDistrict >= MIN_DISTRICT_LISTINGS) path += `${districtSlug}/`;
     const params = new URLSearchParams();
     if (animal) params.set("animal", animal);
     if (near) params.set("near", `${near.lat.toFixed(4)},${near.lng.toFixed(4)}`);

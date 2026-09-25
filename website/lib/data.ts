@@ -3,15 +3,22 @@ import { prisma } from "./prisma";
 import type { Business, BusinessCategory, District, City } from "@prisma/client";
 import { CATEGORY_LABELS, categorySlugFromEnum } from "./categories";
 import type { Locale } from "./i18n";
+import { SERVICES } from "./services";
 
 export type BusinessWithRelations = Business & {
   district: (District & { city: City }) | null;
+  city: City | null;
   priceItems: {
     id: number;
     priceFrom: unknown;
     priceTo: unknown;
     currency: string;
     sizeClass: string | null;
+    weightFromKg: number | null;
+    weightToKg: number | null;
+    sourceUrl: string;
+    observedAt: Date;
+    service: { code: string | null };
   }[];
   reviews: { id: number; rating: number; authorName: string; comment: string; createdAt: Date }[];
 };
@@ -20,7 +27,8 @@ const PUBLISHED_REVIEWS = { where: { status: "PUBLISHED" as const } };
 
 const BUSINESS_INCLUDE = {
   district: { include: { city: true } },
-  priceItems: true,
+  city: true,
+  priceItems: { include: { service: { select: { code: true } } } },
   reviews: PUBLISHED_REVIEWS,
 } as const;
 
@@ -72,14 +80,19 @@ export function averageRating(reviews: { rating: number }[]): number | null {
 // never shown. On a local-language page only local text is used (no
 // English fallback); on English pages English first, local as fallback
 // (docs/design-plan.md §2.2, language model).
-type BusinessTexts = Pick<BusinessWithRelations, "description" | "shortDescription" | "shortDescriptionLocal">;
+type BusinessTexts = Pick<
+  BusinessWithRelations,
+  "description" | "descriptionLocal" | "shortDescription" | "shortDescriptionLocal"
+>;
 
 export function cardDescription(b: BusinessTexts, locale: Locale): string | null {
   return locale === "en" ? (b.shortDescription ?? b.shortDescriptionLocal) : b.shortDescriptionLocal;
 }
 
 export function aboutDescription(b: BusinessTexts, locale: Locale): string | null {
-  return locale === "en" ? (b.description ?? b.shortDescription ?? b.shortDescriptionLocal) : b.shortDescriptionLocal;
+  return locale === "en"
+    ? (b.description ?? b.shortDescription ?? b.descriptionLocal ?? b.shortDescriptionLocal)
+    : (b.descriptionLocal ?? b.shortDescriptionLocal);
 }
 
 export function logoUrl(logoFile: string | null): string | null {
@@ -207,6 +220,9 @@ async function searchBusinessesRaw(filters: BusinessFilters): Promise<BusinessWi
     category: filters.category,
     ...(filters.animal ? { animals: { has: filters.animal } } : {}),
     ...(filters.districtSlug ? { district: { is: { slug: filters.districtSlug } } } : {}),
+    // Places seeded before Business.cityId existed have no city yet; the
+    // next seed fills it (production builds always reseed).
+    OR: [{ city: { is: { slug: filters.citySlug } } }, { cityId: null }],
   };
 
   const businesses = await prisma.business.findMany({
@@ -267,6 +283,13 @@ export interface CategoryAggregates {
   currency: string;
 }
 
+// Price range and € tiers compare like with like: only the category's
+// headline service (full grooming, check-up, dog night...). No main
+// service (pet shops) -> no prices.
+function mainServiceCode(category: BusinessCategory): string {
+  return SERVICES[category]?.[0]?.code ?? "__none__";
+}
+
 async function getCategoryAggregatesRaw(
   category: BusinessCategory,
   districtSlug?: string
@@ -281,7 +304,7 @@ async function getCategoryAggregatesRaw(
     prisma.business.count({ where }),
     prisma.business.count({ where: { ...where, verifiedAt: { not: null } } }),
     prisma.priceItem.findMany({
-      where: { business: where },
+      where: { business: where, service: { code: mainServiceCode(category) } },
       select: { priceFrom: true, priceTo: true, currency: true },
     }),
   ]);
@@ -310,7 +333,7 @@ async function getCategoryAggregatesRaw(
 // is missing.
 async function getPriceTierMapRaw(category: BusinessCategory): Promise<[number, number][]> {
   const items = await prisma.priceItem.findMany({
-    where: { business: { category, status: "PUBLISHED" } },
+    where: { business: { category, status: "PUBLISHED" }, service: { code: mainServiceCode(category) } },
     select: { businessId: true, priceFrom: true },
   });
 
@@ -320,7 +343,8 @@ async function getPriceTierMapRaw(category: BusinessCategory): Promise<[number, 
     const current = cheapestByBusiness.get(item.businessId);
     if (current === undefined || price < current) cheapestByBusiness.set(item.businessId, price);
   }
-  if (cheapestByBusiness.size === 0) return [];
+  // Tiers compare places with each other: meaningless for one or two.
+  if (cheapestByBusiness.size < 3) return [];
 
   const sortedPrices = [...cheapestByBusiness.values()].sort((a, b) => a - b);
   function tierFor(price: number): number {
@@ -457,11 +481,39 @@ function reviveBusiness(b: BusinessWithRelations): BusinessWithRelations {
     ...b,
     verifiedAt: toDate(b.verifiedAt),
     ratingObservedAt: toDate(b.ratingObservedAt),
+    hoursObservedAt: toDate(b.hoursObservedAt),
+    priceItems: b.priceItems.map((p) => ({ ...p, observedAt: new Date(p.observedAt) })),
     reviews: b.reviews.map((r) => ({ ...r, createdAt: new Date(r.createdAt) })),
   };
 }
 
+// Nonstop (24/7) vet clinics in a city: the /<vets>/<city>/nonstop page
+// exists only when there is at least one.
+async function getNonstopVetCountRaw(citySlug: string): Promise<number> {
+  return prisma.business.count({
+    where: {
+      status: "PUBLISHED",
+      category: "VET_CLINIC",
+      emergency247: true,
+      OR: [{ city: { is: { slug: citySlug } } }, { cityId: null }],
+    },
+  });
+}
+
+// Pets that at least one place in the category says it serves: the pet
+// filter hides the others (animals are no longer collected, so a pet with
+// no confirmed place would only ever show an empty list).
+async function getAnimalsInCategoryRaw(category: BusinessCategory, citySlug: string): Promise<string[]> {
+  const rows = await prisma.business.findMany({
+    where: { status: "PUBLISHED", category, OR: [{ city: { is: { slug: citySlug } } }, { cityId: null }] },
+    select: { animals: true },
+  });
+  return [...new Set(rows.flatMap((r) => r.animals))];
+}
+
 export const getCityBySlug = cached(getCityBySlugRaw, "getCityBySlug");
+export const getAnimalsInCategory = cached(getAnimalsInCategoryRaw, "getAnimalsInCategory");
+export const getNonstopVetCount = cached(getNonstopVetCountRaw, "getNonstopVetCount");
 export const getAllCities = cached(getAllCitiesRaw, "getAllCities");
 export const getDefaultCity = cached(getDefaultCityRaw, "getDefaultCity");
 export const getDistrictBySlug = cached(getDistrictBySlugRaw, "getDistrictBySlug");

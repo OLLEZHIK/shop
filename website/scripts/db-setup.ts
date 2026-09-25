@@ -16,7 +16,7 @@ import { config as loadEnv } from "dotenv";
 import { Client } from "pg";
 import { directDatabaseUrl } from "../prisma/db-url";
 
-loadEnv({ path: ".env.local" });
+loadEnv({ path: ".env.local", quiet: true });
 
 function run(command: string) {
   console.log(`db-setup: ${command}`);

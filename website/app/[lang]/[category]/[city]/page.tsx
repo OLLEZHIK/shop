@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const locales = localesForCountry(city.country);
 
   return {
-    // Filter variants (?animal=, ?near=, ?sort=, ?rating=) point at the unfiltered page.
+    // Filter variants (?animal=, ?near=, ?sort=, ?rating=, ?open=) point at the unfiltered page.
     alternates: localeAlternates(
       locale,
       Object.fromEntries(locales.map((l) => [l, listingPath(l, category, city.slug)]))
@@ -60,12 +60,12 @@ export default async function CategoryCityPage({
   searchParams,
 }: {
   params: Promise<PageParams>;
-  searchParams: Promise<{ animal?: string; near?: string; sort?: string; rating?: string }>;
+  searchParams: Promise<{ animal?: string; near?: string; sort?: string; rating?: string; open?: string }>;
 }) {
   const resolved = await resolve(params);
   if (!resolved) notFound();
 
-  const { animal, near, sort, rating } = await searchParams;
+  const { animal, near, sort, rating, open } = await searchParams;
   const { locale, category, city, citySlug } = resolved;
 
   return (
@@ -78,6 +78,7 @@ export default async function CategoryCityPage({
       near={near}
       sort={sort}
       rating={rating}
+      open={open}
     />
   );
 }
