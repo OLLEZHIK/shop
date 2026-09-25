@@ -1,10 +1,12 @@
 # Задача: каких животных принимает каждое заведение (5 видов)
 
-**Исполнитель:** Antigravity
+**Исполнитель:** Antigravity (Mac)
 **Роль:** Data agent.
 **Тип:** сбор данных, объём средний (все записи в 4 CSV).
-**Ветка:** `antigravity/collect-animals-served`
-**Зависимости:** `tasks/antigravity-collect-ratings-and-review-summaries.md` смёржена — обе задачи правят одни и те же `data/*.csv`, параллельно будут конфликты. Брать эту после неё, от свежего `main`.
+**Ветка:** `mac/collect-animals-served`
+**Зависимости:** `tasks/antigravity-collect-ratings-and-review-summaries.md` смёржена — обе задачи правят одни и те же `data/*.csv`, параллельно будут конфликты. Она уже смёржена (PR #57), задачу можно брать сразу, от свежего `main`.
+
+*Передана Antigravity (Mac) 2026-09-25 (раньше была `antigravity-collect-animals-served.md`, не начата). Причина: это голова очереди CSV-задач (от неё зависят `antigravity-collect-hours-and-vet-services` и `antigravity-slovak-descriptions`), а Antigravity Desktop сейчас дорабатывает PR #64.*
 
 ## Контекст
 
