@@ -4,7 +4,7 @@ import { SERVICES, serviceIncludes, serviceLabel } from "@/lib/services";
 import { formatDate, getDictionary, type Locale } from "@/lib/i18n";
 import Link from "next/link";
 import { TagIcon } from "./icons";
-import { pricesPath } from "@/lib/pricePages";
+import { pricesPath } from "@/lib/priceSlugs";
 import { MARKET_BAND, pctAgainst, type MarketPrice } from "@/lib/priceMarket";
 
 type PriceRow = BusinessWithRelations["priceItems"][number];

@@ -7,12 +7,19 @@ import type { Locale } from "./i18n";
  * `paths` maps each available locale to that version's path; English
  * doubles as x-default.
  */
-export function localeAlternates(current: Locale, paths: Partial<Record<Locale, string>>): Metadata["alternates"] {
+export function localeAlternates(
+  current: Locale,
+  paths: Partial<Record<Locale, string>>,
+  /** x-default: the home page passes "/" (the root picks the visitor's
+   *  language, docs/design-plan.md 2.2); other pages default to English. */
+  xDefault?: string
+): Metadata["alternates"] {
   const languages: Record<string, string> = {};
   for (const [locale, path] of Object.entries(paths)) {
     if (path) languages[locale] = `${SITE_URL}${path}`;
   }
-  if (paths.en) languages["x-default"] = `${SITE_URL}${paths.en}`;
+  const fallback = xDefault ?? paths.en;
+  if (fallback) languages["x-default"] = `${SITE_URL}${fallback}`;
   return {
     canonical: `${SITE_URL}${paths[current]}`,
     languages,

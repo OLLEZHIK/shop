@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       locale: lang,
       image: { title: `${t.h1Before} ${t.h1Highlight}`, subtitle: where },
     }),
-    alternates: localeAlternates(lang, Object.fromEntries(locales.map((l) => [l, localePath(l, "/")]))),
+    alternates: localeAlternates(lang, Object.fromEntries(locales.map((l) => [l, localePath(l, "/")])), "/"),
   };
 }
 
@@ -74,7 +74,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   const citySlug = city?.slug ?? "";
 
   const categories = ALL_CATEGORIES.map((category) => ({
-    slug: listingPath(locale, category, citySlug).split("/").filter(Boolean).at(locale === "en" ? 0 : 1)!,
+    slug: listingPath(locale, category, citySlug).split("/").filter(Boolean).at(1)!,
     href: listingPath(locale, category, citySlug),
     category,
     label: categoryLabel(category, locale),
@@ -277,7 +277,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           })}
         </ol>
         <Link
-          href="/how-it-works/"
+          href="/en/how-it-works/"
           className="mt-6 inline-flex items-center gap-1.5 font-semibold text-brand-blue hover:underline"
         >
           {t.howLink}
@@ -338,7 +338,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               {t.ctaBody}
             </p>
             <Link
-              href="/add-or-fix-listing/"
+              href="/en/add-or-fix-listing/"
               className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-pill)] bg-white px-6 py-3 font-semibold text-ink transition hover:bg-ink hover:text-white"
             >
               {t.ctaButton}

@@ -53,14 +53,14 @@ export async function Footer({ locale }: { locale: Locale }) {
           </FooterColumn>
 
           <FooterColumn title={t.about}>
-            <FooterLink href="/how-it-works/">{t.howItWorks + en}</FooterLink>
-            <FooterLink href="/add-or-fix-listing/">{t.addBusiness + en}</FooterLink>
-            <FooterLink href="/add-or-fix-listing/">{t.fixListing + en}</FooterLink>
+            <FooterLink href="/en/how-it-works/">{t.howItWorks + en}</FooterLink>
+            <FooterLink href="/en/add-or-fix-listing/">{t.addBusiness + en}</FooterLink>
+            <FooterLink href="/en/add-or-fix-listing/">{t.fixListing + en}</FooterLink>
           </FooterColumn>
 
           <FooterColumn title={t.legal}>
-            <FooterLink href="/privacy-policy/">{t.privacy + en}</FooterLink>
-            <FooterLink href="/terms-of-use/">{t.terms + en}</FooterLink>
+            <FooterLink href="/en/privacy-policy/">{t.privacy + en}</FooterLink>
+            <FooterLink href="/en/terms-of-use/">{t.terms + en}</FooterLink>
           </FooterColumn>
         </div>
 

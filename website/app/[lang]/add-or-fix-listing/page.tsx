@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/site";
 import { ArrowRightIcon, MailIcon, ShieldCheckIcon, SparkleIcon, TagIcon } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Add or Fix a Listing - pawenn",
   description: "Add your business or correct details on an existing pawenn listing.",
+  // English only for now; v2 URL with the /en/ prefix.
+  alternates: { canonical: `${SITE_URL}/en/add-or-fix-listing/` },
 };
 
 const WHAT_TO_INCLUDE = [

@@ -1,30 +1,48 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { DEFAULT_LOCALE, LOCALES } from "./lib/locales";
+import { LANG_COOKIE, LEGACY_EN_SEGMENTS, LOCALES, pickLocale } from "./lib/locales";
 
-// Locale routing (see lib/i18n.ts). Imports only lib/locales.ts, which
-// has no dependencies - proxy runs separately from render code.
-//   /sk/...  -> served as is (app/[lang] with lang = "sk")
-//   /en/...  -> 308 to the unprefixed URL, so English has one canonical URL
-//   /...     -> rewritten to /en/... internally
-const PREFIXED_LOCALES: readonly string[] = LOCALES.filter((l) => l !== DEFAULT_LOCALE);
-
+// Language routing, model v2 (owner 2026-09-23/25; docs/design-plan.md 2.2).
+// Imports only lib/locales.ts, which has no dependencies - proxy runs
+// separately from render code.
+//   /en/..., /sk/...  -> served as is (app/[lang])
+//   /                 -> 307 to the visitor's language: cookie, browser,
+//                        country, English. The only URL that looks at them.
+//   /grooming/... etc. -> 301 to /en/... (English URLs before v2)
+//   anything else     -> 404
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
 
-  if (PREFIXED_LOCALES.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`))) {
+  if (LOCALES.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`))) {
     return NextResponse.next();
   }
 
-  if (pathname === "/en" || pathname.startsWith("/en/")) {
+  if (pathname === "/") {
+    const locale = pickLocale({
+      cookie: request.cookies.get(LANG_COOKIE)?.value,
+      acceptLanguage: request.headers.get("accept-language"),
+      // Cloudflare sits in front of Vercel: its header has the visitor's
+      // country; Vercel's would see Cloudflare's edge.
+      country: request.headers.get("cf-ipcountry") ?? request.headers.get("x-vercel-ip-country"),
+    });
     const url = request.nextUrl.clone();
-    url.pathname = pathname.slice(3) || "/";
-    return NextResponse.redirect(url, 308);
+    url.pathname = `/${locale}/`;
+    const response = NextResponse.redirect(url, 307);
+    response.headers.set("Vary", "Cookie, Accept-Language, CF-IPCountry");
+    response.headers.set("Cache-Control", "private, no-store");
+    return response;
   }
 
-  const url = request.nextUrl.clone();
-  url.pathname = `/en${pathname}`;
-  return NextResponse.rewrite(url);
+  const first = pathname.split("/")[1];
+  if (LEGACY_EN_SEGMENTS.includes(first)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/en${pathname}`;
+    url.search = search;
+    return NextResponse.redirect(url, 301);
+  }
+
+  // Unknown unprefixed URL: let app/global-not-found answer 404.
+  return NextResponse.next();
 }
 
 export const config = {

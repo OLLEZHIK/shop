@@ -24,7 +24,7 @@ import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
 import { ANIMALS, animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
 import { SITE_URL } from "@/lib/site";
-import { pricesPath } from "@/lib/pricePages";
+import { pricesPath } from "@/lib/priceSlugs";
 import { FilterPanel } from "./FilterPanel";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
 import { cityTimezone, hoursFromStored, isOpenAt, localNow } from "@/lib/hours";
@@ -413,7 +413,7 @@ export async function CategoryListing({
             <h2 className="font-heading text-base font-bold">{t.listing.missingTitle}</h2>
             <p className="mt-1.5 text-sm text-white/70">{t.listing.missingBody}</p>
             <Link
-              href="/add-or-fix-listing/"
+              href="/en/add-or-fix-listing/"
               className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-orange hover:underline"
             >
               {t.listing.missingLink}
