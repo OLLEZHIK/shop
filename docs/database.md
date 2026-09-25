@@ -75,9 +75,9 @@ Seed (`website/prisma/seed.ts`) делает upsert по slug, его можно
   `districts.geojson`. Полигоны скачивает
   `website/scripts/fetch-districts.ts <город> <OSM relation> [admin_level]`,
   результат коммитится. Seed в сеть не ходит.
-- **Пока нет `data/cities/bratislava/city.json`,** Братислава грузится
-  из старых `data/*-bratislava.csv` (район берётся из CSV). Seed печатает,
-  у кого район по полигонам отличается.
+- **Братислава** с 2026-09-25 тоже в `data/cities/bratislava/`. Старый
+  путь из `data/*-bratislava.csv` в seed остаётся, только пока старые
+  файлы не удалены (`data/cities/bratislava/README.md`).
 - **Итог по городам** печатается в конце: сколько заведений, районов,
   часов работы, цен, сводок отзывов. Там же предупреждения: неверные
   часы, неизвестные коды, логотип не найден.
