@@ -263,6 +263,8 @@ async function seedServices(): Promise<Map<string, number>> {
 }
 
 // prices.csv (docs/card-spec.md, "Цены"): replaces the city's price rows.
+// unit, partial, note, note_local are optional columns (added 2026-09-25).
+const PRICE_UNITS = ["per_hour", "per_km"];
 async function seedPrices(
   citySlug: string,
   businesses: Map<string, { id: number; category: BusinessCategory }>,
@@ -293,8 +295,21 @@ async function seedPrices(
       rep.warnings.push(`prices: missing price_from, source_url or observed_at (${where})`);
       continue;
     }
+    const unit = nullableString(row.unit);
+    if (unit && !PRICE_UNITS.includes(unit)) {
+      rep.warnings.push(`prices: unknown unit "${unit}" (${where})`);
+      continue;
+    }
+    const partial = nullableString(row.partial)?.toLowerCase() === "yes";
+    const note = nullableString(row.note);
+    const noteLocal = nullableString(row.note_local);
+    if (partial && (!note || !noteLocal)) rep.warnings.push(`prices: partial=yes without note / note_local (${where})`);
     data.push({
       businessId: business.id,
+      unit,
+      partial,
+      note,
+      noteLocal,
       serviceId: serviceIds.get(serviceSlug(business.category, code))!,
       weightFromKg: parseNullableFloat(row.weight_from_kg),
       weightToKg: parseNullableFloat(row.weight_to_kg),

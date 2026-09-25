@@ -1,8 +1,12 @@
-business_slug,price_code,weight_from_kg,weight_to_kg,price_from,price_to,currency,source_url,observed_at,notes
-test-salon,full_groom,,10,35,35,EUR,https://example.com/cennik,2026-09-25,do 10 kg 35 €
-test-salon,full_groom,10,25,45,55,EUR,https://example.com/cennik,2026-09-25,10-25 kg 45-55 €
-test-salon,full_groom,40,,70,,EUR,https://example.com/cennik,2026-09-25,nad 40 kg od 70 €
-test-salon,exam,,,20,,EUR,https://example.com/cennik,2026-09-25,wrong category
-test-vet-nonstop,spay_dog,,20,150,,EUR,https://vet.example.com/cennik,2026-09-25,
-test-vet-nonstop,microchip,,,25,25,EUR,,2026-09-25,no source
-unknown-biz,exam,,,10,,EUR,https://x,2026-09-25,
+business_slug,price_code,weight_from_kg,weight_to_kg,price_from,price_to,currency,source_url,observed_at,notes,unit,partial,note,note_local
+test-salon,full_groom,,10,35,35,EUR,https://example.com/cennik,2026-09-25,do 10 kg 35 €,,,,
+test-salon,full_groom,10,25,45,55,EUR,https://example.com/cennik,2026-09-25,10-25 kg 45-55 €,,,,
+test-salon,full_groom,40,,70,,EUR,https://example.com/cennik,2026-09-25,nad 40 kg od 70 €,,,,
+test-salon,exam,,,20,,EUR,https://example.com/cennik,2026-09-25,wrong category,,,,
+test-vet-nonstop,spay_dog,,20,150,,EUR,https://vet.example.com/cennik,2026-09-25,,,,,
+test-vet-nonstop,microchip,,,25,25,EUR,,2026-09-25,no source,,,,
+unknown-biz,exam,,,10,,EUR,https://x,2026-09-25,,,,,
+test-salon,hand_stripping,,,25,,EUR,https://example.com/cennik,2026-09-25,25 € / hod.,per_hour,,,
+test-vet-nonstop,neuter_cat,,,42,42,EUR,https://vet.example.com/cennik,2026-09-25,bez anestézy 42 €,,yes,without anaesthesia,bez anestézy
+test-vet-nonstop,spay_cat,,,79,79,EUR,https://vet.example.com/cennik,2026-09-25,bez anestézy,,yes,,
+test-vet-nonstop,exam,,,33.9,33.9,EUR,https://vet.example.com/cennik,2026-09-25,bad unit,per_visit,,,

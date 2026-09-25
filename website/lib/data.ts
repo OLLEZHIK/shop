@@ -18,10 +18,19 @@ export type BusinessWithRelations = Business & {
     weightToKg: number | null;
     sourceUrl: string;
     observedAt: Date;
+    unit: string | null;
+    partial: boolean;
+    note: string | null;
+    noteLocal: string | null;
     service: { code: string | null };
   }[];
   reviews: { id: number; rating: number; authorName: string; comment: string; createdAt: Date }[];
 };
+
+// Only whole-service prices are compared (ranges, tiers): not per hour or
+// per km, not partial ones like surgery without anaesthesia
+// (docs/card-spec.md, "Цены").
+const COMPARABLE_PRICE = { partial: false, unit: null } as const;
 
 const PUBLISHED_REVIEWS = { where: { status: "PUBLISHED" as const } };
 
@@ -251,7 +260,7 @@ async function getCategoryAggregatesRaw(
     prisma.business.count({ where }),
     prisma.business.count({ where: { ...where, verifiedAt: { not: null } } }),
     prisma.priceItem.findMany({
-      where: { business: where, service: { code: mainServiceCode(category) } },
+      where: { business: where, service: { code: mainServiceCode(category) }, ...COMPARABLE_PRICE },
       select: { priceFrom: true, priceTo: true, currency: true },
     }),
   ]);
@@ -283,6 +292,7 @@ async function getPriceTierMapRaw(category: BusinessCategory, citySlug: string):
     where: {
       business: { category, status: "PUBLISHED", ...inCityWhere(citySlug) },
       service: { code: mainServiceCode(category) },
+      ...COMPARABLE_PRICE,
     },
     select: { businessId: true, priceFrom: true },
   });

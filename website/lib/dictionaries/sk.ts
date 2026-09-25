@@ -390,6 +390,9 @@ export const sk: Dictionary = {
     weightRange: (from: string, to: string) => `${from}–${to} kg`,
     pricesChecked: (date: string) => `Overené ${date}`,
     priceList: "cenník",
+    perUnit: { per_hour: "/ hod.", per_km: "/ km" },
+    notCompared: "neporovnávame s inými podnikmi",
+    pricesDisclaimer: "Ceny tak, ako ich podnik zverejnil k uvedenému dátumu. Môžu sa zmeniť - pred objednaním si ich overte.",
   },
   reviewForm: {
     name: "Vaše meno",

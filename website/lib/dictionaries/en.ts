@@ -358,6 +358,9 @@ export const en = {
     weightRange: (from: string, to: string) => `${from}–${to} kg`,
     pricesChecked: (date: string) => `Checked ${date}`,
     priceList: "price list",
+    perUnit: { per_hour: "/ hour", per_km: "/ km" } as Record<string, string>,
+    notCompared: "not compared with other places",
+    pricesDisclaimer: "Prices as published by the place on the date shown. They can change - confirm before you book.",
   },
   reviewForm: {
     name: "Your name",
