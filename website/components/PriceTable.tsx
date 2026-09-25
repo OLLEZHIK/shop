@@ -3,6 +3,7 @@ import type { BusinessWithRelations } from "@/lib/data";
 import { SERVICES, serviceIncludes, serviceLabel } from "@/lib/services";
 import { formatDate, getDictionary, type Locale } from "@/lib/i18n";
 import { TagIcon } from "./icons";
+import { MARKET_BAND, pctAgainst, type MarketPrice } from "@/lib/priceMarket";
 
 type PriceRow = BusinessWithRelations["priceItems"][number];
 
@@ -15,12 +16,16 @@ export function PriceTable({
   items,
   category,
   locale,
+  market,
 }: {
   items: PriceRow[];
   category: BusinessCategory;
   locale: Locale;
+  /** City market price per service code (lib/priceMarket.ts). */
+  market?: Map<string, MarketPrice>;
 }) {
   const t = getDictionary(locale).business;
+  const card = getDictionary(locale).card;
   const order = (SERVICES[category] ?? []).map((s) => s.code);
   const rows = items
     .filter((i) => i.service.code && order.includes(i.service.code))
@@ -65,7 +70,8 @@ export function PriceTable({
           const firstOfService = index === 0 || rows[index - 1].service.code !== code;
           const unit = item.unit ? t.perUnit[item.unit] : null;
           const note = locale === "en" ? item.note : (item.noteLocal ?? item.note);
-          const notCompared = item.partial || item.unit !== null;
+          // Partial, per hour/km, or more than the standard (a note): shown, not compared.
+          const notCompared = item.partial || item.unit !== null || Boolean(item.note);
           // The standard's "includes" would contradict a partial or
           // per-hour price, so it goes on comparable rows only.
           const includes = firstOfService && !notCompared ? serviceIncludes(category, code, locale) : null;
@@ -73,6 +79,18 @@ export function PriceTable({
           const to = item.priceTo === null ? null : Number(item.priceTo);
           const price =
             to === null ? t.priceFrom(money(from, item.currency)) : to === from ? money(from, item.currency) : `${money(from, item.currency)}–${money(to, item.currency)}`;
+          // Against the city median: once per service, on its cheapest
+          // comparable row - the same "from" price the market is built of.
+          const cityMarket = market?.get(code);
+          const comparableOfService = rows.filter((r) => r.service.code === code && !r.partial && r.unit === null && !r.note);
+          const cheapest = comparableOfService.reduce<PriceRow | null>(
+            (min, r) => (min === null || Number(r.priceFrom) < Number(min.priceFrom) ? r : min),
+            null
+          );
+          const vsMarket =
+            cityMarket && cheapest?.id === item.id && cityMarket.currency === item.currency
+              ? pctAgainst(from, cityMarket.median)
+              : null;
           return (
             <li key={item.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-2.5 text-sm">
               <span className="text-foreground/80">
@@ -87,6 +105,22 @@ export function PriceTable({
               {(note || notCompared) && (
                 <span className="w-full text-xs text-brand-orange">
                   {[note, notCompared ? t.notCompared : null].filter(Boolean).join(" · ")}
+                </span>
+              )}
+              {vsMarket !== null && cityMarket && (
+                <span className="w-full text-xs">
+                  <span
+                    className={
+                      Math.abs(vsMarket) <= MARKET_BAND
+                        ? "font-medium text-foreground/70"
+                        : vsMarket < 0
+                          ? "font-medium text-brand-green"
+                          : "font-medium text-brand-orange"
+                    }
+                  >
+                    {card.vsMarket(vsMarket, Math.abs(vsMarket) <= MARKET_BAND)}
+                  </span>
+                  <span className="text-foreground/50"> · {t.cityMedian(money(cityMarket.median, cityMarket.currency), cityMarket.places)}</span>
                 </span>
               )}
               <span className="w-full text-xs text-foreground/45">

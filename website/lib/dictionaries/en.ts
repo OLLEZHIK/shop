@@ -288,6 +288,10 @@ export const en = {
   },
   card: {
     priceLevel: (tier: number) => `Price level ${tier} of 5`,
+    /** Against the city market price (lib/priceMarket.ts): 0 = within the market band. */
+    vsMarket: (pct: number, marketBand: boolean) =>
+      marketBand ? "Market price" : pct < 0 ? `${-pct}% below market` : `${pct}% above market`,
+    vsMarketHint: "Compared with the median price of the same services in the city",
   },
   rating: {
     countGoogle: (count: string) => `${count} · Google`,
@@ -358,6 +362,7 @@ export const en = {
     priceList: "price list",
     perUnit: { per_hour: "/ hour", per_km: "/ km" } as Record<string, string>,
     notCompared: "not compared with other places",
+    cityMedian: (price: string, places: number) => `City median ${price} · ${places} places`,
     pricesDisclaimer: "Prices as published by the place on the date shown. They can change - confirm before you book.",
   },
   reviewForm: {

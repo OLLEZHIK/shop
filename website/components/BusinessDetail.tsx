@@ -8,6 +8,7 @@ import {
   logoUrl,
   searchBusinesses,
   getPriceTierMap,
+  getMarketPrices,
   getDistrictSummaries,
 } from "@/lib/data";
 import { isDistrictLinkable } from "@/lib/districts";
@@ -87,9 +88,10 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
   const insights = parseReviewInsights(business.reviewInsights);
   const timeZone = cityTimezone(business.city ?? business.district?.city);
 
-  const [similarRaw, priceTiers, districtSummaries] = await Promise.all([
+  const [similarRaw, priceTiers, marketPrices, districtSummaries] = await Promise.all([
     citySlug ? searchBusinesses({ category: business.category, citySlug }) : Promise.resolve([]),
     getPriceTierMap(business.category, citySlug ?? ""),
+    getMarketPrices(business.category, citySlug ?? ""),
     getDistrictSummaries(citySlug ?? ""),
   ]);
   const similar = similarRaw.filter((b) => b.id !== business.id).slice(0, 4);
@@ -237,7 +239,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
                   />
                 )}
                 {priceTiers.has(business.id) && (
-                  <PriceTier tier={priceTiers.get(business.id)!} currency={city?.currency} locale={locale} className="text-sm" />
+                  <PriceTier level={priceTiers.get(business.id)!} currency={city?.currency} locale={locale} className="text-sm" />
                 )}
                 {rating !== null && (
                   <a href="#reviews" className="flex items-center gap-1.5 hover:opacity-80">
@@ -265,6 +267,10 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
           <div className="lg:hidden">
             <ContactCard business={business} locale={locale} />
           </div>
+
+          {/* Prices right after contact (owner, 2026-09-25): the price is what
+              people come to compare, each row against the city median. */}
+          <PriceTable items={business.priceItems} category={business.category} locale={locale} market={marketPrices} />
 
           {hasAbout && (
             <section className="rounded-[var(--radius-card)] bg-surface p-6 shadow-[var(--shadow-card)]">
@@ -357,8 +363,6 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
           )}
 
           {insights && <ReviewInsightsSection insights={insights} locale={locale} />}
-
-          <PriceTable items={business.priceItems} category={business.category} locale={locale} />
 
           <section className="overflow-hidden rounded-[var(--radius-card)] bg-surface shadow-[var(--shadow-card)]">
             <div className="flex items-center justify-between gap-3 p-6 pb-4">
