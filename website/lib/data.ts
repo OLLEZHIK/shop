@@ -439,9 +439,13 @@ export function parseNear(value: string | undefined): { lat: number; lng: number
 // Number()/String() everywhere already).
 // ---------------------------------------------------------------------
 const REVALIDATE_SECONDS = 24 * 60 * 60;
+// The data cache outlives deployments, so without this a deploy that
+// adds columns or reseeds the CSVs would keep serving day-old objects.
+// Scoping keys to the deployment starts every deploy with a fresh cache.
+const CACHE_VERSION = process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMMIT_SHA ?? "local";
 
 function cached<A extends unknown[], R>(fn: (...args: A) => Promise<R>, key: string) {
-  return unstable_cache(fn, ["db", key], { revalidate: REVALIDATE_SECONDS, tags: ["db"] });
+  return unstable_cache(fn, ["db", CACHE_VERSION, key], { revalidate: REVALIDATE_SECONDS, tags: ["db"] });
 }
 
 function toDate(value: Date | string | null): Date | null {

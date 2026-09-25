@@ -24,6 +24,8 @@ import { PhotoGallery } from "@/components/PhotoGallery";
 import { BusinessCard, StarRow } from "@/components/BusinessCard";
 import { BusinessAvatar } from "@/components/BusinessAvatar";
 import { GoogleRating } from "@/components/GoogleRating";
+import { ReviewInsightsSection } from "@/components/ReviewInsightsSection";
+import { parseReviewInsights } from "@/lib/reviewInsights";
 import {
   ArrowRightIcon,
   ClockIcon,
@@ -70,6 +72,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
   const rating = averageRating(business.reviews);
   const sourceUrl = business.sourceUrls[0];
   const description = aboutDescription(business, locale);
+  const insights = parseReviewInsights(business.reviewInsights);
 
   const [similarRaw, priceTiers] = await Promise.all([
     citySlug ? searchBusinesses({ category: business.category, citySlug }) : Promise.resolve([]),
@@ -278,6 +281,8 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
               )}
             </section>
           )}
+
+          {insights && <ReviewInsightsSection insights={insights} locale={locale} />}
 
           {business.priceItems.length > 0 && (
             <section className="rounded-[var(--radius-card)] bg-surface p-6 shadow-[var(--shadow-card)]">

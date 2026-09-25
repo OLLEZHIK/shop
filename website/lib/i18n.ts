@@ -343,6 +343,15 @@ const en = {
     countGoogle: (count: string) => `${count} · Google`,
     aria: (value: string, count: number) => `Rated ${value} out of 5 from ${count} Google ratings`,
   },
+  insights: {
+    title: "What customers say",
+    summary: (n: number, period: string) => `pawenn summary of ${n} Google reviews from ${period}`,
+    allOnGoogle: "All reviews on Google",
+    disclosure: "Summary of public Google reviews; pawenn does not verify them.",
+    sentiment: { positive: "Mostly positive", mixed: "Mixed", negative: "Mostly negative" },
+    mentions: (m: number, n: number) => `${m} of ${n} reviews`,
+    faqTitle: "Questions owners ask",
+  },
   actions: { call: "Call", website: "Website", route: "Route" },
   badges: { verified: (date: string) => `Verified ${date}`, partner: "Partner" },
   business: {
@@ -685,6 +694,15 @@ const sk: Dictionary = {
   rating: {
     countGoogle: (count: string) => `${count} · Google`,
     aria: (value: string, count: number) => `Hodnotenie ${value} z 5 podľa ${count} hodnotení na Google`,
+  },
+  insights: {
+    title: "Čo hovoria zákazníci",
+    summary: (n: number, period: string) => `Zhrnutie pawenn z ${n} recenzií na Google za obdobie ${period}`,
+    allOnGoogle: "Všetky recenzie na Google",
+    disclosure: "Súhrn verejných recenzií z Google, pawenn ich neoverujeme.",
+    sentiment: { positive: "Prevažne pozitívne", mixed: "Zmiešané", negative: "Prevažne negatívne" },
+    mentions: (m: number, n: number) => `${m} z ${n} recenzií`,
+    faqTitle: "Časté otázky",
   },
   actions: { call: "Zavolať", website: "Web", route: "Trasa" },
   badges: { verified: (date: string) => `Overené ${date}`, partner: "Partner" },

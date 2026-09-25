@@ -3,7 +3,7 @@ import path from "path";
 import { config as loadEnv } from "dotenv";
 import Papa from "papaparse";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, BusinessCategory } from "@prisma/client";
+import { Prisma, PrismaClient, BusinessCategory } from "@prisma/client";
 import { directDatabaseUrl } from "./db-url";
 
 loadEnv({ path: path.join(process.cwd(), ".env.local") });
@@ -13,6 +13,25 @@ const prisma = new PrismaClient({ adapter });
 
 // data/ at the repo root, not website/data/ (that's a stale duplicate copy).
 const DATA_DIR = path.join(process.cwd(), "..", "data");
+const INSIGHTS_DIR = path.join(DATA_DIR, "review-insights");
+
+// "What customers say" summaries, one JSON file per business slug
+// (tasks/ide-review-insights.md). Validated again when rendered.
+function readReviewInsights(slug: string): Prisma.InputJsonValue | typeof Prisma.DbNull {
+  const file = path.join(INSIGHTS_DIR, `${slug}.json`);
+  if (!fs.existsSync(file)) return Prisma.DbNull;
+  try {
+    const data = JSON.parse(fs.readFileSync(file, "utf-8"));
+    if (data?.slug !== slug) {
+      console.log(`  review insights: slug mismatch in ${slug}.json, skipped`);
+      return Prisma.DbNull;
+    }
+    return data;
+  } catch (e) {
+    console.log(`  review insights: invalid JSON in ${slug}.json, skipped (${(e as Error).message})`);
+    return Prisma.DbNull;
+  }
+}
 
 const BRATISLAVA_DISTRICTS: { name: string; slug: string }[] = [
   { name: "Staré Mesto", slug: "stare-mesto" },
@@ -223,6 +242,7 @@ async function main() {
           sourceUrls: sourceUrl ? [sourceUrl] : [],
           notes: nullableString(row.notes),
           ...cardFields(row),
+          reviewInsights: readReviewInsights(slug),
         },
         create: {
           name,
@@ -240,6 +260,7 @@ async function main() {
           sourceUrls: sourceUrl ? [sourceUrl] : [],
           notes: nullableString(row.notes),
           ...cardFields(row),
+          reviewInsights: readReviewInsights(slug),
         },
       });
 

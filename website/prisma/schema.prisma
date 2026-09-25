@@ -79,6 +79,10 @@ model Business {
   googleRating          Float?
   googleRatingCount     Int?
   ratingObservedAt      DateTime?
+  // "What customers say" summary from data/review-insights/<slug>.json
+  // (tasks/ide-review-insights.md): our summary of public Google reviews,
+  // never shown or marked up as reviews. Validated in lib/reviewInsights.ts.
+  reviewInsights        Json?
   district     District?        @relation(fields: [districtId], references: [id])
   priceItems   PriceItem[]
   clickEvents  ClickEvent[]
