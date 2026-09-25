@@ -215,7 +215,7 @@ export function listingPath(
   districtSlug?: string | null
 ): string {
   const base = `/${categorySlug(category, locale)}/${citySlug}/${districtSlug ? `${districtSlug}/` : ""}`;
-  return locale === "en" ? base : `/${locale}${base}`;
+  return `/${locale}${base}`;
 }
 
 // City hub: /city/<slug>/, /sk/mesto/<slug>/ - served by the
@@ -228,10 +228,10 @@ export function isCitySegment(segment: string, locale: Locale): boolean {
 
 export function cityPath(locale: Locale, citySlug: string): string {
   const base = `/${CITY_SEGMENT[locale]}/${citySlug}/`;
-  return locale === "en" ? base : `/${locale}${base}`;
+  return `/${locale}${base}`;
 }
 
 export function businessPath(locale: Locale, slug: string): string {
   const base = `/${BUSINESS_SEGMENT[locale]}/${slug}/`;
-  return locale === "en" ? base : `/${locale}${base}`;
+  return `/${locale}${base}`;
 }

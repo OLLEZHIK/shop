@@ -1,11 +1,11 @@
 // Locales, URL helpers and UI dictionaries.
 //
-// URL scheme (decision 2026-09-23, replaces docs/design-plan.md 2.2's
-// "English-only UI"): English lives at the unprefixed URLs
-// (`/grooming/bratislava/`), each city's local language gets a full
-// parallel version under its prefix (`/sk/psi-salon/bratislava/`), and
-// the two are linked with hreflang. `proxy.ts` maps unprefixed URLs onto
-// the `app/[lang]` route tree.
+// URL scheme - language model v2 (owner 2026-09-23/25,
+// docs/design-plan.md 2.2): every language has its prefix, English too
+// (`/en/grooming/bratislava/`, `/sk/psi-salon/bratislava/`), versions are
+// linked with hreflang. The root `/` sends the visitor to their language
+// (cookie, browser, country - proxy.ts); pre-v2 English URLs without a
+// prefix get a 301 to /en/.
 //
 // Scaling rule: a new city is data only (docs/architecture/multi-city.md).
 // A new *language* is one dictionary file in lib/dictionaries/ plus slugs

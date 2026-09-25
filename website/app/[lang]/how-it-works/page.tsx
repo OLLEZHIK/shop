@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/site";
 import { readDocsMarkdown } from "@/lib/content";
 import { MarkdownContent } from "@/components/MarkdownContent";
 
 export const metadata: Metadata = {
   title: "How It Works - pawenn",
   description: "How pawenn finds, verifies and ranks pet service listings in Bratislava.",
+  // English only for now; v2 URL with the /en/ prefix.
+  alternates: { canonical: `${SITE_URL}/en/how-it-works/` },
 };
 
 // English only for now - the Slovak site links here with an "(EN)" hint.

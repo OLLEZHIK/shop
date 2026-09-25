@@ -137,7 +137,7 @@ export function MobileMenu({ locale, services, cities, defaultCitySlug }: Mobile
               <div className="mt-6 space-y-2">
                 <Link
                   data-close
-                  href="/how-it-works/"
+                  href="/en/how-it-works/"
                   className="flex items-center justify-between rounded-[var(--radius-control)] bg-surface px-4 py-3.5 font-medium"
                 >
                   {t.nav.howItWorks}
@@ -145,7 +145,7 @@ export function MobileMenu({ locale, services, cities, defaultCitySlug }: Mobile
                 </Link>
                 <Link
                   data-close
-                  href="/add-or-fix-listing/"
+                  href="/en/add-or-fix-listing/"
                   className="flex items-center justify-between rounded-[var(--radius-control)] bg-ink px-4 py-3.5 font-medium text-white"
                 >
                   {t.nav.listYourBusiness}

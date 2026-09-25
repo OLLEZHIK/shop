@@ -47,13 +47,13 @@ export async function Header({ locale }: { locale: Locale }) {
             defaultCitySlug={citySlug}
           />
           <Link
-            href="/how-it-works/"
+            href="/en/how-it-works/"
             className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-4 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
           >
             {t.nav.help}
           </Link>
           <Link
-            href="/add-or-fix-listing/"
+            href="/en/add-or-fix-listing/"
             className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-4 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
           >
             {t.nav.listBusiness}

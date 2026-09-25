@@ -23,8 +23,8 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
-// Root layout per locale: English is served here via proxy.ts rewrites
-// (/grooming/... -> /en/grooming/...), local languages by their prefix.
+// Root layout per locale: every language under its prefix (/en/, /sk/),
+// language model v2 - proxy.ts.
 export default async function RootLayout({
   children,
   params,

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale } from "@/lib/i18n";
+import { LANG_COOKIE } from "@/lib/locales";
 import { localeOfPath, switchLocalePath } from "@/lib/localeSwitch";
 
 // The page's language follows its URL (search engines send people to
@@ -22,7 +23,17 @@ export function LanguageSwitch({ locales }: { locales: Locale[] }) {
             {NAMES[l]}
           </span>
         ) : (
-          <Link key={l} href={switchLocalePath(pathname, l)} hrefLang={l} className="hover:text-brand-orange">
+          <Link
+            key={l}
+            href={switchLocalePath(pathname, l)}
+            hrefLang={l}
+            // Remembered for the root "/" only (docs/design-plan.md 2.2):
+            // a functional cookie set by the visitor's own choice.
+            onClick={() => {
+              document.cookie = `${LANG_COOKIE}=${l}; Max-Age=31536000; Path=/; SameSite=Lax`;
+            }}
+            className="hover:text-brand-orange"
+          >
             {NAMES[l]}
           </Link>
         )

@@ -35,8 +35,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 1,
     }),
-    { url: `${SITE_URL}/how-it-works/`, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/add-or-fix-listing/`, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${SITE_URL}/en/how-it-works/`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/en/add-or-fix-listing/`, changeFrequency: "monthly", priority: 0.3 },
   ];
 
   for (const city of cities) {
