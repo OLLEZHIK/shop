@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { categoryFromSlug, categoryPlural, categorySeoTitle, categorySingular, listingPath } from "@/lib/categories";
+import { categoryFromSlug, categoryLabel, categoryPlural, categorySeoTitle, categorySingular, listingPath } from "@/lib/categories";
 import { getCityBySlug, getDistrictBySlug, getCategoryAggregates, getNonstopVetCount } from "@/lib/data";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
 import { getDictionary, isLocale, localesForCity } from "@/lib/i18n";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates, socialMeta } from "@/lib/seo";
 import { CategoryListing, whereLabel } from "@/components/CategoryListing";
 
 interface PageParams {
@@ -54,6 +54,13 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
       ),
       title: { absolute: t.nonstopMetaTitle(where) },
       description: t.nonstopMetaDescription(count, where),
+      ...socialMeta({
+        title: t.nonstopMetaTitle(where),
+        description: t.nonstopMetaDescription(count, where),
+        path: listingPath(locale, category, city.slug, NONSTOP_SEGMENT),
+        locale,
+        image: { title: t.nonstopH1(where), category },
+      }),
     };
   }
 
@@ -70,6 +77,13 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
     ),
     title: t.metaTitle(categorySeoTitle(category, locale), where),
     description: t.metaDescription(aggregates.count, what, where),
+    ...socialMeta({
+      title: t.metaTitle(categorySeoTitle(category, locale), where),
+      description: t.metaDescription(aggregates.count, what, where),
+      path: listingPath(locale, category, city.slug, district.slug),
+      locale,
+      image: { title: `${categoryLabel(category, locale)} – ${district.name}`, subtitle: city.name, category },
+    }),
     robots: aggregates.count < 3 ? { index: false, follow: true } : undefined,
   };
 }

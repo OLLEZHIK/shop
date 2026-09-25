@@ -6,6 +6,7 @@ import {
   averageRating,
   aboutDescription,
   logoUrl,
+  cardDescription,
   searchBusinesses,
   getPriceTierMap,
   getMarketPrices,
@@ -13,9 +14,9 @@ import {
 } from "@/lib/data";
 import { isDistrictLinkable } from "@/lib/districts";
 import type { BusinessWithRelations } from "@/lib/data";
-import { CATEGORY_THEME, businessPath, categoryLabel, categorySingular, listingPath } from "@/lib/categories";
+import { CATEGORY_THEME, businessPath, categoryLabel, categorySingular, cityPath, listingPath } from "@/lib/categories";
 import { formatDate as formatLocaleDate, getDictionary, localePath, inCity, localesForCity, type Locale } from "@/lib/i18n";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates, socialMeta } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
@@ -23,7 +24,6 @@ import { PartnerBadge } from "@/components/PartnerBadge";
 import { QuickActions } from "@/components/QuickActions";
 import { ReviewForm } from "@/components/ReviewForm";
 import { AmbientBackground } from "@/components/AmbientBackground";
-import { PhotoGallery } from "@/components/PhotoGallery";
 import { BusinessCard, StarRow } from "@/components/BusinessCard";
 import { BusinessAvatar } from "@/components/BusinessAvatar";
 import { GoogleRating } from "@/components/GoogleRating";
@@ -31,7 +31,7 @@ import { ReviewInsightsSection } from "@/components/ReviewInsightsSection";
 import { OpeningHoursTable } from "@/components/OpeningHoursTable";
 import { OpenNowBadge } from "@/components/OpenNowBadge";
 import { PriceTable } from "@/components/PriceTable";
-import { cityTimezone, hoursFromStored } from "@/lib/hours";
+import { cityTimezone, hoursFromStored, openingHoursSpecification } from "@/lib/hours";
 import { specialtyLabel } from "@/lib/vet";
 import { parseReviewInsights } from "@/lib/reviewInsights";
 import {
@@ -64,15 +64,42 @@ export async function businessMetadata(locale: Locale, slug: string): Promise<Me
     : city
       ? inCity(locale, city)
       : "";
+  // Title "{Name} – {District}, {City} | Pawenn", shortened to stay about
+  // 60 characters; description from the place's own short text (SEO audit T11).
+  const place = [business.district?.name, city?.name].filter(Boolean).join(", ");
+  const titleOptions = [
+    `${business.name} – ${place} | Pawenn`,
+    `${business.name} – ${place}`,
+    business.district ? `${business.name} – ${business.district.name}` : business.name,
+    business.name,
+  ];
+  const title = titleOptions.find((o) => o.length <= 60) ?? business.name;
+  const summary = cardDescription(business, locale);
+  const description = summary
+    ? `${business.name}, ${business.address}. ${summary} ${t.metaDescriptionTail(business.priceItems.length > 0)}`
+    : t.metaDescription(business.name, where);
+  const path = businessPath(locale, business.slug);
   return {
-    title: t.metaTitle(business.name, categoryLabel(business.category, locale), where),
-    description: t.metaDescription(business.name, where),
+    title: { absolute: title },
+    description,
+    ...socialMeta({
+      title,
+      description,
+      path,
+      locale,
+      image: { title: business.name, subtitle: `${categorySingular(business.category, locale)} · ${place}`, category: business.category },
+    }),
     alternates: localeAlternates(
       locale,
       Object.fromEntries(availableLocales(business).map((l) => [l, businessPath(l, business.slug)]))
     ),
   };
 }
+
+const SCHEMA_TYPE: Partial<Record<BusinessWithRelations["category"], string>> = {
+  VET_CLINIC: "VeterinaryCare",
+  PET_SHOP: "PetStore",
+};
 
 export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: string }) {
   const business = await getBusinessBySlug(slug);
@@ -111,10 +138,9 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
       : null;
 
   const breadcrumbItems = [
-    // Home -> category list -> district -> place. The city is part of
-    // the category list's own title, so it doesn't get a crumb that would
-    // point at the same URL as the category.
+    // Home -> city hub -> category list -> district -> place (SEO audit T14).
     { label: t.listing.home, href: localePath(locale, "/") },
+    ...(citySlug && city ? [{ label: city.name, href: cityPath(locale, citySlug) }] : []),
     ...(citySlug
       ? [{ label, href: listingPath(locale, business.category, citySlug) }]
       : [{ label }]),
@@ -126,7 +152,9 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
 
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    // Most specific schema.org type we have: vets and pet shops have their
+    // own, the rest stay LocalBusiness (SEO audit T15).
+    "@type": SCHEMA_TYPE[business.category] ?? "LocalBusiness",
     name: business.name,
     url: `${SITE_URL}${businessPath(locale, business.slug)}`,
     address: {
@@ -137,7 +165,17 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
     },
   };
   if (business.phone) jsonLd.telephone = business.phone;
-  if (business.website) jsonLd.sameAs = [business.website];
+  const sameAs = [business.website, business.googleMapsUrl].filter((u): u is string => Boolean(u));
+  if (sameAs.length) jsonLd.sameAs = sameAs;
+  const logo = logoUrl(business.logoFile);
+  if (logo) jsonLd.image = `${SITE_URL}${logo}`;
+  const openingHours = hoursFromStored(business.openingHours);
+  if (openingHours) {
+    const spec = openingHoursSpecification(openingHours);
+    if (spec.length) jsonLd.openingHoursSpecification = spec;
+  }
+  const level = priceTiers.get(business.id);
+  if (level) jsonLd.priceRange = (city?.currency === "EUR" || !city?.currency ? "€" : city.currency).repeat(level.tier);
   if (business.lat !== null && business.lng !== null) {
     jsonLd.geo = { "@type": "GeoCoordinates", latitude: business.lat, longitude: business.lng };
   }
@@ -149,17 +187,6 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
       reviewCount: business.reviews.length,
     };
   }
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: breadcrumbItems.map((item, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      name: item.label,
-      ...(item.href ? { item: `${SITE_URL}${item.href}` } : {}),
-    })),
-  };
 
   const theme = CATEGORY_THEME[business.category];
   const hours = hoursFromStored(business.openingHours);
@@ -178,10 +205,6 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
   return (
     <main className="relative" style={{ "--accent": theme.accent } as React.CSSProperties}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
 
       {/* ---------- Header band ---------- */}
       <section className="under-header relative overflow-hidden border-b border-line">
@@ -259,10 +282,10 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
       <div className="mx-auto grid max-w-7xl gap-8 px-4 pt-8 lg:grid-cols-[1fr_360px]">
         {/* ---------- Main column ---------- */}
         <div className="min-w-0 space-y-6">
-          {business.photoUrls.length > 0 && (
-            <PhotoGallery photoUrls={business.photoUrls} alt={business.name} variant="detail" />
-          )}
-
+          {/* No photo gallery (owner, 2026-09-25): photos were hotlinked from
+              the places' own sites without permission, and the logo already
+              heads the page. Business.photoUrls stays in the data for places
+              that give permission later (docs/card-spec.md). */}
           {/* Contact card inline on small screens; sticky sidebar on large */}
           <div className="lg:hidden">
             <ContactCard business={business} locale={locale} />

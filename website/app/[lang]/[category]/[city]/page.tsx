@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { categoryFromSlug, categoryPlural, categorySeoTitle, categorySingular, cityPath, isCitySegment, listingPath } from "@/lib/categories";
+import { categoryFromSlug, categoryLabel, categoryPlural, categorySeoTitle, categorySingular, cityPath, isCitySegment, listingPath } from "@/lib/categories";
 import { getBusinessCount, getCityBySlug, getCategoryAggregates } from "@/lib/data";
 import { getDictionary, inCity, isLocale, localesForCity } from "@/lib/i18n";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates, socialMeta } from "@/lib/seo";
 import { CategoryListing, whereLabel } from "@/components/CategoryListing";
 
 interface PageParams {
@@ -44,6 +44,13 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
       alternates: localeAlternates(locale, Object.fromEntries(locales.map((l) => [l, cityPath(l, city.slug)]))),
       title: { absolute: hub.metaTitle(where) },
       description: hub.metaDescription(counts.total, where),
+      ...socialMeta({
+        title: hub.metaTitle(where),
+        description: hub.metaDescription(counts.total, where),
+        path: cityPath(locale, city.slug),
+        locale,
+        image: { title: `${hub.h1Before} ${where}` },
+      }),
       robots: counts.total < 3 ? { index: false, follow: true } : undefined,
     };
   }
@@ -61,6 +68,13 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
     ),
     title: t.metaTitle(categorySeoTitle(category, locale), where),
     description: t.metaDescription(aggregates.count, what, where),
+    ...socialMeta({
+      title: t.metaTitle(categorySeoTitle(category, locale), where),
+      description: t.metaDescription(aggregates.count, what, where),
+      path: listingPath(locale, category, city.slug),
+      locale,
+      image: { title: `${categoryLabel(category, locale)} ${where}`, category },
+    }),
     robots: aggregates.count < 3 ? { index: false, follow: true } : undefined,
   };
 }

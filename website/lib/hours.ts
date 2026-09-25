@@ -102,3 +102,34 @@ export function isOpenAt(hours: OpeningHours | null, at: { day: Day; minute: num
 export function formatMinutes(m: number): string {
   return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 }
+
+const SCHEMA_DAY: Record<Day, string> = {
+  mo: "Monday",
+  tu: "Tuesday",
+  we: "Wednesday",
+  th: "Thursday",
+  fr: "Friday",
+  sa: "Saturday",
+  su: "Sunday",
+};
+
+const hhmm = (minutes: number) =>
+  `${String(Math.floor(minutes / 60) % 24).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+
+/** schema.org openingHoursSpecification for JSON-LD: only days with real
+ *  hours; closed and "by appointment" days are left out. */
+export function openingHoursSpecification(hours: OpeningHours): Record<string, string>[] {
+  return DAYS.flatMap((day) => {
+    const h = hours[day];
+    if (!h) return [];
+    const dayOfWeek = `https://schema.org/${SCHEMA_DAY[day]}`;
+    if (h.kind === "24h") return [{ "@type": "OpeningHoursSpecification", dayOfWeek, opens: "00:00", closes: "23:59" }];
+    if (h.kind !== "intervals") return [];
+    return h.intervals.map(([from, to]) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek,
+      opens: hhmm(from),
+      closes: to >= 24 * 60 ? "23:59" : hhmm(to),
+    }));
+  });
+}

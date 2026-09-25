@@ -196,14 +196,30 @@ async function searchBusinessesRaw(filters: BusinessFilters): Promise<BusinessWi
   return shuffleDeterministically(businesses) as BusinessWithRelations[];
 }
 
+// verifiedAt is the latest date anything on the place page was checked
+// (manual verification, hours, rating, prices): the sitemap's lastmod
+// (SEO audit T03), never "today" for everything.
 async function getAllPublishedBusinessSlugsRaw(): Promise<
   { slug: string; verifiedAt: Date | null; city: { country: string; locales: string[] } | null }[]
 > {
   const rows = await prisma.business.findMany({
     where: { status: "PUBLISHED" },
-    select: { slug: true, verifiedAt: true, city: { select: { country: true, locales: true } } },
+    select: {
+      slug: true,
+      verifiedAt: true,
+      hoursObservedAt: true,
+      ratingObservedAt: true,
+      priceItems: { select: { observedAt: true }, orderBy: { observedAt: "desc" }, take: 1 },
+      city: { select: { country: true, locales: true } },
+    },
   });
-  return rows;
+  return rows.map((r) => {
+    const dates = [r.verifiedAt, r.hoursObservedAt, r.ratingObservedAt, r.priceItems[0]?.observedAt].filter(
+      (d): d is Date => d instanceof Date
+    );
+    const latest = dates.length ? new Date(Math.max(...dates.map((d) => d.getTime()))) : null;
+    return { slug: r.slug, verifiedAt: latest, city: r.city };
+  });
 }
 
 async function getFeaturedBusinessesRaw(citySlug: string, limit = 4): Promise<BusinessWithRelations[]> {
