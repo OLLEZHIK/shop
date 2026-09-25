@@ -1,0 +1,96 @@
+{
+  "slug": "marfilvet-veterinarna-nemocnica",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=13179175955138546791",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 28,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "results",
+      "sentiment": "positive",
+      "mentions": 19,
+      "title": {
+        "en": "Comprehensive diagnostics and hospital facilities",
+        "sk": "Komplexná diagnostika a nemocničné zázemie"
+      },
+      "text": {
+        "en": "Clients consistently praise this veterinary hospital in Lamač for its modern technological capacity, including digital X-rays, ultrasound, endoscopy, and computed tomography (CT). Many reviews describe successful surgical outcomes and effective intensive therapy that stabilized pets in serious conditions following accidents or sudden illnesses.",
+        "sk": "Klienti pravidelne vyzdvihujú moderné technologické zázemie tejto veterinárnej nemocnice v Lamači, vrátane digitálneho RTG, sonografie, endoskopie a CT vyšetrení. Viaceré recenzie opisujú úspešné chirurgické zákroky a efektívnu intenzívnu liečbu, vďaka ktorej sa podarilo stabilizovať zvieratá v kritických stavoch po úrazoch."
+      }
+    },
+    {
+      "topic": "waiting",
+      "sentiment": "positive",
+      "mentions": 16,
+      "title": {
+        "en": "Helpful evening emergency service every day",
+        "sk": "Dostupná večerná pohotovosť každý deň"
+      },
+      "text": {
+        "en": "Reviewers frequently highlight the evening emergency service operating after standard clinic hours as a major benefit for pet owners in northwestern Bratislava. Multiple reviews recount arriving with acutely ill animals between 20:00 and 22:00, where medical staff promptly performed blood tests, administered medication, and arranged overnight observation.",
+        "sk": "Hodnotenia často vyzdvihujú večernú pohotovosť nadväzujúcu na bežné ordinačné hodiny ako veľkú pomoc pre majiteľov zvierat zo západu Bratislavy. Viacerí klienti opisujú skúsenosť s príchodom v akútnych stavoch medzi 20:00 a 22:00, kedy personál rýchlo vykonal krvné testy, podal lieky a zabezpečil nočné pozorovanie zvieraťa."
+      }
+    },
+    {
+      "topic": "staff",
+      "sentiment": "mixed",
+      "mentions": 15,
+      "title": {
+        "en": "Professional care with occasional communication friction",
+        "sk": "Odborná starostlivosť s občasnými výhradami"
+      },
+      "text": {
+        "en": "While the majority of pet owners praise the dedication and technical skill of the veterinary team, several reviews point out occasional differences in bedside manner depending on the attending doctor. A few visitors noted that stressful peak hours can make consultations feel brief, though clinical treatment quality remains consistently reliable.",
+        "sk": "Hoci väčšina majiteľov zvierat chváli nasadenie a zručnosť lekárskeho tímu, niekoľko recenzií poukazuje na rozdielny prístup v komunikácii podľa konkrétneho slúžiaceho lekára. Pár recenzentov poznamenalo, že počas špičky pôsobili konzultácie uponáhľane, no samotný odborný zákrok a zdravotná starostlivosť boli na vysokej úrovni."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "What are the evening emergency hours?",
+        "sk": "Kedy funguje večerná pohotovostná služba?"
+      },
+      "a": {
+        "en": "Evening emergency care operates daily from 20:00 to 22:00 following daytime clinical hours.",
+        "sk": "Večerná pohotovosť pre akútne prípady funguje denne od 20:00 do 22:00 po skončení bežných ordinačných hodín."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Does Marfilvet have on-site CT scan capabilities?",
+        "sk": "Disponuje nemocnica vlastným CT prístrojom?"
+      },
+      "a": {
+        "en": "Yes, computed tomography (CT) diagnostic examinations are performed directly on-site.",
+        "sk": "Áno, CT vyšetrenia sa vykonávajú priamo na pracovisku v Lamači."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Is parking easily accessible for patients?",
+        "sk": "Je pri nemocnici dostupné parkovanie?"
+      },
+      "a": {
+        "en": "Yes, customer parking spaces are available directly in front of the clinic on Hodonínska street.",
+        "sk": "Áno, parkovanie pre klientov je zabezpečené priamo pred budovou nemocnice na Hodonínskej ulici."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Can pets be hospitalized overnight if needed?",
+        "sk": "Je k dispozícii hospitalizácia pre zvieratá cez noc?"
+      },
+      "a": {
+        "en": "Yes, the hospital has an inpatient ward for continuous post-operative and intensive monitoring.",
+        "sk": "Áno, nemocnica disponuje lôžkovým oddelením pre pooperačnú a intenzívnu hospitalizáciu."
+      },
+      "basis": "website"
+    }
+  ]
+}
