@@ -41,6 +41,7 @@ website/public/logos/kosice/. Когда закончишь — открой PR 
 ```
 data/cities/<slug>/city.json          город и его районы
 data/cities/<slug>/businesses.csv     все заведения города
+data/cities/<slug>/review-insights/   «что говорят клиенты», файл на заведение
 website/public/logos/<slug>/          логотипы (если нашлись)
 ```
 
@@ -77,11 +78,18 @@ website/public/logos/<slug>/          логотипы (если нашлись)
 
 ### 1.2 `businesses.csv`
 
+**Что собирать для каждого заведения, зачем и на каком языке — в
+`docs/card-spec.md` (стандарт карточки).** Ниже — формат файла.
+
 Первая строка — ровно этот заголовок (порядок столбцов важен):
 
 ```
-category,name,address,district,lat,lng,phone,email,website,animals,short_description,short_description_local,description,google_place_id,google_maps_url,google_rating,google_rating_count,rating_observed_at,logo_file,source_url,observed_at,notes
+category,name,slug,address,district,lat,lng,phone,email,website,instagram,facebook,short_description,short_description_local,description,description_local,opening_hours,hours_source_url,hours_observed_at,emergency_24_7,emergency_note,home_visits,specialties,languages_spoken,photo_urls,google_place_id,google_maps_url,google_rating,google_rating_count,rating_observed_at,logo_file,source_url,observed_at,notes
 ```
+
+Столбцы `emergency_24_7`, `emergency_note`, `home_visits`,
+`specialties` заполняются только у `VET_CLINIC`, у остальных пустые.
+Столбцы, которых нет в таблице ниже, описаны в `docs/card-spec.md`.
 
 | Столбец | Что | Правила |
 |---|---|---|
@@ -93,10 +101,10 @@ category,name,address,district,lat,lng,phone,email,website,animals,short_descrip
 | `phone` | телефон | в международном формате: `+421 905 123 456` |
 | `email` | почта | только публично указанная самим заведением |
 | `website` | сайт | официальный сайт или официальная страница в соцсети; `https://…` |
-| `animals` | для каких животных | через `;` из: `dog`, `cat`, `small-pet`, `bird`, `fish`; только то, что заведение **явно** пишет о себе; иначе пусто |
 | `short_description` | короткое описание на английском | до 100 символов, своими словами, см. раздел 3 |
 | `short_description_local` | то же на языке города | до 100 символов; естественный язык, не дословный перевод |
-| `description` | подробное описание на английском | 1–3 предложения своими словами; можно пусто |
+| `description` | подробное описание на английском | 2–4 предложения своими словами |
+| `description_local` | то же на языке города | своими словами, не дословный перевод |
 | `google_place_id` | Place ID | если удаётся определить; нужен для будущего перехода на Places API |
 | `google_maps_url` | ссылка на место в Google Maps | |
 | `google_rating` | рейтинг | ровно как на карточке, например `4.7`; пусто, если оценок меньше 5 |
@@ -131,9 +139,15 @@ category,name,address,district,lat,lng,phone,email,website,animals,short_descrip
 Для другой страны — те же запросы на её языке.
 
 Для каждого места: взять список из поиска → открыть карточку в Google
-Maps (адрес, телефон, сайт, рейтинг, число оценок, ссылка) → открыть
-официальный сайт (что делают, для каких животных, логотип) → записать
-строку. На одно место — **3–5 минут**, без чтения всех отзывов.
+Maps (адрес, телефон, сайт, часы, рейтинг, число оценок, ссылка) →
+открыть официальный сайт (что делают, часы, для ветклиник — неотложка
+и специализации, логотип, соцсети) → записать строку со всеми полями
+из `docs/card-spec.md`. На одно место — **5–8 минут**.
+
+**Второй проход — «что говорят клиенты».** После того как CSV готов,
+для мест с ≥ 5 отзывами с текстом за полгода сделать файлы
+`review-insights/<slug>.json` по правилам `tasks/ide-review-insights.md`
+(язык города вместо `sk`, если город не в Словакии).
 
 **Не включать:**
 - закрытые места: «Permanently closed», сайт не работает и нет
@@ -202,6 +216,8 @@ Maps (адрес, телефон, сайт, рейтинг, число оцен�
   `city.json` или пусто.
 - `short_description` и `short_description_local` не длиннее 100
   символов.
+- Каждый текст есть на двух языках (`docs/card-spec.md`, «Проверка
+  перед PR»).
 - У каждой строки есть хотя бы один способ связи.
 - Каждый файл из `logo_file` существует в
   `website/public/logos/<slug>/`.

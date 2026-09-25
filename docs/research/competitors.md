@@ -21,7 +21,7 @@
 - Фильтры ветклиник: «Otvorené teraz», «Pohotovosť 24/7» (отдельная
   страница `/kliniky/pohotovost/`), выходные, выезд домой, экзоты
   (рептилии, птицы, лошади), специализации. → задача
-  `tasks/antigravity-collect-hours-and-vet-services.md`.
+  `tasks/mac-collect-hours-and-vet-services.md`.
 - На карточке: часы работы, прайс, услуги, логотип.
 - Логотип почти у всех (13–15 из 15 на выборочных страницах). Как
   сделано:
