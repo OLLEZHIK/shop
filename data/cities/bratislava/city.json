@@ -1,0 +1,12 @@
+{
+  "name": "Bratislava",
+  "slug": "bratislava",
+  "country": "SK",
+  "locale": "sk",
+  "lat": 48.1486,
+  "lng": 17.1077,
+  "sources": [
+    "https://sk.wikipedia.org/wiki/Bratislava"
+  ],
+  "observed_at": "2026-09-25"
+}
