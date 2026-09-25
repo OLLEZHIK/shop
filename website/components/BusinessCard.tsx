@@ -9,6 +9,7 @@ import { QuickActions } from "./QuickActions";
 import { BusinessAvatar } from "./BusinessAvatar";
 import { GoogleRating } from "./GoogleRating";
 import { ArrowRightIcon, MapPinIcon, RouteIcon } from "./icons";
+import { PriceTier } from "./PriceTier";
 
 interface BusinessCardProps {
   business: BusinessWithRelations;
@@ -80,12 +81,7 @@ export function BusinessCard({ business, priceTier = null, locale, distanceKm = 
               {t.listing.kmAway(distanceKm < 10 ? distanceKm.toFixed(1) : distanceKm.toFixed(0))}
             </span>
           )}
-          {priceTier !== null && (
-            <span aria-label={t.card.priceLevel(priceTier)}>
-              <span className="font-semibold text-brand-green">{"€".repeat(priceTier)}</span>
-              <span className="text-foreground/25">{"€".repeat(5 - priceTier)}</span>
-            </span>
-          )}
+          {priceTier !== null && <PriceTier tier={priceTier} currency={business.city?.currency} locale={locale} />}
         </div>
 
         {description && <p className="mt-2 line-clamp-2 text-sm text-foreground/70">{description}</p>}

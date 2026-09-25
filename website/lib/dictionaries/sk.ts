@@ -57,8 +57,7 @@ export const sk: Dictionary = {
     metaDescription: (n: number, where: string) =>
       `Služby pre zvieratá ${where}: ${n} ${plural("sk", n, { one: "podnik", few: "podniky", other: "podnikov" })} – veterinári, psie salóny, hotely pre zvieratá, výcvik, chovateľské potreby a opatrovanie, s otváracími hodinami, cenami a kontaktom na jeden dotyk.`,
     h1Before: "Služby pre zvieratá",
-    intro: "Vyberte si službu a uvidíte všetky podniky s otváracími hodinami, cenami (ak ich zverejňujú) a zdrojom pri každom zázname.",
-    nonstop: "Veterinár nonstop 24/7",
+    intro: "Všetky služby pre zvieratá v jednom zozname: veterinári, psie salóny, hotely, výcvik, chovateľské potreby a opatrovanie, každý podnik so zdrojom. Hore si vyberte službu a zúžte výber.",
   },
   animals: {
     any: "Všetky zvieratá",
@@ -156,8 +155,6 @@ export const sk: Dictionary = {
     all: (city: string) => `Celá ${city}`,
     search: "Hľadať",
     showResults: "Zobraziť výsledky",
-    pickService: "Vyberte službu",
-    chooseServiceFirst: "Najprv vyberte službu",
     stepPet: "1 · Vaše zviera",
     stepService: "2 · Služba",
     stepWhere: "3 · Kde",
@@ -277,6 +274,7 @@ export const sk: Dictionary = {
     ratingAny: "Všetky",
     hiddenUnrated: (n: number) => `skryté bez hodnotenia: ${n}`,
     openNowFilter: "Otvorené teraz",
+    allServices: "Všetky služby",
     geoOff: "Poloha je vypnutá - zobrazujeme všetky podniky.",
     nonstopFilter: "Nonstop 24/7",
     hiddenNoHours: (n: number) => `skryté bez otváracích hodín: ${n}`,

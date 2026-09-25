@@ -42,7 +42,8 @@ const BUSINESS_INCLUDE = {
 } as const;
 
 export interface BusinessFilters {
-  category: BusinessCategory;
+  /** Left out: every service in the city (the city page). */
+  category?: BusinessCategory;
   citySlug: string;
   districtSlug?: string;
   animal?: string;
@@ -180,7 +181,7 @@ async function getAllDistrictsRaw() {
 async function searchBusinessesRaw(filters: BusinessFilters): Promise<BusinessWithRelations[]> {
   const where = {
     status: "PUBLISHED" as const,
-    category: filters.category,
+    ...(filters.category ? { category: filters.category } : {}),
     ...(filters.animal ? { animals: { has: filters.animal } } : {}),
     ...(filters.districtSlug ? inDistrictWhere(filters.citySlug, filters.districtSlug) : inCityWhere(filters.citySlug)),
   };
