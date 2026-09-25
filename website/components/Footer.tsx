@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getAllCities, getDefaultCity } from "@/lib/data";
 import { LanguageSwitch } from "./LanguageSwitch";
 import { ALL_CATEGORIES, categoryLabel, cityPath, listingPath } from "@/lib/categories";
-import { getDictionary, localesForCity, type Locale } from "@/lib/i18n";
+import { getDictionary, inCity, localesForCity, type Locale } from "@/lib/i18n";
 import { Logo } from "./Logo";
 import { ShieldCheckIcon } from "./icons";
 
@@ -10,7 +10,7 @@ export async function Footer({ locale }: { locale: Locale }) {
   const [city, cities] = await Promise.all([getDefaultCity(), getAllCities()]);
   const citySlug = city?.slug ?? "";
   // Name the city only while there is one; with several the site is generic.
-  const cityName = cities.length === 1 ? cities[0].name : null;
+  const cityWhere = cities.length === 1 ? inCity(locale, cities[0]) : null;
   const t = getDictionary(locale).footer;
   // Help and legal pages exist in English only; flag that in other locales.
   const en = t.englishOnly;
@@ -27,7 +27,7 @@ export async function Footer({ locale }: { locale: Locale }) {
           <div>
             <Logo className="h-10 w-auto" wordmarkColor="#FFFFFF" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/65">
-              {t.tagline(cityName)}
+              {t.tagline(cityWhere)}
             </p>
             <p className="mt-5 inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-white/10 px-3 py-1.5 text-xs text-white/80">
               <ShieldCheckIcon className="h-4 w-4 text-brand-green" />
@@ -67,7 +67,7 @@ export async function Footer({ locale }: { locale: Locale }) {
         <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row sm:items-center">
           <p>&copy; {new Date().getFullYear()} pawenn.com</p>
           <LanguageSwitch locales={localesForCity(city)} />
-          <p>{t.madeWithCare(cityName)}</p>
+          <p>{t.madeWithCare(cityWhere)}</p>
         </div>
       </div>
     </footer>

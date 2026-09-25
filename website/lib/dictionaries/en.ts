@@ -25,8 +25,8 @@ export const en = {
     { label: "Supplements", blurb: "Joints, skin, coat and digestion" },
   ],
   footer: {
-    tagline: (city: string | null) =>
-      `A friendly, independent guide to pet services${city ? ` in ${city}` : ""}. No sign-ups, no ads - just the details you need to pick up the phone.`,
+    tagline: (where: string | null) =>
+      `A friendly, independent guide to pet services${where ? ` ${where}` : ""}. No sign-ups, no ads - just the details you need to pick up the phone.`,
     sourced: "Every listing links to its source",
     services: "Services",
     about: "pawenn",
@@ -37,7 +37,7 @@ export const en = {
     privacy: "Privacy Policy",
     terms: "Terms of Use",
     englishOnly: "",
-    madeWithCare: (city: string | null) => `Made with care for pets${city ? ` in ${city}` : ""}`,
+    madeWithCare: (where: string | null) => `Made with care for pets${where ? ` ${where}` : ""}`,
     cities: "Cities",
   },
   cityHub: {
@@ -64,13 +64,13 @@ export const en = {
     fish: "Fish",
   } as Record<string, string>,
   home: {
-    metaTitle: (city: string) => `pawenn - Pet Services in ${city}`,
-    metaDescription: (city: string) =>
-      `Find trusted pet services in ${city} - groomers, vets, hotels, training and more`,
+    metaTitle: (where: string) => `Pet Services ${where} – vets, grooming, pet hotels | Pawenn`,
+    metaDescription: (where: string) =>
+      `Find trusted pet services ${where} - groomers, vets, hotels, training and more`,
     h1Before: "Find trusted",
     h1Highlight: "pet services",
-    subtitle: (city: string) =>
-      `Groomers, vets, pet hotels and trainers in ${city} - with honest details, clear sources and one-tap contact.`,
+    subtitle: (where: string) =>
+      `Groomers, vets, pet hotels and trainers ${where} - with honest details, clear sources and one-tap contact.`,
     popular: "Popular:",
     statPlaces: "places listed",
     statDistricts: "districts covered",
@@ -127,7 +127,7 @@ export const en = {
         body: "Regular brushing catches mats before they need to be shaved out, and it's a lot cheaper than a grooming visit for a tangled coat.",
       },
     ] as { title: string; body?: string; items?: string[] }[],
-    ctaTitle: (city: string) => `Run a pet business in ${city}?`,
+    ctaTitle: (where: string) => `Run a pet business ${where}?`,
     ctaBody: "Add your salon, clinic or hotel, or tell us if something on your listing is out of date.",
     ctaButton: "Add or fix a listing",
   },
@@ -312,6 +312,9 @@ export const en = {
     metaTitle: (name: string, label: string, where: string) => `${name} - ${label}${where ? ` ${where}` : ""}`,
     metaDescription: (name: string, where: string) =>
       `${name}${where ? ` ${where}` : ""}: address, contact details and directions.`,
+    /** After the place's own short description (SEO audit T11). */
+    metaDescriptionTail: (hasPrices: boolean) =>
+      `Opening hours${hasPrices ? ", prices" : ""} and one tap to call, visit the website or get directions.`,
     about: "About",
     welcomes: "Welcomes",
     specialties: "Specialties",

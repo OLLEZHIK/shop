@@ -34,7 +34,11 @@ export function BusinessCard({ business, priceTier = null, locale, distanceKm = 
       className="group relative flex gap-4 rounded-[var(--radius-card)] border border-transparent bg-surface p-4 shadow-[var(--shadow-card)] transition duration-200 hover:-translate-y-0.5 hover:border-brand-blue-muted-border hover:shadow-[var(--shadow-card-hover)] sm:gap-5 sm:p-5"
       style={{ "--accent": accent } as React.CSSProperties}
     >
-      <Link href={businessPath(locale, business.slug)} className="absolute inset-0 z-0 rounded-[var(--radius-card)]" aria-label={business.name} />
+      {/* The whole card is the link; its text is the place's name, so the
+          link has a real anchor text for search engines (SEO audit T12). */}
+      <Link href={businessPath(locale, business.slug)} className="absolute inset-0 z-0 rounded-[var(--radius-card)]">
+        <span className="sr-only">{business.name}</span>
+      </Link>
 
       {/* Card format (owner, 2026-09-24): the business's logo, or its
           initials when it has none; photos live on the place page. */}

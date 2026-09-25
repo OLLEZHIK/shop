@@ -37,8 +37,8 @@ export const sk: Dictionary = {
     { label: "Doplnky výživy", blurb: "Kĺby, koža, srsť a trávenie" },
   ],
   footer: {
-    tagline: (city: string | null) =>
-      `Priateľský a nezávislý sprievodca službami pre zvieratá${city ? ` v meste ${city}` : ""}. Bez registrácie a bez reklám - len informácie, ktoré potrebujete, aby ste mohli zavolať.`,
+    tagline: (where: string | null) =>
+      `Priateľský a nezávislý sprievodca službami pre zvieratá${where ? ` ${skIn(where)}` : ""}. Bez registrácie a bez reklám - len informácie, ktoré potrebujete, aby ste mohli zavolať.`,
     sourced: "Každý záznam odkazuje na svoj zdroj",
     services: "Služby",
     about: "pawenn",
@@ -49,7 +49,7 @@ export const sk: Dictionary = {
     privacy: "Ochrana osobných údajov",
     terms: "Podmienky používania",
     englishOnly: " (EN)",
-    madeWithCare: (city: string | null) => `S láskou k zvieratám${city ? ` v meste ${city}` : ""}`,
+    madeWithCare: (where: string | null) => `S láskou k zvieratám${where ? ` ${skIn(where)}` : ""}`,
     cities: "Mestá",
   },
   cityHub: {
@@ -76,13 +76,13 @@ export const sk: Dictionary = {
     fish: "Ryba",
   },
   home: {
-    metaTitle: (city: string) => `pawenn - Služby pre zvieratá v meste ${city}`,
-    metaDescription: (city: string) =>
-      `Služby pre zvieratá v meste ${city} - psie salóny, veterinári, hotely pre zvieratá, výcvik a ďalšie, s kontaktom na jeden dotyk`,
+    metaTitle: (where: string) => `Služby pre zvieratá ${skIn(where)} – veterinári, psie salóny, hotely | Pawenn`,
+    metaDescription: (where: string) =>
+      `Služby pre zvieratá ${skIn(where)} - psie salóny, veterinári, hotely pre zvieratá, výcvik a ďalšie, s kontaktom na jeden dotyk`,
     h1Before: "Nájdite spoľahlivé",
     h1Highlight: "služby pre zvieratá",
-    subtitle: (city: string) =>
-      `Psie salóny, veterinári, hotely pre zvieratá a cvičitelia v meste ${city} - s poctivými údajmi, jasnými zdrojmi a kontaktom na jeden dotyk.`,
+    subtitle: (where: string) =>
+      `Psie salóny, veterinári, hotely pre zvieratá a cvičitelia ${skIn(where)} - s poctivými údajmi, jasnými zdrojmi a kontaktom na jeden dotyk.`,
     popular: "Obľúbené:",
     statPlaces: "podnikov v zozname",
     statDistricts: "mestských častí",
@@ -142,7 +142,7 @@ export const sk: Dictionary = {
         body: "Pravidelné kefovanie zachytí plsť skôr, než ju treba vystrihať - a je oveľa lacnejšie než návšteva salónu so zacuchanou srsťou.",
       },
     ],
-    ctaTitle: (city: string) => `Máte podnik pre zvieratá v meste ${city}?`,
+    ctaTitle: (where: string) => `Máte podnik pre zvieratá ${skIn(where)}?`,
     ctaBody: "Pridajte svoj salón, ambulanciu alebo hotel, alebo nám dajte vedieť, ak niečo vo vašom zázname nesedí.",
     ctaButton: "Pridať alebo opraviť záznam",
   },
@@ -342,6 +342,8 @@ export const sk: Dictionary = {
     metaTitle: (name: string, label: string, where: string) => `${name} - ${label}${where ? ` ${where}` : ""}`,
     metaDescription: (name: string, where: string) =>
       `${name}${where ? ` ${where}` : ""}: adresa, kontakt a trasa.`,
+    metaDescriptionTail: (hasPrices: boolean) =>
+      `Otváracie hodiny${hasPrices ? ", ceny" : ""} a telefón, web či trasa na jeden dotyk.`,
     about: "O podniku",
     welcomes: "Prijíma",
     specialties: "Špecializácie",

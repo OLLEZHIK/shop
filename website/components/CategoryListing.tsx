@@ -15,12 +15,14 @@ import {
   categoryBlurb,
   categoryLabel,
   categoryPlural, categorySingular,
+  businessPath,
   cityPath,
   listingPath,
 } from "@/lib/categories";
 import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
 import { ANIMALS, animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
+import { SITE_URL } from "@/lib/site";
 import { FilterPanel } from "./FilterPanel";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
 import { cityTimezone, hoursFromStored, isOpenAt, localNow } from "@/lib/hours";
@@ -143,6 +145,25 @@ export async function CategoryListing({
 
   return (
     <main style={{ "--accent": accent } as React.CSSProperties}>
+      {/* The places on this page, in the order shown (SEO audit T15). */}
+      {listItems.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              numberOfItems: listItems.length,
+              itemListElement: listItems.map((item, i) => ({
+                "@type": "ListItem",
+                position: i + 1,
+                name: item.business.name,
+                url: `${SITE_URL}${businessPath(locale, item.business.slug)}`,
+              })),
+            }),
+          }}
+        />
+      )}
       {/* ---------- Header band ---------- */}
       <section className="under-header relative overflow-hidden border-b border-line">
         <div
@@ -155,12 +176,14 @@ export async function CategoryListing({
           <Breadcrumbs
             items={[
               { label: t.listing.home, href: localePath(locale, "/") },
-              ...(category ? [{ label, href: listingPath(locale, category, citySlug) }] : []),
-              ...(nonstopPage
-                ? [{ label: t.listing.nonstopCrumb }]
-                : districtName
-                  ? [{ label: districtName }]
-                  : [{ label: cityName }]),
+              // City hub: the city is the page itself.
+              ...(category ? [{ label: cityName, href: cityPath(locale, citySlug) }] : [{ label: cityName }]),
+              ...(category
+                ? nonstopPage || districtName
+                  ? [{ label, href: listingPath(locale, category, citySlug) }]
+                  : [{ label }]
+                : []),
+              ...(nonstopPage ? [{ label: t.listing.nonstopCrumb }] : districtName ? [{ label: districtName }] : []),
             ]}
           />
 

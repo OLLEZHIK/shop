@@ -16,7 +16,8 @@ import {
   listingPath,
 } from "@/lib/categories";
 import { getDictionary, inCity, isLocale, localePath, localesForCity } from "@/lib/i18n";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates, socialMeta } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 import { HomeSearch } from "@/components/HomeSearch";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { BusinessCard } from "@/components/BusinessCard";
@@ -38,12 +39,19 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const city = await getDefaultCity();
-  const cityName = city?.name ?? "Bratislava";
+  const where = inCity(lang, city ?? { name: "Bratislava" });
   const t = getDictionary(lang).home;
   const locales = localesForCity(city);
   return {
-    title: t.metaTitle(cityName),
-    description: t.metaDescription(cityName),
+    title: { absolute: t.metaTitle(where) },
+    description: t.metaDescription(where),
+    ...socialMeta({
+      title: t.metaTitle(where),
+      description: t.metaDescription(where),
+      path: localePath(lang, "/"),
+      locale: lang,
+      image: { title: `${t.h1Before} ${t.h1Highlight}`, subtitle: where },
+    }),
     alternates: localeAlternates(lang, Object.fromEntries(locales.map((l) => [l, localePath(l, "/")]))),
   };
 }
@@ -89,6 +97,32 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
   return (
     <main className="relative overflow-x-clip">
+      {/* Who runs the site (SEO audit T15): brand entity for search engines
+          and AI answers - one name, one logo, one address. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "@id": `${SITE_URL}/#organization`,
+              name: "Pawenn",
+              url: `${SITE_URL}/`,
+              logo: `${SITE_URL}/brand/logo.png`,
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "@id": `${SITE_URL}/#website`,
+              name: "Pawenn",
+              url: `${SITE_URL}/`,
+              inLanguage: locale,
+              publisher: { "@id": `${SITE_URL}/#organization` },
+            },
+          ]),
+        }}
+      />
       {/* ---------- Hero ---------- */}
       <section className="under-header relative">
         <AmbientBackground />
@@ -112,7 +146,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               {inCity(locale, city ?? { name: cityName })}
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg text-foreground/70 lg:mx-0">
-              {t.subtitle(cityName)}
+              {t.subtitle(inCity(locale, city ?? { name: cityName }))}
             </p>
 
             <div id="search" className="mt-8 scroll-mt-28 lg:max-w-none">
@@ -299,7 +333,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           <PawIcon className="pointer-events-none absolute -right-6 -top-6 h-48 w-48 rotate-12 text-white/10" />
           <PawIcon className="pointer-events-none absolute bottom-[-3rem] right-40 h-32 w-32 -rotate-12 text-white/10" />
           <div className="relative max-w-2xl">
-            <h2 className="text-3xl font-extrabold md:text-4xl">{t.ctaTitle(cityName)}</h2>
+            <h2 className="text-3xl font-extrabold md:text-4xl">{t.ctaTitle(inCity(locale, city ?? { name: cityName }))}</h2>
             <p className="mt-3 text-lg text-white/85">
               {t.ctaBody}
             </p>
