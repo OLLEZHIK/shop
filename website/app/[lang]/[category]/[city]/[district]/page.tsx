@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ALL_CATEGORIES, categoryFromSlug, categoryPlural, categorySeoTitle, categorySingular, categorySlug, listingPath } from "@/lib/categories";
-import { getCityBySlug, getAllCities, getAllDistricts, getDistrictBySlug, getCategoryAggregates, getNonstopVetCount } from "@/lib/data";
+import { categoryFromSlug, categoryPlural, categorySeoTitle, categorySingular, listingPath } from "@/lib/categories";
+import { getCityBySlug, getDistrictBySlug, getCategoryAggregates, getNonstopVetCount } from "@/lib/data";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
-import { getDictionary, isLocale, localesForCountry } from "@/lib/i18n";
+import { getDictionary, isLocale, localesForCity } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
 import { CategoryListing, whereLabel } from "@/components/CategoryListing";
 
@@ -20,38 +20,21 @@ async function resolve(params: Promise<PageParams>) {
   const category = categoryFromSlug(slug, lang);
   if (!category) return null;
   const city = await getCityBySlug(citySlug);
-  if (!city || !localesForCountry(city.country).includes(lang)) return null;
+  if (!city || !localesForCity(city).includes(lang)) return null;
   // /<vets>/<city>/nonstop: the 24/7 clinics page, while the city has any.
   if (districtSlug === NONSTOP_SEGMENT) {
     if (category !== "VET_CLINIC" || (await getNonstopVetCount(citySlug)) === 0) return null;
     return { locale: lang, category, city, citySlug, district: null, districtSlug, nonstop: true as const };
   }
-  const district = await getDistrictBySlug(districtSlug);
-  if (!district || district.city.slug !== citySlug) return null;
+  const district = await getDistrictBySlug(citySlug, districtSlug);
+  if (!district) return null;
   return { locale: lang, category, city, citySlug, district, districtSlug, nonstop: false as const };
 }
 
-export async function generateStaticParams() {
-  const [cities, districts] = await Promise.all([getAllCities(), getAllDistricts()]);
-  const nonstop = await Promise.all(cities.map((c) => getNonstopVetCount(c.slug)));
-  return cities.flatMap((city, i) =>
-    localesForCountry(city.country).flatMap((lang) => [
-      ...ALL_CATEGORIES.flatMap((category) =>
-        districts
-          .filter((d) => d.cityId === city.id)
-          .map((district) => ({
-            lang,
-            category: categorySlug(category, lang),
-            city: city.slug,
-            district: district.slug,
-          }))
-      ),
-      ...(nonstop[i] > 0
-        ? [{ lang, category: categorySlug("VET_CLINIC", lang), city: city.slug, district: NONSTOP_SEGMENT }]
-        : []),
-    ])
-  );
-}
+// Rendered per request (filters come from the query string) with data
+// from the per-deploy cache (lib/data.ts). Nothing is prerendered per
+// city or district, so builds don't grow with cities
+// (docs/architecture/multi-city.md).
 
 export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
   const resolved = await resolve(params);
@@ -59,10 +42,10 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 
   const { locale, category, city } = resolved;
   const t = getDictionary(locale).listing;
-  const locales = localesForCountry(city.country);
+  const locales = localesForCity(city);
 
   if (resolved.nonstop) {
-    const where = whereLabel(locale, city.slug, city.name);
+    const where = whereLabel(locale, city);
     const count = await getNonstopVetCount(city.slug);
     return {
       alternates: localeAlternates(
@@ -75,8 +58,8 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   }
 
   const { district } = resolved;
-  const aggregates = await getCategoryAggregates(category, district.slug);
-  const where = whereLabel(locale, city.slug, city.name, district.name);
+  const aggregates = await getCategoryAggregates(category, city.slug, district.slug);
+  const where = whereLabel(locale, city, district.name);
   const what = aggregates.count === 1 ? categorySingular(category, locale) : categoryPlural(category, locale);
 
   return {
@@ -102,14 +85,13 @@ export default async function CategoryCityDistrictPage({
   if (!resolved) notFound();
 
   const { animal, near, sort, rating, open } = await searchParams;
-  const { locale, category, city, citySlug } = resolved;
+  const { locale, category, city } = resolved;
 
   return (
     <CategoryListing
       locale={locale}
       category={category}
-      citySlug={citySlug}
-      cityName={city.name}
+      city={city}
       districtSlug={resolved.nonstop ? undefined : resolved.districtSlug}
       districtName={resolved.nonstop ? undefined : resolved.district.name}
       nonstopPage={resolved.nonstop}

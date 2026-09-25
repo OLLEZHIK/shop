@@ -218,6 +218,19 @@ export function listingPath(
   return locale === "en" ? base : `/${locale}${base}`;
 }
 
+// City hub: /city/<slug>/, /sk/mesto/<slug>/ - served by the
+// [category]/[city] route (this segment is never a category slug).
+export const CITY_SEGMENT: Record<Locale, string> = { en: "city", sk: "mesto" };
+
+export function isCitySegment(segment: string, locale: Locale): boolean {
+  return CITY_SEGMENT[locale] === segment;
+}
+
+export function cityPath(locale: Locale, citySlug: string): string {
+  const base = `/${CITY_SEGMENT[locale]}/${citySlug}/`;
+  return locale === "en" ? base : `/${locale}${base}`;
+}
+
 export function businessPath(locale: Locale, slug: string): string {
   const base = `/${BUSINESS_SEGMENT[locale]}/${slug}/`;
   return locale === "en" ? base : `/${locale}${base}`;

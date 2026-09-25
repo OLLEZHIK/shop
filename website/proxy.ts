@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { DEFAULT_LOCALE, LOCALES } from "./lib/locales";
 
-// Locale routing (see lib/i18n.ts). Kept self-contained - proxy runs
-// separately from render code.
+// Locale routing (see lib/i18n.ts). Imports only lib/locales.ts, which
+// has no dependencies - proxy runs separately from render code.
 //   /sk/...  -> served as is (app/[lang] with lang = "sk")
 //   /en/...  -> 308 to the unprefixed URL, so English has one canonical URL
 //   /...     -> rewritten to /en/... internally
-const PREFIXED_LOCALES = ["sk"];
+const PREFIXED_LOCALES: readonly string[] = LOCALES.filter((l) => l !== DEFAULT_LOCALE);
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

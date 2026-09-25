@@ -15,7 +15,7 @@ import {
   categoryLabel,
   listingPath,
 } from "@/lib/categories";
-import { getDictionary, inCity, isLocale, localePath, localesForCountry } from "@/lib/i18n";
+import { getDictionary, inCity, isLocale, localePath, localesForCity } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
 import { HomeSearch } from "@/components/HomeSearch";
 import { AmbientBackground } from "@/components/AmbientBackground";
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const city = await getDefaultCity();
   const cityName = city?.name ?? "Bratislava";
   const t = getDictionary(lang).home;
-  const locales = localesForCountry(city?.country);
+  const locales = localesForCity(city);
   return {
     title: t.metaTitle(cityName),
     description: t.metaDescription(cityName),
@@ -53,11 +53,12 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   if (!isLocale(lang)) notFound();
   const locale = lang;
   const t = getDictionary(locale).home;
-  const [city, featured, counts, districtSummaries, cityPoints] = await Promise.all([
-    getDefaultCity(),
-    getFeaturedBusinesses(),
-    getBusinessCount(),
-    getDistrictSummaries(),
+  const city = await getDefaultCity();
+  const defaultSlug = city?.slug ?? "";
+  const [featured, counts, districtSummaries, cityPoints] = await Promise.all([
+    getFeaturedBusinesses(defaultSlug),
+    getBusinessCount(defaultSlug),
+    getDistrictSummaries(defaultSlug),
     getCityPoints(),
   ]);
 
@@ -108,7 +109,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                   <path d="M3 12C60 4 140 2 297 8" stroke="currentColor" strokeWidth="5" strokeLinecap="round" fill="none" />
                 </svg>
               </span>{" "}
-              {inCity(locale, citySlug, cityName)}
+              {inCity(locale, city ?? { name: cityName })}
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg text-foreground/70 lg:mx-0">
               {t.subtitle(cityName)}

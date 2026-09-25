@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { config as loadEnv } from "dotenv";
@@ -225,24 +226,15 @@ async function seedDistricts(cityId: number, citySlug: string): Promise<District
   const geo = JSON.parse(fs.readFileSync(file, "utf-8")) as {
     features: { properties: { name: string; slug: string }; geometry: { type: string; coordinates: number[][][][] } }[];
   };
-  const shapes: DistrictShape[] = [];
-  for (const f of geo.features) {
+  return inBatches(geo.features, BATCH, async (f) => {
     const { name, slug } = f.properties;
-    const clash = await prisma.district.findFirst({ where: { slug, cityId: { not: cityId } }, include: { city: true } });
-    if (clash) {
-      throw new Error(
-        `District slug "${slug}" (${citySlug}) is already used in ${clash.city.slug}. District slugs are meant to be ` +
-          `unique per city, but the old global index on District.slug still exists: drop it first (schema.prisma, District).`
-      );
-    }
     const district = await prisma.district.upsert({
       where: { cityId_slug: { cityId, slug } },
       update: { name },
       create: { name, slug, cityId },
     });
-    shapes.push({ id: district.id, slug, coordinates: f.geometry.coordinates });
-  }
-  return shapes;
+    return { id: district.id, slug, coordinates: f.geometry.coordinates };
+  });
 }
 
 function districtFor(shapes: DistrictShape[], lat: number | null, lng: number | null): DistrictShape | null {
@@ -255,17 +247,18 @@ function districtFor(shapes: DistrictShape[], lat: number | null, lng: number | 
 // ---------------------------------------------------------------------
 async function seedServices(): Promise<Map<string, number>> {
   const ids = new Map<string, number>();
-  for (const [category, defs] of Object.entries(SERVICES) as [BusinessCategory, typeof SERVICES.GROOMING][]) {
-    for (const def of defs ?? []) {
-      const slug = serviceSlug(category, def.code);
-      const s = await prisma.service.upsert({
-        where: { slug },
-        update: { name: def.en, code: def.code, category },
-        create: { name: def.en, slug, code: def.code, category },
-      });
-      ids.set(slug, s.id);
-    }
-  }
+  const defs = (Object.entries(SERVICES) as [BusinessCategory, typeof SERVICES.GROOMING][]).flatMap(([category, list]) =>
+    (list ?? []).map((def) => ({ category, def }))
+  );
+  await inBatches(defs, BATCH, async ({ category, def }) => {
+    const slug = serviceSlug(category, def.code);
+    const s = await prisma.service.upsert({
+      where: { slug },
+      update: { name: def.en, code: def.code, category },
+      create: { name: def.en, slug, code: def.code, category },
+    });
+    ids.set(slug, s.id);
+  });
   return ids;
 }
 
@@ -326,26 +319,108 @@ interface CityJson {
   name: string;
   slug: string;
   country: string;
+  /** Main local language (ISO 639-1). */
   locale: string;
+  /** All local languages, main first (defaults to [locale]); English is always added by the site. */
+  locales?: string[];
   lat?: number;
   lng?: number;
+  /** IANA time zone, e.g. "Europe/Vienna" - "Open now" is judged in it. */
+  timezone?: string;
+  /** ISO 4217, e.g. "EUR", "CZK", "USD". */
+  currency?: string;
+  /** "in <city>" per language: {"en": "in Košice", "sk": "v Košiciach"}. */
+  in_city?: Record<string, string>;
 }
 
-async function seedCity(citySlug: string, serviceIds: Map<string, number>) {
+// City settings shared by city.json and the legacy Bratislava path; see
+// docs/architecture/multi-city.md for what each field drives.
+function cityData(meta: CityJson) {
+  const locales = (meta.locales?.length ? meta.locales : [meta.locale]).map((l) => l.toLowerCase());
+  if (!meta.timezone) throw new Error(`${meta.slug}/city.json: "timezone" is required (e.g. "Europe/Vienna")`);
+  if (!meta.currency) throw new Error(`${meta.slug}/city.json: "currency" is required (e.g. "EUR")`);
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: meta.timezone });
+  } catch {
+    throw new Error(`${meta.slug}/city.json: unknown time zone "${meta.timezone}"`);
+  }
+  return {
+    name: meta.name,
+    country: meta.country.toUpperCase(),
+    locale: locales[0],
+    locales,
+    lat: meta.lat ?? null,
+    lng: meta.lng ?? null,
+    timezone: meta.timezone,
+    currency: meta.currency.toUpperCase(),
+    inPhrases: meta.in_city ?? { en: `in ${meta.name}` },
+  };
+}
+
+// Business slugs are URLs (/business/<slug>/), unique across all cities.
+// Checked for every city before writing anything, including cities the
+// seed skips as unchanged, so a new city can't take over another city's
+// business.
+function claimCitySlugs(citySlug: string) {
+  const dir = path.join(CITIES_DIR, citySlug);
+  for (const file of fs.readdirSync(dir).filter((f) => /^businesses.*\.csv$/.test(f)).sort()) {
+    for (const row of parseCsv(path.join(dir, file))) {
+      const slug = nullableString(row.slug);
+      if (slug) claimSlug(slug, citySlug, file);
+    }
+  }
+}
+
+// Everything a city's rows are built from: its data folder, its logos
+// and the seed code itself (a code change reseeds every city).
+const SEED_CODE = ["prisma/seed.ts", "lib/services.ts", "lib/hours.ts", "lib/pointInPolygon.ts", "lib/vet.ts"];
+
+function filesUnder(dir: string): string[] {
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .flatMap((e) => (e.isDirectory() ? filesUnder(path.join(dir, e.name)) : [path.join(dir, e.name)]))
+    .sort();
+}
+
+function cityHash(citySlug: string): string {
+  const hash = crypto.createHash("sha256");
+  for (const file of SEED_CODE) hash.update(file).update(fs.readFileSync(path.join(process.cwd(), file)));
+  for (const file of filesUnder(path.join(CITIES_DIR, citySlug))) {
+    hash.update(path.relative(CITIES_DIR, file)).update(fs.readFileSync(file));
+  }
+  // Only which logos exist matters to the seed, not their bytes.
+  for (const file of filesUnder(path.join(LOGOS_DIR, citySlug))) hash.update(path.relative(LOGOS_DIR, file));
+  return hash.digest("hex");
+}
+
+// Runs async work over items, `size` at a time: the database is far away
+// from the build machine, so one write after another is slow.
+async function inBatches<T, R>(items: T[], size: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = [];
+  for (let i = 0; i < items.length; i += size) out.push(...(await Promise.all(items.slice(i, i + size).map(fn))));
+  return out;
+}
+
+const BATCH = 10;
+
+async function seedCity(citySlug: string, serviceIds: Map<string, number>, hash: string) {
   const dir = path.join(CITIES_DIR, citySlug);
   const meta = JSON.parse(fs.readFileSync(path.join(dir, "city.json"), "utf-8")) as CityJson;
   if (meta.slug !== citySlug) throw new Error(`${dir}/city.json: slug "${meta.slug}" doesn't match the folder name`);
   const rep = report(citySlug);
 
+  const settings = cityData(meta);
   const city = await prisma.city.upsert({
     where: { slug: citySlug },
-    update: { name: meta.name, country: meta.country, locale: meta.locale, lat: meta.lat ?? null, lng: meta.lng ?? null },
-    create: { name: meta.name, slug: citySlug, country: meta.country, locale: meta.locale, lat: meta.lat, lng: meta.lng },
+    update: settings,
+    create: { ...settings, slug: citySlug },
   });
   const shapes = await seedDistricts(city.id, citySlug);
 
   const files = fs.readdirSync(dir).filter((f) => /^businesses.*\.csv$/.test(f)).sort();
   const seeded = new Map<string, { id: number; category: BusinessCategory }>();
+  const rows: { slug: string; category: BusinessCategory; data: Omit<Prisma.BusinessUncheckedCreateInput, "slug"> }[] = [];
   for (const file of files) {
     for (const row of parseCsv(path.join(dir, file))) {
       const name = nullableString(row.name);
@@ -367,20 +442,23 @@ async function seedCity(citySlug: string, serviceIds: Map<string, number>) {
         rep.warnings.push(`${name}: no phone, email or website, skipped`);
         continue;
       }
-      claimSlug(slug, citySlug, file);
-
       const fields = businessFields(row, citySlug, rep, citySlug);
       const district = districtFor(shapes, fields.lat, fields.lng);
       if (district) rep.withDistrict++;
       const reviewInsights = readReviewInsights(path.join(dir, "review-insights"), slug, rep);
       const data = { ...fields, category, cityId: city.id, districtId: district?.id ?? null, reviewInsights };
-      const b = await prisma.business.upsert({ where: { slug }, update: data, create: { ...data, slug } });
-      seeded.set(slug, { id: b.id, category });
+      rows.push({ slug, category, data });
       rep.businesses++;
       rep.byCategory[category] = (rep.byCategory[category] ?? 0) + 1;
     }
   }
+  await inBatches(rows, BATCH, async ({ slug, category, data }) => {
+    const b = await prisma.business.upsert({ where: { slug }, update: data, create: { ...data, slug } });
+    seeded.set(slug, { id: b.id, category });
+  });
   await seedPrices(citySlug, seeded, serviceIds, rep);
+  // Last, so a seed that fails halfway is retried on the next build.
+  await prisma.city.update({ where: { id: city.id }, data: { seedHash: hash } });
 }
 
 // ---------------------------------------------------------------------
@@ -418,10 +496,21 @@ const LEGACY_DISTRICTS: { name: string; slug: string }[] = [
 
 async function seedLegacyBratislava() {
   const rep = report("bratislava (legacy data/*-bratislava.csv)");
+  const settings = cityData({
+    name: "Bratislava",
+    slug: "bratislava",
+    country: "SK",
+    locale: "sk",
+    lat: 48.1486,
+    lng: 17.1077,
+    timezone: "Europe/Bratislava",
+    currency: "EUR",
+    in_city: { en: "in Bratislava", sk: "v Bratislave" },
+  });
   const city = await prisma.city.upsert({
     where: { slug: "bratislava" },
-    update: { name: "Bratislava", country: "SK", locale: "sk" },
-    create: { name: "Bratislava", slug: "bratislava", country: "SK", locale: "sk" },
+    update: settings,
+    create: { ...settings, slug: "bratislava" },
   });
   const districtIds = new Map<string, number>();
   for (const d of LEGACY_DISTRICTS) {
@@ -495,8 +584,24 @@ async function main() {
         .filter((d) => fs.existsSync(path.join(CITIES_DIR, d, "city.json")))
         .sort()
     : [];
+  for (const c of cities) claimCitySlugs(c);
   if (!cities.includes("bratislava") && !process.env.SEED_CITIES_DIR) await seedLegacyBratislava();
-  for (const c of cities) await seedCity(c, serviceIds);
+
+  // Only cities whose data (or the seed code) changed since the last seed;
+  // SEED_FORCE=1 reseeds all of them.
+  const stored = new Map(
+    (await prisma.city.findMany({ select: { slug: true, seedHash: true } })).map((c) => [c.slug, c.seedHash])
+  );
+  const unchanged: string[] = [];
+  for (const c of cities) {
+    const hash = cityHash(c);
+    if (!process.env.SEED_FORCE && stored.get(c) === hash) {
+      unchanged.push(c);
+      continue;
+    }
+    await seedCity(c, serviceIds, hash);
+  }
+  if (unchanged.length) console.log(`Unchanged, not reseeded: ${unchanged.join(", ")}`);
 
   console.log("\nSeed summary:");
   for (const [city, r] of reports) {

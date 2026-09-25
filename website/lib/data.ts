@@ -99,6 +99,16 @@ export function logoUrl(logoFile: string | null): string | null {
   return logoFile ? `/logos/${logoFile}` : null;
 }
 
+/** Business filter for "in this city" (every seeded place has cityId). */
+function inCityWhere(citySlug: string) {
+  return { city: { is: { slug: citySlug } } };
+}
+
+/** District filter scoped to its city: district slugs repeat across cities. */
+function inDistrictWhere(citySlug: string, districtSlug: string) {
+  return { district: { is: { slug: districtSlug, city: { slug: citySlug } } } };
+}
+
 async function getCityBySlugRaw(slug: string) {
   return prisma.city.findUnique({ where: { slug } });
 }
@@ -107,30 +117,34 @@ async function getAllCitiesRaw() {
   return prisma.city.findMany();
 }
 
-// Single source for "the city to link to" across Header/Footer/homepage
-// search, instead of each caller hardcoding "bratislava" - see
-// docs/design-plan.md 2.2. With one city this is just the first row;
-// once a second city exists, this call site is where routing/geo-IP
-// logic for picking a default would go.
+// The city the site opens with (homepage, header, footer): the first one
+// added. Every other page works on the city in its URL; see
+// docs/architecture/multi-city.md.
 async function getDefaultCityRaw() {
   return prisma.city.findFirst({ orderBy: { id: "asc" } });
 }
 
-async function getDistrictBySlugRaw(slug: string) {
-  return prisma.district.findUnique({ where: { slug }, include: { city: true } });
+async function getDistrictBySlugRaw(citySlug: string, slug: string) {
+  return prisma.district.findFirst({ where: { slug, city: { slug: citySlug } }, include: { city: true } });
 }
 
 // Real listing counts per district, optionally scoped to one category -
 // used to surface genuinely popular districts (most businesses) instead of
 // a made-up "popular searches" list.
 async function getDistrictCountsRaw(
+  citySlug: string,
   category?: BusinessCategory
 ): Promise<{ slug: string; name: string; count: number }[]> {
   // One query + an in-memory tally (was one count query per district).
   const [districts, rows] = await Promise.all([
-    prisma.district.findMany(),
+    prisma.district.findMany({ where: { city: { slug: citySlug } } }),
     prisma.business.findMany({
-      where: { status: "PUBLISHED", districtId: { not: null }, ...(category ? { category } : {}) },
+      where: {
+        status: "PUBLISHED",
+        districtId: { not: null },
+        ...inCityWhere(citySlug),
+        ...(category ? { category } : {}),
+      },
       select: { districtId: true },
     }),
   ]);
@@ -139,14 +153,6 @@ async function getDistrictCountsRaw(
   return districts
     .map((d) => ({ slug: d.slug, name: d.name, count: tally.get(d.id) ?? 0 }))
     .sort((a, b) => b.count - a.count);
-}
-
-export interface PopularNearby {
-  districtSlug: string;
-  districtName: string;
-  categorySlug: string;
-  categoryLabel: string;
-  count: number;
 }
 
 const ALL_BUSINESS_CATEGORIES: BusinessCategory[] = [
@@ -158,71 +164,16 @@ const ALL_BUSINESS_CATEGORIES: BusinessCategory[] = [
   "PET_SITTING",
 ];
 
-// "Popular nearby" for the homepage: real top districts by listing
-// count, each paired with its single most-listed category there - not
-// geolocation-based (see tasks/cli-redesign-homepage.md), just what
-// the data actually shows for the default city.
-async function getPopularNearbyRaw(limit = 4): Promise<PopularNearby[]> {
-  const topDistricts = (await getDistrictCounts()).filter((d) => d.count > 0).slice(0, limit);
-
-  // Sequential, not Promise.all: each district picks its best category
-  // that a higher-ranked district hasn't already claimed, so the grid
-  // doesn't just repeat "Veterinary Clinics" four times - still real
-  // per-district counts, just diversified in the order districts are
-  // considered rather than picking the literal global max every time.
-  const usedCategories = new Set<BusinessCategory>();
-  const results: PopularNearby[] = [];
-
-  for (const district of topDistricts) {
-    const counts = await Promise.all(
-      ALL_BUSINESS_CATEGORIES.map((category) =>
-        prisma.business.count({
-          where: { status: "PUBLISHED", category, district: { is: { slug: district.slug } } },
-        })
-      )
-    );
-    const ranked = ALL_BUSINESS_CATEGORIES.map((category, i) => ({ category, count: counts[i] }))
-      .filter((c) => c.count > 0)
-      .sort((a, b) => b.count - a.count);
-
-    const pick = ranked.find((c) => !usedCategories.has(c.category)) ?? ranked[0];
-    if (!pick) continue;
-
-    usedCategories.add(pick.category);
-    results.push({
-      districtSlug: district.slug,
-      districtName: district.name,
-      categorySlug: categorySlugFromEnum(pick.category),
-      categoryLabel: CATEGORY_LABELS[pick.category],
-      count: pick.count,
-    });
-  }
-
-  return results;
-}
-
 async function getAllDistrictsRaw() {
   return prisma.district.findMany({ orderBy: { name: "asc" } });
 }
 
-// City-level listing intentionally does NOT join-filter by city: the schema
-// only ties a Business to a city indirectly via District, and district is
-// nullable (some addresses have no resolved district yet). With a single
-// city (Bratislava) that's a no-op; once a second city exists, businesses
-// with a null district would need their own direct city reference to be
-// placed correctly - flagged as an open question in PR #28, not solved here
-// (out of this task's scope). The caller is still responsible for checking
-// the city slug resolves to a real City (see getCityBySlug) before calling
-// this, to 404 on typos.
 async function searchBusinessesRaw(filters: BusinessFilters): Promise<BusinessWithRelations[]> {
   const where = {
     status: "PUBLISHED" as const,
     category: filters.category,
     ...(filters.animal ? { animals: { has: filters.animal } } : {}),
-    ...(filters.districtSlug ? { district: { is: { slug: filters.districtSlug } } } : {}),
-    // Places seeded before Business.cityId existed have no city yet; the
-    // next seed fills it (production builds always reseed).
-    OR: [{ city: { is: { slug: filters.citySlug } } }, { cityId: null }],
+    ...(filters.districtSlug ? inDistrictWhere(filters.citySlug, filters.districtSlug) : inCityWhere(filters.citySlug)),
   };
 
   const businesses = await prisma.business.findMany({
@@ -234,26 +185,18 @@ async function searchBusinessesRaw(filters: BusinessFilters): Promise<BusinessWi
 }
 
 async function getAllPublishedBusinessSlugsRaw(): Promise<
-  { slug: string; verifiedAt: Date | null; country: string | null }[]
+  { slug: string; verifiedAt: Date | null; city: { country: string; locales: string[] } | null }[]
 > {
-  const [rows, districts] = await Promise.all([
-    prisma.business.findMany({
-      where: { status: "PUBLISHED" },
-      select: { slug: true, verifiedAt: true, districtId: true },
-    }),
-    prisma.district.findMany({ include: { city: true } }),
-  ]);
-  const countryOf = new Map(districts.map((d) => [d.id, d.city.country]));
-  return rows.map((r) => ({
-    slug: r.slug,
-    verifiedAt: r.verifiedAt,
-    country: r.districtId !== null ? countryOf.get(r.districtId) ?? null : null,
-  }));
+  const rows = await prisma.business.findMany({
+    where: { status: "PUBLISHED" },
+    select: { slug: true, verifiedAt: true, city: { select: { country: true, locales: true } } },
+  });
+  return rows;
 }
 
-async function getFeaturedBusinessesRaw(limit = 4): Promise<BusinessWithRelations[]> {
+async function getFeaturedBusinessesRaw(citySlug: string, limit = 4): Promise<BusinessWithRelations[]> {
   const businesses = await prisma.business.findMany({
-    where: { status: "PUBLISHED", featured: true },
+    where: { status: "PUBLISHED", featured: true, ...inCityWhere(citySlug) },
     include: BUSINESS_INCLUDE,
     take: limit,
   });
@@ -267,8 +210,11 @@ async function getBusinessBySlugRaw(slug: string): Promise<BusinessWithRelations
   }) as Promise<BusinessWithRelations | null>;
 }
 
-async function getBusinessCountRaw(): Promise<{ total: number; byCategory: Record<string, number> }> {
-  const rows = await prisma.business.findMany({ where: { status: "PUBLISHED" }, select: { category: true } });
+async function getBusinessCountRaw(citySlug: string): Promise<{ total: number; byCategory: Record<string, number> }> {
+  const rows = await prisma.business.findMany({
+    where: { status: "PUBLISHED", ...inCityWhere(citySlug) },
+    select: { category: true },
+  });
   const byCategory: Record<string, number> = {};
   for (const category of ALL_BUSINESS_CATEGORIES) byCategory[category] = 0;
   for (const r of rows) byCategory[r.category] = (byCategory[r.category] ?? 0) + 1;
@@ -292,12 +238,13 @@ function mainServiceCode(category: BusinessCategory): string {
 
 async function getCategoryAggregatesRaw(
   category: BusinessCategory,
+  citySlug: string,
   districtSlug?: string
 ): Promise<CategoryAggregates> {
   const where = {
     status: "PUBLISHED" as const,
     category,
-    ...(districtSlug ? { district: { is: { slug: districtSlug } } } : {}),
+    ...(districtSlug ? inDistrictWhere(citySlug, districtSlug) : inCityWhere(citySlug)),
   };
 
   const [count, verifiedCount, priceItems] = await Promise.all([
@@ -331,9 +278,12 @@ async function getCategoryAggregatesRaw(
 // with no PriceItem at all are simply absent from the returned map -
 // callers render no price block for them, same as everywhere else data
 // is missing.
-async function getPriceTierMapRaw(category: BusinessCategory): Promise<[number, number][]> {
+async function getPriceTierMapRaw(category: BusinessCategory, citySlug: string): Promise<[number, number][]> {
   const items = await prisma.priceItem.findMany({
-    where: { business: { category, status: "PUBLISHED" }, service: { code: mainServiceCode(category) } },
+    where: {
+      business: { category, status: "PUBLISHED", ...inCityWhere(citySlug) },
+      service: { code: mainServiceCode(category) },
+    },
     select: { businessId: true, priceFrom: true },
   });
 
@@ -372,11 +322,11 @@ export interface DistrictSummary {
 // lightweight select (a few dozen rows; groupBy doesn't type-check
 // through the Accelerate extension). Districts with no listings are
 // dropped; categories within a district are ranked by count.
-async function getDistrictSummariesRaw(): Promise<DistrictSummary[]> {
+async function getDistrictSummariesRaw(citySlug: string): Promise<DistrictSummary[]> {
   const [districts, rows] = await Promise.all([
-    prisma.district.findMany(),
+    prisma.district.findMany({ where: { city: { slug: citySlug } } }),
     prisma.business.findMany({
-      where: { status: "PUBLISHED", districtId: { not: null } },
+      where: { status: "PUBLISHED", districtId: { not: null }, ...inCityWhere(citySlug) },
       select: { districtId: true, category: true },
     }),
   ]);
@@ -413,23 +363,20 @@ export interface CityPoint {
   lng: number;
 }
 
-// City "centre" for the Browse menu's geolocation shortcut: the mean of
-// its geocoded businesses (City has no coordinates of its own, and this
-// keeps a new city data-only). Cities without geocoded businesses are
-// left out.
+// City centres for "Near me" (nearest covered city) and the search's
+// city suggestions.
 async function getCityPointsRaw(): Promise<CityPoint[]> {
-  const [cities, districts, rows] = await Promise.all([
-    prisma.city.findMany(),
-    prisma.district.findMany({ select: { id: true, cityId: true } }),
+  const [cities, rows] = await Promise.all([
+    prisma.city.findMany({ orderBy: { id: "asc" } }),
     prisma.business.findMany({
-      where: { status: "PUBLISHED", lat: { not: null }, lng: { not: null }, districtId: { not: null } },
-      select: { lat: true, lng: true, districtId: true },
+      where: { status: "PUBLISHED", lat: { not: null }, lng: { not: null }, cityId: { not: null } },
+      select: { lat: true, lng: true, cityId: true },
     }),
   ]);
-  const cityOfDistrict = new Map(districts.map((d) => [d.id, d.cityId]));
-
   return cities.flatMap((city) => {
-    const points = rows.filter((r) => r.districtId !== null && cityOfDistrict.get(r.districtId) === city.id);
+    // city.json centre first; else the mean of the city's geocoded places.
+    if (city.lat !== null && city.lng !== null) return [{ slug: city.slug, name: city.name, lat: city.lat, lng: city.lng }];
+    const points = rows.filter((r) => r.cityId === city.id);
     if (points.length === 0) return [];
     return [
       {
@@ -495,7 +442,7 @@ async function getNonstopVetCountRaw(citySlug: string): Promise<number> {
       status: "PUBLISHED",
       category: "VET_CLINIC",
       emergency247: true,
-      OR: [{ city: { is: { slug: citySlug } } }, { cityId: null }],
+      ...inCityWhere(citySlug),
     },
   });
 }
@@ -505,7 +452,7 @@ async function getNonstopVetCountRaw(citySlug: string): Promise<number> {
 // no confirmed place would only ever show an empty list).
 async function getAnimalsInCategoryRaw(category: BusinessCategory, citySlug: string): Promise<string[]> {
   const rows = await prisma.business.findMany({
-    where: { status: "PUBLISHED", category, OR: [{ city: { is: { slug: citySlug } } }, { cityId: null }] },
+    where: { status: "PUBLISHED", category, ...inCityWhere(citySlug) },
     select: { animals: true },
   });
   return [...new Set(rows.flatMap((r) => r.animals))];
@@ -518,7 +465,6 @@ export const getAllCities = cached(getAllCitiesRaw, "getAllCities");
 export const getDefaultCity = cached(getDefaultCityRaw, "getDefaultCity");
 export const getDistrictBySlug = cached(getDistrictBySlugRaw, "getDistrictBySlug");
 export const getDistrictCounts = cached(getDistrictCountsRaw, "getDistrictCounts");
-export const getPopularNearby = cached(getPopularNearbyRaw, "getPopularNearby");
 export const getAllDistricts = cached(getAllDistrictsRaw, "getAllDistricts");
 export const getBusinessCount = cached(getBusinessCountRaw, "getBusinessCount");
 export const getCategoryAggregates = cached(getCategoryAggregatesRaw, "getCategoryAggregates");
@@ -531,8 +477,8 @@ export async function searchBusinesses(filters: BusinessFilters): Promise<Busine
 }
 
 const getFeaturedBusinessesCached = cached(getFeaturedBusinessesRaw, "getFeaturedBusinesses");
-export async function getFeaturedBusinesses(limit = 4): Promise<BusinessWithRelations[]> {
-  return (await getFeaturedBusinessesCached(limit)).map(reviveBusiness);
+export async function getFeaturedBusinesses(citySlug: string, limit = 4): Promise<BusinessWithRelations[]> {
+  return (await getFeaturedBusinessesCached(citySlug, limit)).map(reviveBusiness);
 }
 
 const getBusinessBySlugCached = cached(getBusinessBySlugRaw, "getBusinessBySlug");
@@ -547,6 +493,6 @@ export async function getAllPublishedBusinessSlugs() {
 }
 
 const getPriceTierEntries = cached(getPriceTierMapRaw, "getPriceTierMap");
-export async function getPriceTierMap(category: BusinessCategory): Promise<Map<number, number>> {
-  return new Map(await getPriceTierEntries(category));
+export async function getPriceTierMap(category: BusinessCategory, citySlug: string): Promise<Map<number, number>> {
+  return new Map(await getPriceTierEntries(category, citySlug));
 }

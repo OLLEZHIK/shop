@@ -38,6 +38,8 @@
 | Английские слаги | `grooming`, `vet-clinics`, `pet-hotels`, `dog-training`, `pet-shops`, `pet-sitting` | 5 слагов подтверждены исследованием, `pet-training` → `dog-training`: весь спрос про собак; `english-keywords.md` §2 |
 | Словацкие слаги | `psi-salon`, `veterinar`, `hotel-pre-zvierata`, `vycvik-psov`, `chovatelske-potreby`, `opatrovanie-zvierat` | **Временные**, до `tasks/antigravity-slovak-keyword-research.md` |
 | Карточка заведения | `/business/{slug}/`, `/sk/podnik/{slug}/` | `design-plan.md` §3 |
+| Страница города (хаб) | `/city/{город}/`, `/sk/mesto/{город}/`: 6 категорий со счётчиками, ссылка на nonstop | Точка входа для запросов «pet services {город}» и внутренние ссылки на все категории; ссылки из футера («Города»). Индексируется от 3 заведений. `docs/architecture/multi-city.md` |
+| Языки города | Страница на местном языке есть, только если язык указан в `locales` города (`city.json`), иначе 404 | Не создавать словацкие страницы для Нью-Йорка; `docs/architecture/multi-city.md` §3 |
 | Город в адресе | Динамический сегмент `[city]` из базы, не зашит в код | Новый город — только данные; `design-plan.md` §2.2 |
 | Слэш в конце адреса | Всегда (`trailingSlash: true`) | Один вариант адреса на страницу, без дублей |
 

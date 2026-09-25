@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { getDefaultCity } from "@/lib/data";
+import { getAllCities, getDefaultCity } from "@/lib/data";
 import { LanguageSwitch } from "./LanguageSwitch";
-import { ALL_CATEGORIES, categoryLabel, listingPath } from "@/lib/categories";
-import { getDictionary, localesForCountry, type Locale } from "@/lib/i18n";
+import { ALL_CATEGORIES, categoryLabel, cityPath, listingPath } from "@/lib/categories";
+import { getDictionary, localesForCity, type Locale } from "@/lib/i18n";
 import { Logo } from "./Logo";
 import { ShieldCheckIcon } from "./icons";
 
 export async function Footer({ locale }: { locale: Locale }) {
-  const city = await getDefaultCity();
+  const [city, cities] = await Promise.all([getDefaultCity(), getAllCities()]);
   const citySlug = city?.slug ?? "";
-  const cityName = city?.name ?? "Bratislava";
+  // Name the city only while there is one; with several the site is generic.
+  const cityName = cities.length === 1 ? cities[0].name : null;
   const t = getDictionary(locale).footer;
   // Help and legal pages exist in English only; flag that in other locales.
   const en = t.englishOnly;
@@ -22,7 +23,7 @@ export async function Footer({ locale }: { locale: Locale }) {
         style={{ background: "var(--brand-orange)" }}
       />
       <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-16">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
           <div>
             <Logo className="h-10 w-auto" wordmarkColor="#FFFFFF" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/65">
@@ -42,6 +43,15 @@ export async function Footer({ locale }: { locale: Locale }) {
             ))}
           </FooterColumn>
 
+          {/* Every city's hub, in this language where the city has it. */}
+          <FooterColumn title={t.cities}>
+            {cities.map((c) => (
+              <FooterLink key={c.slug} href={cityPath(localesForCity(c).includes(locale) ? locale : "en", c.slug)}>
+                {c.name}
+              </FooterLink>
+            ))}
+          </FooterColumn>
+
           <FooterColumn title={t.about}>
             <FooterLink href="/how-it-works/">{t.howItWorks + en}</FooterLink>
             <FooterLink href="/add-or-fix-listing/">{t.addBusiness + en}</FooterLink>
@@ -56,7 +66,7 @@ export async function Footer({ locale }: { locale: Locale }) {
 
         <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row sm:items-center">
           <p>&copy; {new Date().getFullYear()} pawenn.com</p>
-          <LanguageSwitch locales={localesForCountry(city?.country)} />
+          <LanguageSwitch locales={localesForCity(city)} />
           <p>{t.madeWithCare(cityName)}</p>
         </div>
       </div>
