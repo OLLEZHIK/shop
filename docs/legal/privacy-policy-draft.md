@@ -2,7 +2,7 @@
 
 # Privacy Policy (Draft)
 
-*Last updated: September 20, 2026*
+*Last updated: September 25, 2026*
 
 This Privacy Policy explains how **Pawenn** ("we", "us", or "our"), accessible at `pawenn.com`, processes information when you use our online pet services directory.
 
@@ -25,7 +25,7 @@ The operator and data controller responsible for the processing of data on this 
 ## 2. Our Core Privacy Principles
 
 1. **No User Accounts:** We do not offer or require user registration, profiles, or logins.
-2. **No Tracking Cookies:** We do not deploy advertising cookies, remarketing trackers, or cross-site behavioral tracking scripts.
+2. **No Tracking Cookies:** We do not deploy advertising cookies, remarketing trackers, or cross-site behavioral tracking scripts. The only cookie we set is a functional one that remembers the language you chose (see section 3.E).
 3. **No Monetization of Personal Data:** We do not sell, rent, or trade user data to third parties or data brokers.
 4. **Data Minimization:** We collect only the minimal data strictly necessary to operate a functional directory and deliver transparent public information.
 
@@ -58,6 +58,17 @@ If you choose to submit a correction, update prices, or suggest a new pet care f
 The directory contains business information regarding pet grooming salons, veterinary clinics, pet boarding hotels, training academies, and pet stores operating in Bratislava.
 - **Nature of Data:** This information consists of publicly available business contact information (company trade name, commercial address, public business telephone, public business email, website URL, and publicly advertised service fees).
 - **Rights of Business Representatives:** Business owners may claim, correct, update, or request the immediate removal of their business listing at any time by contacting `{EMAIL}`.
+
+
+### E. Language Preference Cookie
+If you switch the website language using the language selector, we store your choice in a single first-party cookie.
+- **Name:** `pawenn_lang`
+- **Content:** Only the language code you selected (for example `en` or `sk`). It contains no identifier and is not linked to you or to any other data.
+- **When it is set:** Only when you click the language selector. Simply visiting the website sets no cookie.
+- **Duration:** 1 year, or until you delete it in your browser.
+- **Purpose:** When you open the home page `pawenn.com`, we show it in the language you last chose. No other page reads this cookie.
+- **Without the cookie:** The home page chooses the language from your browser's language setting or, failing that, from the country your request comes from. This information is used only at that moment to pick the language and is not stored.
+- **Legal Basis:** The cookie is strictly necessary to provide the language setting you explicitly requested, so it does not require consent (Article 5(3) of Directive 2002/58/EC and Section 109(8) of Slovak Act No. 452/2021 Coll. on Electronic Communications).
 
 ---
 
