@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getDictionary } from "@/lib/i18n";
+import { DEFAULT_LOCALE, LOCALES, getDictionary, localePath } from "@/lib/i18n";
 import { ArrowRightIcon, PawIcon } from "./icons";
 
 // not-found files get no route params, so the locale comes from the URL.
 export function NotFoundContent() {
   const pathname = usePathname() ?? "/";
-  const locale = pathname === "/sk" || pathname.startsWith("/sk/") ? "sk" : "en";
+  const locale =
+    LOCALES.find((l) => l !== DEFAULT_LOCALE && (pathname === `/${l}` || pathname.startsWith(`/${l}/`))) ??
+    DEFAULT_LOCALE;
   const t = getDictionary(locale).notFound;
 
   return (
@@ -20,7 +22,7 @@ export function NotFoundContent() {
       <h1 className="mt-6 text-3xl font-extrabold text-foreground">{t.title}</h1>
       <p className="mt-3 text-foreground/65">{t.body}</p>
       <Link
-        href={locale === "sk" ? "/sk/" : "/"}
+        href={localePath(locale, "/")}
         className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-pill)] bg-ink px-6 font-semibold text-white transition hover:bg-brand-blue"
       >
         {t.back}

@@ -1,5 +1,7 @@
 // Vet clinic specialty codes (tasks/mac-collect-hours-and-vet-services.md,
 // docs/card-spec.md section 8) with their labels.
+import type { Locale } from "./locales";
+
 export const VET_SPECIALTIES = [
   "surgery",
   "orthopedics",
@@ -24,7 +26,7 @@ export const VET_SPECIALTIES = [
 
 export type VetSpecialty = (typeof VET_SPECIALTIES)[number];
 
-const LABELS: Record<VetSpecialty, { en: string; sk: string }> = {
+const LABELS: Record<VetSpecialty, Record<Locale, string>> = {
   surgery: { en: "Surgery", sk: "Chirurgia" },
   orthopedics: { en: "Orthopaedics", sk: "Ortopédia" },
   dentistry: { en: "Dentistry", sk: "Stomatológia" },
@@ -48,5 +50,5 @@ const LABELS: Record<VetSpecialty, { en: string; sk: string }> = {
 
 export function specialtyLabel(code: string, locale: string): string {
   const l = LABELS[code as VetSpecialty];
-  return l ? (locale === "sk" ? l.sk : l.en) : code;
+  return l ? (l[locale as Locale] ?? l.en) : code;
 }

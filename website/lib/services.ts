@@ -1,13 +1,12 @@
 import type { BusinessCategory } from "@prisma/client";
+import type { Locale } from "./locales";
 
 // The 6 priced services per category - docs/card-spec.md, "Цены"
 // (owner, 2026-09-25). Pet shops have no prices. Codes are the contract
 // with data agents (prices.csv price_code); labels are ours, per locale.
-export interface ServiceDef {
-  code: string;
-  en: string;
-  sk: string;
-}
+// One label per site language; TypeScript flags a missing one when a
+// language is added (docs/playbooks/add-language.md).
+export type ServiceDef = { code: string } & Record<Locale, string>;
 
 export const SERVICES: Partial<Record<BusinessCategory, ServiceDef[]>> = {
   GROOMING: [
@@ -65,5 +64,5 @@ export function findService(category: BusinessCategory, code: string): ServiceDe
 export function serviceLabel(category: BusinessCategory, code: string, locale: string): string {
   const def = findService(category, code);
   if (!def) return code;
-  return locale === "sk" ? def.sk : def.en;
+  return def[locale as Locale] ?? def.en;
 }
