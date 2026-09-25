@@ -3,6 +3,8 @@
 **Исполнитель:** Antigravity IDE
 **Роль:** Data agent.
 **Тип:** сбор данных, объём средний (49 заведений без логотипа).
+**Статус (2026-09-25):** данные перенесены в `data/cities/bratislava/` облачным Claude Code (часы — из ветки, логотипы — из PR #73, кроме 7 непригодных). Остаток — в `tasks/antigravity-complete-bratislava-cards.md`.
+
 **Ветка:** `antigravity/collect-logos-bratislava`
 **Зависимости:** нет, брать сразу. **Приоритет выше, чем у
 `ide-collect-vet-prices`** (та на паузе) **и `ide-review-insights`**.
