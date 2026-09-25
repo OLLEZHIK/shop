@@ -75,7 +75,7 @@ Logos, trade names, and trademarks of third-party businesses displayed on the pl
 
 ## 6. Privacy & Cookies
 
-Your privacy is paramount. Pawenn is built without user account requirements, without tracking cookies, and without personal profiling. For comprehensive information regarding our anonymous click tracking (`/api/click`) and cookieless analytics, please review our [Privacy Policy](/privacy-policy/) (`docs/legal/privacy-policy-draft.md`).
+Your privacy is paramount. Pawenn is built without user account requirements, without tracking cookies, and without personal profiling. For comprehensive information regarding our anonymous click tracking (`/api/click`) and cookieless analytics, please review our [Privacy Policy](/en/privacy-policy/) (`docs/legal/privacy-policy-draft.md`).
 
 ---
 
