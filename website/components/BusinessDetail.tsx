@@ -12,7 +12,7 @@ import {
 } from "@/lib/data";
 import { isDistrictLinkable } from "@/lib/districts";
 import type { BusinessWithRelations } from "@/lib/data";
-import { CATEGORY_THEME, businessPath, categoryLabel, listingPath } from "@/lib/categories";
+import { CATEGORY_THEME, businessPath, categoryLabel, categorySingular, listingPath } from "@/lib/categories";
 import { formatDate as formatLocaleDate, getDictionary, localePath, localesForCountry, type Locale } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
@@ -94,6 +94,15 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
       ? `${business.lat},${business.lng}`
       : `${business.address}${business.district ? `, ${business.district.name}` : ""}`;
 
+  // "Psí salón v mestskej časti Ružinov, Bratislava": the district in
+  // words, for people and for district searches (owner, 2026-09-25: no
+  // district picker, districts live in texts). Linked to the district
+  // page only when that page has enough places.
+  const districtHref =
+    business.district && citySlug && isDistrictLinkable(districtSummaries, business.district.slug, business.category)
+      ? listingPath(locale, business.category, citySlug, business.district.slug)
+      : null;
+
   const breadcrumbItems = [
     // Home -> category list -> district -> place. The city is part of
     // the category list's own title, so it doesn't get a crumb that would
@@ -151,6 +160,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
   const languages = business.languagesSpoken.map((code) => languageName(code, locale));
   const hasVetInfo = business.emergency247 || Boolean(business.emergencyNote) || business.homeVisits;
   const hasAbout =
+    Boolean(business.district) ||
     Boolean(description) ||
     business.animals.length > 0 ||
     business.specialties.length > 0 ||
@@ -253,6 +263,19 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
             <section className="rounded-[var(--radius-card)] bg-surface p-6 shadow-[var(--shadow-card)]">
               <h2 className="text-xl font-bold text-foreground">{t.business.about}</h2>
 
+              {business.district && (
+                <p className="mt-3 font-medium text-foreground">
+                  {t.business.placeIn.before(categorySingular(business.category, locale))}
+                  {districtHref ? (
+                    <Link href={districtHref} prefetch={false} className="text-brand-blue hover:underline">
+                      {business.district.name}
+                    </Link>
+                  ) : (
+                    business.district.name
+                  )}
+                  , {business.district.city.name}
+                </p>
+              )}
               {description && <p className="mt-3 text-foreground/80">{description}</p>}
 
               {hasVetInfo && (

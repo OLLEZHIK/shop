@@ -1,6 +1,8 @@
 // Client-safe geo helpers (no Prisma import).
 export interface CityPointLite {
   slug: string;
+  /** Display name, for the search's city field. */
+  name?: string;
   lat: number;
   lng: number;
 }

@@ -59,3 +59,12 @@ summary::-webkit-details-marker {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* City field in the search (HomeSearch): the whole segment shows focus
+   (focus-within), not the bare input; no native datalist arrow. */
+.search-city:focus-visible {
+  outline: none;
+}
+.search-city::-webkit-calendar-picker-indicator {
+  display: none !important;
+}

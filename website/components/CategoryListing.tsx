@@ -3,10 +3,7 @@ import type { BusinessCategory } from "@prisma/client";
 import {
   searchBusinesses,
   getCategoryAggregates,
-  getAllDistricts,
   getPriceTierMap,
-  getDistrictCounts,
-  getDistrictSummaries,
   getNonstopVetCount,
   getAnimalsInCategory,
   distanceKm,
@@ -24,7 +21,7 @@ import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
 import { animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
 import { FilterPanel } from "./FilterPanel";
-import { MIN_DISTRICT_LISTINGS, NONSTOP_SEGMENT, isDistrictLinkable } from "@/lib/districts";
+import { NONSTOP_SEGMENT } from "@/lib/districts";
 import { hoursFromStored, isOpenAt, localNow, timezoneFor } from "@/lib/hours";
 import { meetsMinRating, parseMinRating, parseSort, sortByListing } from "@/lib/listingSort";
 import { EmptyState } from "./EmptyState";
@@ -80,15 +77,10 @@ export async function CategoryListing({
   // told us every pet they cater for yet (Business.animals is mostly just
   // dog/cat), so an unconfirmed place is shown in a second, clearly
   // labelled group instead of vanishing from an empty result.
-  const [all, aggregates, districts, priceTiers, districtCounts, districtSummaries] = await Promise.all([
+  const [all, aggregates, priceTiers, nonstopCount, animalsPresent] = await Promise.all([
     searchBusinesses({ category, citySlug, districtSlug }),
     getCategoryAggregates(category, districtSlug),
-    getAllDistricts(),
     getPriceTierMap(category),
-    getDistrictCounts(category),
-    getDistrictSummaries(),
-  ]);
-  const [nonstopCount, animalsPresent] = await Promise.all([
     category === "VET_CLINIC" ? getNonstopVetCount(citySlug) : Promise.resolve(0),
     getAnimalsInCategory(category, citySlug),
   ]);
@@ -98,9 +90,6 @@ export async function CategoryListing({
   const theme = CATEGORY_THEME[category];
   const where = whereLabel(locale, citySlug, cityName, districtName);
   const resetHref = listingPath(locale, category, citySlug, districtSlug);
-  const listedDistricts = districtCounts.filter((d) => d.count > 0);
-  // Only districts with enough places get links (lib/districts.ts).
-  const linkableDistricts = districtCounts.filter((d) => d.count >= MIN_DISTRICT_LISTINGS);
 
   // "Near me": sort by distance from the visitor, places without
   // coordinates last (in their usual daily order).
@@ -183,9 +172,6 @@ export async function CategoryListing({
           <dl className="mt-6 flex flex-wrap gap-2">
             <Stat label={t.listing.listed} value={String(aggregates.count)} />
             {aggregates.verifiedCount > 0 && <Stat label={t.listing.verified} value={String(aggregates.verifiedCount)} />}
-            {!districtName && listedDistricts.length > 0 && (
-              <Stat label={t.listing.districts} value={String(listedDistricts.length)} />
-            )}
           </dl>
 
           {/* Switch service, keep the location */}
@@ -198,12 +184,7 @@ export async function CategoryListing({
                 return (
                   <li key={other} className="shrink-0">
                     <Link
-                      href={listingPath(
-                        locale,
-                        other,
-                        citySlug,
-                        districtSlug && isDistrictLinkable(districtSummaries, districtSlug, other) ? districtSlug : null
-                      )}
+                      href={listingPath(locale, other, citySlug)}
                       aria-current={active ? "page" : undefined}
                       className={`inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border px-3.5 py-2 text-sm font-medium transition ${
                         active
@@ -228,10 +209,6 @@ export async function CategoryListing({
             locale={locale}
             category={category}
             citySlug={citySlug}
-            cityName={cityName}
-            districts={districts.filter(
-              (d) => d.slug === districtSlug || linkableDistricts.some((l) => l.slug === d.slug)
-            )}
             currentDistrictSlug={nonstopPage ? NONSTOP_SEGMENT : districtSlug}
             currentAnimal={animal}
             near={origin ? near : undefined}
@@ -345,32 +322,6 @@ export async function CategoryListing({
 
         {/* ---------- Sidebar ---------- */}
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          {!nonstopPage && linkableDistricts.length > 0 && (
-            <div className="rounded-[var(--radius-card)] bg-surface p-5 shadow-[var(--shadow-card)]">
-              <h2 className="font-heading text-base font-bold text-foreground">{t.listing.byDistrict}</h2>
-              <ul className="mt-3 space-y-0.5">
-                <li>
-                  <DistrictLink
-                    href={listingPath(locale, category, citySlug)}
-                    label={t.listing.allOf(cityName)}
-                    count={listedDistricts.reduce((acc, d) => acc + d.count, 0)}
-                    active={!districtSlug}
-                  />
-                </li>
-                {linkableDistricts.map((d) => (
-                  <li key={d.slug}>
-                    <DistrictLink
-                      href={listingPath(locale, category, citySlug, d.slug)}
-                      label={d.name}
-                      count={d.count}
-                      active={d.slug === districtSlug}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           <div className="rounded-[var(--radius-card)] bg-ink p-5 text-white">
             <h2 className="font-heading text-base font-bold">{t.listing.missingTitle}</h2>
             <p className="mt-1.5 text-sm text-white/70">{t.listing.missingBody}</p>
@@ -397,24 +348,6 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function DistrictLink({ href, label, count, active }: { href: string; label: string; count: number; active: boolean }) {
-  return (
-    <Link
-      href={href}
-      // Next 16 re-prefetches a child of the current [category]/[city]
-      // route behind the proxy.ts rewrite in an endless loop (hundreds of
-      // requests per second); these links load on click instead.
-      prefetch={false}
-      aria-current={active ? "page" : undefined}
-      className={`flex items-center justify-between rounded-[var(--radius-control)] px-3 py-2 text-sm transition ${
-        active ? "accent-soft font-semibold" : "text-foreground/75 hover:bg-surface-sunken hover:text-foreground"
-      }`}
-    >
-      {label}
-      <span className={active ? "" : "text-foreground/45"}>{count}</span>
-    </Link>
-  );
-}
 
 interface Faq {
   question: string;
