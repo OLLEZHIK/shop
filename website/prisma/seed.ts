@@ -5,66 +5,33 @@ import Papa from "papaparse";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma, PrismaClient, BusinessCategory } from "@prisma/client";
 import { directDatabaseUrl } from "./db-url";
+import { SERVICES, findService, serviceSlug } from "../lib/services";
+import { parseOpeningHours } from "../lib/hours";
+import { inMultiPolygon } from "../lib/pointInPolygon";
+import { VET_SPECIALTIES } from "../lib/vet";
 
-loadEnv({ path: path.join(process.cwd(), ".env.local") });
+loadEnv({ path: path.join(process.cwd(), ".env.local"), quiet: true });
 
 const adapter = new PrismaPg({ connectionString: directDatabaseUrl() });
 const prisma = new PrismaClient({ adapter });
 
 // data/ at the repo root, not website/data/ (that's a stale duplicate copy).
 const DATA_DIR = path.join(process.cwd(), "..", "data");
-const INSIGHTS_DIR = path.join(DATA_DIR, "review-insights");
+// SEED_CITIES_DIR points the seed at test fixtures instead of data/cities.
+const CITIES_DIR = process.env.SEED_CITIES_DIR ?? path.join(DATA_DIR, "cities");
+// Logos are checked on disk; fixtures bring their own (SEED_LOGOS_DIR) so
+// nothing test-only ships in public/.
+const LOGOS_DIR = process.env.SEED_LOGOS_DIR ?? path.join(process.cwd(), "public", "logos");
 
-// "What customers say" summaries, one JSON file per business slug
-// (tasks/ide-review-insights.md). Validated again when rendered.
-function readReviewInsights(slug: string): Prisma.InputJsonValue | typeof Prisma.DbNull {
-  const file = path.join(INSIGHTS_DIR, `${slug}.json`);
-  if (!fs.existsSync(file)) return Prisma.DbNull;
-  try {
-    const data = JSON.parse(fs.readFileSync(file, "utf-8"));
-    if (data?.slug !== slug) {
-      console.log(`  review insights: slug mismatch in ${slug}.json, skipped`);
-      return Prisma.DbNull;
-    }
-    return data;
-  } catch (e) {
-    console.log(`  review insights: invalid JSON in ${slug}.json, skipped (${(e as Error).message})`);
-    return Prisma.DbNull;
-  }
-}
-
-const BRATISLAVA_DISTRICTS: { name: string; slug: string }[] = [
-  { name: "Staré Mesto", slug: "stare-mesto" },
-  { name: "Ružinov", slug: "ruzinov" },
-  { name: "Vrakuňa", slug: "vrakuna" },
-  { name: "Podunajské Biskupice", slug: "podunajske-biskupice" },
-  { name: "Nové Mesto", slug: "nove-mesto" },
-  { name: "Rača", slug: "raca" },
-  { name: "Vajnory", slug: "vajnory" },
-  { name: "Karlova Ves", slug: "karlova-ves" },
-  { name: "Dúbravka", slug: "dubravka" },
-  { name: "Lamač", slug: "lamac" },
-  { name: "Devín", slug: "devin" },
-  { name: "Devínska Nová Ves", slug: "devinska-nova-ves" },
-  { name: "Záhorská Bystrica", slug: "zahorska-bystrica" },
-  { name: "Petržalka", slug: "petrzalka" },
-  { name: "Jarovce", slug: "jarovce" },
-  { name: "Rusovce", slug: "rusovce" },
-  { name: "Čunovo", slug: "cunovo" },
-];
+const CATEGORIES = Object.values(BusinessCategory);
 
 type CsvRow = Record<string, string>;
 
 function parseCsv(filePath: string): CsvRow[] {
   const content = fs.readFileSync(filePath, "utf-8");
-  const result = Papa.parse<CsvRow>(content, {
-    header: true,
-    skipEmptyLines: true,
-  });
+  const result = Papa.parse<CsvRow>(content, { header: true, skipEmptyLines: true });
   if (result.errors.length > 0) {
-    throw new Error(
-      `Failed to parse ${filePath}: ${JSON.stringify(result.errors)}`
-    );
+    throw new Error(`Failed to parse ${filePath}: ${JSON.stringify(result.errors)}`);
   }
   return result.data;
 }
@@ -72,17 +39,22 @@ function parseCsv(filePath: string): CsvRow[] {
 function slugify(input: string): string {
   return input
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // strip diacritics
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
 
-function parseAnimals(value: string | undefined): string[] {
-  if (!value) return [];
-  return value
+function nullableString(value: string | undefined): string | null {
+  if (value === undefined || value === null) return null;
+  const trimmed = value.trim();
+  return trimmed === "" ? null : trimmed;
+}
+
+function parseList(value: string | undefined): string[] {
+  return (value ?? "")
     .split(";")
-    .map((a) => a.trim())
+    .map((v) => v.trim())
     .filter(Boolean);
 }
 
@@ -104,178 +76,436 @@ function parseNullableDate(value: string | undefined): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-// Listing-card columns shared by every CSV. Bratislava's files name the
-// local-language text short_description_sk; new city files use
-// short_description_local (docs/playbooks/add-city.md).
-function cardFields(row: CsvRow) {
+const yes = (value: string | undefined) => (value ?? "").trim().toLowerCase() === "yes";
+
+// ---------------------------------------------------------------------
+// Report (printed at the end, pasted into PRs)
+// ---------------------------------------------------------------------
+interface CityReport {
+  businesses: number;
+  skipped: number;
+  byCategory: Record<string, number>;
+  withDistrict: number;
+  withHours: number;
+  withInsights: number;
+  prices: number;
+  businessesWithPrices: number;
+  warnings: string[];
+}
+
+const reports = new Map<string, CityReport>();
+function report(city: string): CityReport {
+  if (!reports.has(city)) {
+    reports.set(city, {
+      businesses: 0,
+      skipped: 0,
+      byCategory: {},
+      withDistrict: 0,
+      withHours: 0,
+      withInsights: 0,
+      prices: 0,
+      businessesWithPrices: 0,
+      warnings: [],
+    });
+  }
+  return reports.get(city)!;
+}
+
+// Business slugs are page URLs (/business/<slug>/): unique across cities.
+const slugOwner = new Map<string, string>();
+function claimSlug(slug: string, city: string, file: string) {
+  const owner = slugOwner.get(slug);
+  if (owner) {
+    throw new Error(`Duplicate business slug "${slug}": ${owner} and ${city} (${file}). Slugs must be unique across all cities.`);
+  }
+  slugOwner.set(slug, `${city} (${file})`);
+}
+
+// ---------------------------------------------------------------------
+// Shared row -> Business fields (legacy Bratislava CSVs and new
+// data/cities/*/businesses*.csv use the same column names; see
+// docs/card-spec.md).
+// ---------------------------------------------------------------------
+function businessFields(row: CsvRow, citySlug: string, rep: CityReport, logoDir: string | null) {
   const rating = parseNullableFloat(row.google_rating);
   const ratingCount = parseNullableInt(row.google_rating_count);
   // Guard the "5+ ratings or nothing" rule here too, not only in the data.
   const showRating = rating !== null && ratingCount !== null && ratingCount >= 5;
-  const logoFile = nullableString(row.logo_file);
+  const name = row.name.trim();
+
+  const logo = nullableString(row.logo_file);
+  let logoFile: string | null = null;
+  if (logo && /^[\w.-]+$/.test(logo)) {
+    const rel = logoDir ? `${logoDir}/${logo}` : logo;
+    if (fs.existsSync(path.join(LOGOS_DIR, rel))) logoFile = rel;
+    else rep.warnings.push(`${name}: logo file not found: public/logos/${rel}`);
+  }
+
+  const rawHours = nullableString(row.opening_hours);
+  const { hours, error } = parseOpeningHours(rawHours);
+  if (error) rep.warnings.push(`${name}: opening_hours ignored (${error})`);
+  if (hours) rep.withHours++;
+
+  const specialties = parseList(row.specialties).filter((s) => {
+    const ok = (VET_SPECIALTIES as readonly string[]).includes(s);
+    if (!ok) rep.warnings.push(`${name}: unknown specialty "${s}"`);
+    return ok;
+  });
+
   return {
+    name,
+    address: row.address ?? "",
+    lat: parseNullableFloat(row.lat),
+    lng: parseNullableFloat(row.lng),
+    phone: nullableString(row.phone),
+    email: nullableString(row.email),
+    website: nullableString(row.website),
+    instagram: nullableString(row.instagram),
+    facebook: nullableString(row.facebook),
+    animals: parseList(row.animals),
     description: nullableString(row.description),
+    descriptionLocal: nullableString(row.description_local),
     shortDescription: nullableString(row.short_description),
+    // Legacy Bratislava files call the local text *_sk.
     shortDescriptionLocal: nullableString(row.short_description_local ?? row.short_description_sk),
-    logoFile: logoFile && /^[\w./-]+$/.test(logoFile) && !logoFile.includes("..") ? logoFile : null,
+    openingHours: hours && rawHours ? rawHours : Prisma.DbNull,
+    hoursSourceUrl: nullableString(row.hours_source_url),
+    hoursObservedAt: parseNullableDate(row.hours_observed_at),
+    emergency247: yes(row.emergency_24_7),
+    emergencyNote: nullableString(row.emergency_note),
+    homeVisits: yes(row.home_visits),
+    specialties,
+    languagesSpoken: parseList(row.languages_spoken).map((l) => l.toLowerCase()),
+    photoUrls: parseList(row.photo_urls).filter((u) => /^https:\/\//.test(u)),
+    logoFile,
     googlePlaceId: nullableString(row.google_place_id),
     googleMapsUrl: nullableString(row.google_maps_url),
     googleRating: showRating ? rating : null,
     googleRatingCount: showRating ? ratingCount : null,
     ratingObservedAt: parseNullableDate(row.rating_observed_at),
+    status: "PUBLISHED" as const,
+    sourceUrls: nullableString(row.source_url) ? [row.source_url.trim()] : [],
+    notes: nullableString(row.notes),
   };
 }
 
-function nullableString(value: string | undefined): string | null {
-  if (value === undefined) return null;
-  const trimmed = value.trim();
-  return trimmed === "" ? null : trimmed;
+// "What customers say" summaries, one JSON file per business slug
+// (tasks/ide-review-insights.md). Validated again when rendered.
+function readReviewInsights(dir: string, slug: string, rep: CityReport): Prisma.InputJsonValue | typeof Prisma.DbNull {
+  const file = path.join(dir, `${slug}.json`);
+  if (!fs.existsSync(file)) return Prisma.DbNull;
+  try {
+    const data = JSON.parse(fs.readFileSync(file, "utf-8"));
+    if (data?.slug !== slug) {
+      rep.warnings.push(`review insights: slug mismatch in ${slug}.json, skipped`);
+      return Prisma.DbNull;
+    }
+    rep.withInsights++;
+    return data;
+  } catch (e) {
+    rep.warnings.push(`review insights: invalid JSON in ${slug}.json, skipped (${(e as Error).message})`);
+    return Prisma.DbNull;
+  }
 }
 
-interface SourceFile {
-  file: string;
-  category: BusinessCategory | "FROM_COLUMN";
+// ---------------------------------------------------------------------
+// Districts: polygons from data/cities/<city>/districts.geojson
+// (scripts/fetch-districts.ts). A business's district is the polygon its
+// coordinates fall in; no coordinates or no polygons -> no district.
+// ---------------------------------------------------------------------
+interface DistrictShape {
+  id: number;
+  slug: string;
+  coordinates: number[][][][];
 }
 
-const SOURCE_FILES: SourceFile[] = [
+async function seedDistricts(cityId: number, citySlug: string): Promise<DistrictShape[]> {
+  const file = path.join(CITIES_DIR, citySlug, "districts.geojson");
+  if (!fs.existsSync(file)) return [];
+  const geo = JSON.parse(fs.readFileSync(file, "utf-8")) as {
+    features: { properties: { name: string; slug: string }; geometry: { type: string; coordinates: number[][][][] } }[];
+  };
+  const shapes: DistrictShape[] = [];
+  for (const f of geo.features) {
+    const { name, slug } = f.properties;
+    const clash = await prisma.district.findFirst({ where: { slug, cityId: { not: cityId } }, include: { city: true } });
+    if (clash) {
+      throw new Error(
+        `District slug "${slug}" (${citySlug}) is already used in ${clash.city.slug}. District slugs are meant to be ` +
+          `unique per city, but the old global index on District.slug still exists: drop it first (schema.prisma, District).`
+      );
+    }
+    const district = await prisma.district.upsert({
+      where: { cityId_slug: { cityId, slug } },
+      update: { name },
+      create: { name, slug, cityId },
+    });
+    shapes.push({ id: district.id, slug, coordinates: f.geometry.coordinates });
+  }
+  return shapes;
+}
+
+function districtFor(shapes: DistrictShape[], lat: number | null, lng: number | null): DistrictShape | null {
+  if (lat === null || lng === null) return null;
+  return shapes.find((s) => inMultiPolygon(lng, lat, s.coordinates)) ?? null;
+}
+
+// ---------------------------------------------------------------------
+// Services: the 6 priced services per category (lib/services.ts).
+// ---------------------------------------------------------------------
+async function seedServices(): Promise<Map<string, number>> {
+  const ids = new Map<string, number>();
+  for (const [category, defs] of Object.entries(SERVICES) as [BusinessCategory, typeof SERVICES.GROOMING][]) {
+    for (const def of defs ?? []) {
+      const slug = serviceSlug(category, def.code);
+      const s = await prisma.service.upsert({
+        where: { slug },
+        update: { name: def.en, code: def.code, category },
+        create: { name: def.en, slug, code: def.code, category },
+      });
+      ids.set(slug, s.id);
+    }
+  }
+  return ids;
+}
+
+// prices.csv (docs/card-spec.md, "Цены"): replaces the city's price rows.
+async function seedPrices(
+  citySlug: string,
+  businesses: Map<string, { id: number; category: BusinessCategory }>,
+  serviceIds: Map<string, number>,
+  rep: CityReport
+) {
+  const file = path.join(CITIES_DIR, citySlug, "prices.csv");
+  if (!fs.existsSync(file)) return;
+  const rows = parseCsv(file);
+  const data: Prisma.PriceItemCreateManyInput[] = [];
+  for (const row of rows) {
+    const slug = nullableString(row.business_slug);
+    const code = nullableString(row.price_code);
+    const business = slug ? businesses.get(slug) : undefined;
+    const where = `${slug ?? "?"} ${code ?? "?"}`;
+    if (!business) {
+      rep.warnings.push(`prices: unknown business_slug (${where})`);
+      continue;
+    }
+    if (!code || !findService(business.category, code)) {
+      rep.warnings.push(`prices: price_code not allowed for ${business.category} (${where})`);
+      continue;
+    }
+    const priceFrom = parseNullableFloat(row.price_from);
+    const sourceUrl = nullableString(row.source_url);
+    const observedAt = parseNullableDate(row.observed_at);
+    if (priceFrom === null || !sourceUrl || !observedAt) {
+      rep.warnings.push(`prices: missing price_from, source_url or observed_at (${where})`);
+      continue;
+    }
+    data.push({
+      businessId: business.id,
+      serviceId: serviceIds.get(serviceSlug(business.category, code))!,
+      weightFromKg: parseNullableFloat(row.weight_from_kg),
+      weightToKg: parseNullableFloat(row.weight_to_kg),
+      priceFrom,
+      priceTo: parseNullableFloat(row.price_to),
+      currency: nullableString(row.currency) ?? "EUR",
+      sourceUrl,
+      observedAt,
+    });
+  }
+  const ids = [...businesses.values()].map((b) => b.id);
+  await prisma.priceItem.deleteMany({ where: { businessId: { in: ids } } });
+  await prisma.priceItem.createMany({ data });
+  rep.prices = data.length;
+  rep.businessesWithPrices = new Set(data.map((d) => d.businessId)).size;
+}
+
+// ---------------------------------------------------------------------
+// data/cities/<city>/ (docs/playbooks/add-city.md)
+// ---------------------------------------------------------------------
+interface CityJson {
+  name: string;
+  slug: string;
+  country: string;
+  locale: string;
+  lat?: number;
+  lng?: number;
+}
+
+async function seedCity(citySlug: string, serviceIds: Map<string, number>) {
+  const dir = path.join(CITIES_DIR, citySlug);
+  const meta = JSON.parse(fs.readFileSync(path.join(dir, "city.json"), "utf-8")) as CityJson;
+  if (meta.slug !== citySlug) throw new Error(`${dir}/city.json: slug "${meta.slug}" doesn't match the folder name`);
+  const rep = report(citySlug);
+
+  const city = await prisma.city.upsert({
+    where: { slug: citySlug },
+    update: { name: meta.name, country: meta.country, locale: meta.locale, lat: meta.lat ?? null, lng: meta.lng ?? null },
+    create: { name: meta.name, slug: citySlug, country: meta.country, locale: meta.locale, lat: meta.lat, lng: meta.lng },
+  });
+  const shapes = await seedDistricts(city.id, citySlug);
+
+  const files = fs.readdirSync(dir).filter((f) => /^businesses.*\.csv$/.test(f)).sort();
+  const seeded = new Map<string, { id: number; category: BusinessCategory }>();
+  for (const file of files) {
+    for (const row of parseCsv(path.join(dir, file))) {
+      const name = nullableString(row.name);
+      const slug = nullableString(row.slug);
+      const category = nullableString(row.category) as BusinessCategory | null;
+      if (!name || !slug) {
+        rep.skipped++;
+        rep.warnings.push(`${file}: row without name or slug skipped (${name ?? slug ?? "?"})`);
+        continue;
+      }
+      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) throw new Error(`${citySlug}/${file}: invalid slug "${slug}"`);
+      if (!category || !CATEGORIES.includes(category)) {
+        rep.skipped++;
+        rep.warnings.push(`${name}: unknown category "${row.category}", skipped`);
+        continue;
+      }
+      if (!nullableString(row.phone) && !nullableString(row.email) && !nullableString(row.website)) {
+        rep.skipped++;
+        rep.warnings.push(`${name}: no phone, email or website, skipped`);
+        continue;
+      }
+      claimSlug(slug, citySlug, file);
+
+      const fields = businessFields(row, citySlug, rep, citySlug);
+      const district = districtFor(shapes, fields.lat, fields.lng);
+      if (district) rep.withDistrict++;
+      const reviewInsights = readReviewInsights(path.join(dir, "review-insights"), slug, rep);
+      const data = { ...fields, category, cityId: city.id, districtId: district?.id ?? null, reviewInsights };
+      const b = await prisma.business.upsert({ where: { slug }, update: data, create: { ...data, slug } });
+      seeded.set(slug, { id: b.id, category });
+      rep.businesses++;
+      rep.byCategory[category] = (rep.byCategory[category] ?? 0) + 1;
+    }
+  }
+  await seedPrices(citySlug, seeded, serviceIds, rep);
+}
+
+// ---------------------------------------------------------------------
+// Legacy Bratislava (data/*-bratislava.csv), used until the orchestrator
+// moves Bratislava to data/cities/bratislava/ (city.json). Districts still
+// come from the CSV here; the polygon district is only compared and
+// reported, so the switch shows exactly which places would move.
+// ---------------------------------------------------------------------
+const LEGACY_FILES: { file: string; category: BusinessCategory | "FROM_COLUMN" }[] = [
   { file: "salons-bratislava.csv", category: "GROOMING" },
   { file: "vet-clinics-bratislava.csv", category: "VET_CLINIC" },
   { file: "pet-hotels-bratislava.csv", category: "PET_HOTEL" },
   { file: "other-pet-services-bratislava.csv", category: "FROM_COLUMN" },
 ];
+const LEGACY_OTHER: Record<string, BusinessCategory> = { shop: "PET_SHOP", training: "DOG_TRAINING", sitting: "PET_SITTING" };
+const LEGACY_DISTRICTS: { name: string; slug: string }[] = [
+  { name: "Staré Mesto", slug: "stare-mesto" },
+  { name: "Ružinov", slug: "ruzinov" },
+  { name: "Vrakuňa", slug: "vrakuna" },
+  { name: "Podunajské Biskupice", slug: "podunajske-biskupice" },
+  { name: "Nové Mesto", slug: "nove-mesto" },
+  { name: "Rača", slug: "raca" },
+  { name: "Vajnory", slug: "vajnory" },
+  { name: "Karlova Ves", slug: "karlova-ves" },
+  { name: "Dúbravka", slug: "dubravka" },
+  { name: "Lamač", slug: "lamac" },
+  { name: "Devín", slug: "devin" },
+  { name: "Devínska Nová Ves", slug: "devinska-nova-ves" },
+  { name: "Záhorská Bystrica", slug: "zahorska-bystrica" },
+  { name: "Petržalka", slug: "petrzalka" },
+  { name: "Jarovce", slug: "jarovce" },
+  { name: "Rusovce", slug: "rusovce" },
+  { name: "Čunovo", slug: "cunovo" },
+];
 
-const OTHER_SERVICES_CATEGORY_MAP: Record<string, BusinessCategory> = {
-  shop: "PET_SHOP",
-  training: "DOG_TRAINING",
-  sitting: "PET_SITTING",
-};
-
-async function main() {
-  console.log("Seeding City + Districts (Bratislava)...");
+async function seedLegacyBratislava() {
+  const rep = report("bratislava (legacy data/*-bratislava.csv)");
   const city = await prisma.city.upsert({
     where: { slug: "bratislava" },
     update: { name: "Bratislava", country: "SK", locale: "sk" },
     create: { name: "Bratislava", slug: "bratislava", country: "SK", locale: "sk" },
   });
-
-  const districtIdBySlug = new Map<string, number>();
-  for (const d of BRATISLAVA_DISTRICTS) {
+  const districtIds = new Map<string, number>();
+  for (const d of LEGACY_DISTRICTS) {
     const district = await prisma.district.upsert({
-      where: { slug: d.slug },
-      update: { name: d.name, cityId: city.id },
+      where: { cityId_slug: { cityId: city.id, slug: d.slug } },
+      update: { name: d.name },
       create: { name: d.name, slug: d.slug, cityId: city.id },
     });
-    districtIdBySlug.set(d.slug, district.id);
+    districtIds.set(d.slug, district.id);
   }
+  // Polygons (if fetched) only for the comparison report.
+  const geoFile = path.join(CITIES_DIR, "bratislava", "districts.geojson");
+  const shapes: DistrictShape[] = fs.existsSync(geoFile)
+    ? (JSON.parse(fs.readFileSync(geoFile, "utf-8")).features as {
+        properties: { slug: string };
+        geometry: { coordinates: number[][][][] };
+      }[]).map((f) => ({ id: 0, slug: f.properties.slug, coordinates: f.geometry.coordinates }))
+    : [];
+  const districtDiffs: string[] = [];
 
-  const usedSlugs = new Set<string>();
-  const countByCategory: Record<string, number> = {};
-  let skipped = 0;
-
-  for (const source of SOURCE_FILES) {
-    const filePath = path.join(DATA_DIR, source.file);
-    const rows = parseCsv(filePath);
-    console.log(`\n${source.file}: ${rows.length} rows`);
-
-    for (const row of rows) {
+  const used = new Set<string>();
+  for (const source of LEGACY_FILES) {
+    for (const row of parseCsv(path.join(DATA_DIR, source.file))) {
       const name = nullableString(row.name);
-      const phone = nullableString(row.phone);
-      const email = nullableString(row.email);
-      const website = nullableString(row.website);
-
-      if (!name) {
-        console.log(`  SKIP (no name): ${JSON.stringify(row)}`);
-        skipped++;
+      if (!name) continue;
+      if (!nullableString(row.phone) && !nullableString(row.email) && !nullableString(row.website)) {
+        rep.skipped++;
         continue;
       }
-      if (!phone && !email && !website) {
-        console.log(`  SKIP (no contact method): ${name}`);
-        skipped++;
-        continue;
-      }
-
-      const category: BusinessCategory =
-        source.category === "FROM_COLUMN"
-          ? OTHER_SERVICES_CATEGORY_MAP[row.category?.trim() ?? ""]
-          : source.category;
-
+      const category = source.category === "FROM_COLUMN" ? LEGACY_OTHER[row.category?.trim() ?? ""] : source.category;
       if (!category) {
-        console.log(`  SKIP (unknown category "${row.category}"): ${name}`);
-        skipped++;
+        rep.skipped++;
         continue;
       }
-
       const districtSlug = nullableString(row.district);
-      const districtId =
-        districtSlug && districtIdBySlug.has(districtSlug)
-          ? districtIdBySlug.get(districtSlug)!
-          : null;
-
-      const baseSlug = slugify(name);
-      let slug = baseSlug;
-      if (usedSlugs.has(slug) && districtSlug) {
-        slug = `${baseSlug}-${districtSlug}`;
-      }
+      // Same slug rule as before, so URLs don't change.
+      let slug = slugify(name);
+      if (used.has(slug) && districtSlug) slug = `${slug}-${districtSlug}`;
       let suffix = 2;
-      while (usedSlugs.has(slug)) {
-        slug = `${baseSlug}-${suffix}`;
-        suffix++;
+      while (used.has(slug)) slug = `${slugify(name)}-${suffix++}`;
+      used.add(slug);
+      claimSlug(slug, "bratislava", source.file);
+
+      const fields = businessFields(row, "bratislava", rep, null);
+      if (shapes.length) {
+        const poly = districtFor(shapes, fields.lat, fields.lng)?.slug ?? "(none)";
+        if (poly !== (districtSlug ?? "(none)")) districtDiffs.push(`${slug}: CSV ${districtSlug ?? "(none)"} -> polygon ${poly}`);
       }
-      usedSlugs.add(slug);
-
-      const sourceUrl = nullableString(row.source_url);
-
-      await prisma.business.upsert({
-        where: { slug },
-        update: {
-          name,
-          category,
-          address: row.address ?? "",
-          districtId,
-          lat: parseNullableFloat(row.lat),
-          lng: parseNullableFloat(row.lng),
-          phone,
-          email,
-          website,
-          animals: parseAnimals(row.animals),
-          status: "PUBLISHED",
-          sourceUrls: sourceUrl ? [sourceUrl] : [],
-          notes: nullableString(row.notes),
-          ...cardFields(row),
-          reviewInsights: readReviewInsights(slug),
-        },
-        create: {
-          name,
-          slug,
-          category,
-          address: row.address ?? "",
-          districtId,
-          lat: parseNullableFloat(row.lat),
-          lng: parseNullableFloat(row.lng),
-          phone,
-          email,
-          website,
-          animals: parseAnimals(row.animals),
-          status: "PUBLISHED",
-          sourceUrls: sourceUrl ? [sourceUrl] : [],
-          notes: nullableString(row.notes),
-          ...cardFields(row),
-          reviewInsights: readReviewInsights(slug),
-        },
-      });
-
-      countByCategory[category] = (countByCategory[category] ?? 0) + 1;
+      const districtId = districtSlug ? (districtIds.get(districtSlug) ?? null) : null;
+      if (districtId) rep.withDistrict++;
+      const reviewInsights = readReviewInsights(path.join(DATA_DIR, "review-insights"), slug, rep);
+      const data = { ...fields, category, cityId: city.id, districtId, reviewInsights };
+      await prisma.business.upsert({ where: { slug }, update: data, create: { ...data, slug } });
+      rep.businesses++;
+      rep.byCategory[category] = (rep.byCategory[category] ?? 0) + 1;
     }
   }
+  if (shapes.length) {
+    console.log(`\nDistrict check (CSV vs OpenStreetMap polygons): ${districtDiffs.length} of ${rep.businesses} differ`);
+    for (const d of districtDiffs) console.log(`  ${d}`);
+  }
+}
+
+async function main() {
+  const serviceIds = await seedServices();
+  console.log(`Services: ${serviceIds.size}`);
+
+  const cities = fs.existsSync(CITIES_DIR)
+    ? fs
+        .readdirSync(CITIES_DIR)
+        .filter((d) => fs.existsSync(path.join(CITIES_DIR, d, "city.json")))
+        .sort()
+    : [];
+  if (!cities.includes("bratislava") && !process.env.SEED_CITIES_DIR) await seedLegacyBratislava();
+  for (const c of cities) await seedCity(c, serviceIds);
 
   console.log("\nSeed summary:");
-  for (const [category, count] of Object.entries(countByCategory)) {
-    console.log(`  ${category}: ${count}`);
+  for (const [city, r] of reports) {
+    console.log(`\n  ${city}: ${r.businesses} businesses (${r.skipped} skipped)`);
+    for (const [cat, n] of Object.entries(r.byCategory)) console.log(`    ${cat}: ${n}`);
+    console.log(`    with district: ${r.withDistrict}, with opening hours: ${r.withHours}, with review insights: ${r.withInsights}`);
+    console.log(`    prices: ${r.prices} rows for ${r.businessesWithPrices} businesses`);
+    for (const w of r.warnings) console.log(`    ! ${w}`);
   }
-  console.log(
-    `  TOTAL loaded: ${Object.values(countByCategory).reduce((a, b) => a + b, 0)}`
-  );
-  console.log(`  Skipped rows: ${skipped}`);
 }
 
 main()

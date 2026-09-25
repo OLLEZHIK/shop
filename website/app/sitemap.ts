@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getAllCities, getAllDistricts, getCategoryAggregates, getAllPublishedBusinessSlugs } from "@/lib/data";
+import { getAllCities, getAllDistricts, getCategoryAggregates, getAllPublishedBusinessSlugs, getNonstopVetCount } from "@/lib/data";
+import { NONSTOP_SEGMENT } from "@/lib/districts";
 import { ALL_CATEGORIES, businessPath, listingPath } from "@/lib/categories";
 import { localePath, localesForCountry, type Locale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
@@ -46,6 +47,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (cityAggregates.count >= MIN_LISTED_FOR_INDEX) {
         entries.push(
           ...localized(locales, (l) => listingPath(l, category, city.slug), { changeFrequency: "daily", priority: 0.9 })
+        );
+      }
+
+      if (category === "VET_CLINIC" && (await getNonstopVetCount(city.slug)) > 0) {
+        entries.push(
+          ...localized(locales, (l) => listingPath(l, category, city.slug, NONSTOP_SEGMENT), {
+            changeFrequency: "daily",
+            priority: 0.8,
+          })
         );
       }
 

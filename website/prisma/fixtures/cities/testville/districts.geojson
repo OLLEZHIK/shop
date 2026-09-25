@@ -1,0 +1,4 @@
+{"type":"FeatureCollection","features":[
+{"type":"Feature","properties":{"name":"Staré Mesto","slug":"stare-mesto-test"},"geometry":{"type":"MultiPolygon","coordinates":[[[[17.4,48.4],[17.5,48.4],[17.5,48.5],[17.4,48.5],[17.4,48.4]]]]}},
+{"type":"Feature","properties":{"name":"Sever","slug":"sever"},"geometry":{"type":"MultiPolygon","coordinates":[[[[17.4,48.5],[17.6,48.5],[17.6,48.6],[17.4,48.6],[17.4,48.5]],[[17.45,48.55],[17.46,48.55],[17.46,48.56],[17.45,48.56],[17.45,48.55]]]]}}
+]}

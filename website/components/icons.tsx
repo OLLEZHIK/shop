@@ -304,3 +304,22 @@ export function FishIcon({ className }: IconProps) {
     </StrokeIcon>
   );
 }
+
+export function InstagramIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <rect x="3" y="3" width="14" height="14" rx="4" />
+      <circle cx="10" cy="10" r="3.2" />
+      <circle cx="14.2" cy="5.8" r="0.6" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function FacebookIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <circle cx="10" cy="10" r="7.5" />
+      <path d="M11.2 17.4v-6.2h2.1M11.2 17.4V8.6c0-1.2.7-1.9 1.9-1.9h.9M9 11.2h2.2" />
+    </svg>
+  );
+}

@@ -6,6 +6,9 @@ import {
   getAllDistricts,
   getPriceTierMap,
   getDistrictCounts,
+  getDistrictSummaries,
+  getNonstopVetCount,
+  getAnimalsInCategory,
   distanceKm,
   parseNear,
 } from "@/lib/data";
@@ -21,6 +24,8 @@ import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
 import { animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
 import { FilterPanel } from "./FilterPanel";
+import { MIN_DISTRICT_LISTINGS, NONSTOP_SEGMENT, isDistrictLinkable } from "@/lib/districts";
+import { hoursFromStored, isOpenAt, localNow, timezoneFor } from "@/lib/hours";
 import { meetsMinRating, parseMinRating, parseSort, sortByListing } from "@/lib/listingSort";
 import { EmptyState } from "./EmptyState";
 import { Breadcrumbs } from "./Breadcrumbs";
@@ -39,6 +44,10 @@ interface CategoryListingProps {
   near?: string;
   sort?: string;
   rating?: string;
+  /** "1" = only places open right now (their opening hours, city time). */
+  open?: string;
+  /** The /<vets>/<city>/nonstop page: only 24/7 clinics. */
+  nonstopPage?: boolean;
 }
 
 /** "in Bratislava" / "v Bratislave", or "Petržalka, Bratislava" for a district. */
@@ -58,7 +67,10 @@ export async function CategoryListing({
   animal: requestedAnimal,
   sort: requestedSort,
   rating: requestedRating,
+  open,
+  nonstopPage = false,
 }: CategoryListingProps) {
+  const openNowOnly = open === "1";
   const sort = parseSort(requestedSort);
   const minRating = parseMinRating(requestedRating);
   // Ignore a pet this service isn't for (e.g. ?animal=bird on dog training).
@@ -68,12 +80,17 @@ export async function CategoryListing({
   // told us every pet they cater for yet (Business.animals is mostly just
   // dog/cat), so an unconfirmed place is shown in a second, clearly
   // labelled group instead of vanishing from an empty result.
-  const [all, aggregates, districts, priceTiers, districtCounts] = await Promise.all([
+  const [all, aggregates, districts, priceTiers, districtCounts, districtSummaries] = await Promise.all([
     searchBusinesses({ category, citySlug, districtSlug }),
     getCategoryAggregates(category, districtSlug),
     getAllDistricts(),
     getPriceTierMap(category),
     getDistrictCounts(category),
+    getDistrictSummaries(),
+  ]);
+  const [nonstopCount, animalsPresent] = await Promise.all([
+    category === "VET_CLINIC" ? getNonstopVetCount(citySlug) : Promise.resolve(0),
+    getAnimalsInCategory(category, citySlug),
   ]);
 
   const t = getDictionary(locale);
@@ -81,15 +98,23 @@ export async function CategoryListing({
   const theme = CATEGORY_THEME[category];
   const where = whereLabel(locale, citySlug, cityName, districtName);
   const resetHref = listingPath(locale, category, citySlug, districtSlug);
-  const symbol = aggregates.currency === "EUR" ? "€" : aggregates.currency;
   const listedDistricts = districtCounts.filter((d) => d.count > 0);
+  // Only districts with enough places get links (lib/districts.ts).
+  const linkableDistricts = districtCounts.filter((d) => d.count >= MIN_DISTRICT_LISTINGS);
 
   // "Near me": sort by distance from the visitor, places without
   // coordinates last (in their usual daily order).
   const origin = parseNear(near);
   // Rating filter first (Google rating as collected), then the pet split.
-  const rated = all.filter((b) => meetsMinRating(b, minRating));
-  const hiddenUnrated = minRating ? all.filter((b) => b.googleRating === null).length : 0;
+  // Open now: judged in the city's time zone at request time; a nonstop
+  // clinic counts as open; places without hours are hidden and counted.
+  const cityNow = localNow(timezoneFor(all[0]?.city?.country ?? all[0]?.district?.city.country));
+  const openState = (b: (typeof all)[number]) => (b.emergency247 ? true : isOpenAt(hoursFromStored(b.openingHours), cityNow));
+  const scoped = nonstopPage ? all.filter((b) => b.emergency247) : all;
+  const openFiltered = openNowOnly ? scoped.filter((b) => openState(b) === true) : scoped;
+  const hiddenNoHours = openNowOnly ? scoped.filter((b) => openState(b) === null).length : 0;
+  const rated = openFiltered.filter((b) => meetsMinRating(b, minRating));
+  const hiddenUnrated = minRating ? openFiltered.filter((b) => b.googleRating === null).length : 0;
   const found = animal ? rated.filter((b) => b.animals.includes(animal)) : rated;
   const unconfirmed = animal ? rated.filter((b) => !b.animals.includes(animal)) : [];
   const toItem = (b: (typeof all)[number]) => ({
@@ -123,7 +148,11 @@ export async function CategoryListing({
             items={[
               { label: t.listing.home, href: localePath(locale, "/") },
               { label, href: listingPath(locale, category, citySlug) },
-              ...(districtName ? [{ label: districtName }] : [{ label: cityName }]),
+              ...(nonstopPage
+                ? [{ label: t.listing.nonstopCrumb }]
+                : districtName
+                  ? [{ label: districtName }]
+                  : [{ label: cityName }]),
             ]}
           />
 
@@ -132,29 +161,28 @@ export async function CategoryListing({
               <CategoryIcon category={category} className="h-7 w-7" />
             </span>
             <div>
-              <h1 className="text-3xl font-extrabold text-foreground md:text-5xl">
-                {label} <span className="text-foreground/40">{where.split(" ")[0]}</span>{" "}
-                {where.split(" ").slice(1).join(" ")}
-              </h1>
-              <p className="mt-2 text-lg text-foreground/65">
-                {t.listing.browseCount(aggregates.count, countLabel, where)} {categoryBlurb(category, locale)}.
-              </p>
+              {nonstopPage ? (
+                <>
+                  <h1 className="text-3xl font-extrabold text-foreground md:text-5xl">{t.listing.nonstopH1(where)}</h1>
+                  <p className="mt-2 text-lg text-foreground/65">{t.listing.nonstopIntro}</p>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-3xl font-extrabold text-foreground md:text-5xl">
+                    {label} <span className="text-foreground/40">{where.split(" ")[0]}</span>{" "}
+                    {where.split(" ").slice(1).join(" ")}
+                  </h1>
+                  <p className="mt-2 text-lg text-foreground/65">
+                    {t.listing.browseCount(aggregates.count, countLabel, where)} {categoryBlurb(category, locale)}.
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
           <dl className="mt-6 flex flex-wrap gap-2">
             <Stat label={t.listing.listed} value={String(aggregates.count)} />
             {aggregates.verifiedCount > 0 && <Stat label={t.listing.verified} value={String(aggregates.verifiedCount)} />}
-            {aggregates.priceFrom !== null && (
-              <Stat
-                label={t.listing.priceRange}
-                value={
-                  aggregates.priceTo && aggregates.priceTo !== aggregates.priceFrom
-                    ? `${symbol}${aggregates.priceFrom}–${symbol}${aggregates.priceTo}`
-                    : `${t.listing.from} ${symbol}${aggregates.priceFrom}`
-                }
-              />
-            )}
             {!districtName && listedDistricts.length > 0 && (
               <Stat label={t.listing.districts} value={String(listedDistricts.length)} />
             )}
@@ -170,7 +198,12 @@ export async function CategoryListing({
                 return (
                   <li key={other} className="shrink-0">
                     <Link
-                      href={listingPath(locale, other, citySlug, districtSlug)}
+                      href={listingPath(
+                        locale,
+                        other,
+                        citySlug,
+                        districtSlug && isDistrictLinkable(districtSummaries, districtSlug, other) ? districtSlug : null
+                      )}
                       aria-current={active ? "page" : undefined}
                       className={`inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border px-3.5 py-2 text-sm font-medium transition ${
                         active
@@ -196,19 +229,27 @@ export async function CategoryListing({
             category={category}
             citySlug={citySlug}
             cityName={cityName}
-            districts={districts}
-            currentDistrictSlug={districtSlug}
+            districts={districts.filter(
+              (d) => d.slug === districtSlug || linkableDistricts.some((l) => l.slug === d.slug)
+            )}
+            currentDistrictSlug={nonstopPage ? NONSTOP_SEGMENT : districtSlug}
             currentAnimal={animal}
             near={origin ? near : undefined}
             sort={sort}
             minRating={minRating}
+            openNow={openNowOnly}
+            showOpenNow={openNowOnly || all.some((b) => b.emergency247 || b.openingHours !== null)}
+            nonstopPage={nonstopPage}
+            showNonstop={nonstopCount > 0}
+            animals={animalsForService(category).filter((a) => a === animal || animalsPresent.includes(a))}
           />
 
           <p className="mt-6 flex items-center gap-1.5 text-sm text-foreground/60">
             {origin && <RouteIcon className="h-4 w-4 text-brand-blue" />}
             {animal ? t.listing.confirmedFor(found.length, t.animals[animal]) : t.listing.results(found.length)}
             {unconfirmed.length > 0 ? ` · ${t.listing.moreToCheck(unconfirmed.length)}` : ""}
-            {hiddenUnrated > 0 ? ` · ${t.listing.hiddenUnrated(hiddenUnrated)}` : ""} ·{" "}
+            {hiddenUnrated > 0 ? ` · ${t.listing.hiddenUnrated(hiddenUnrated)}` : ""}
+            {hiddenNoHours > 0 ? ` · ${t.listing.hiddenNoHours(hiddenNoHours)}` : ""} ·{" "}
             {sort === "rating"
               ? t.listing.ratingFirst
               : sort === "reviews"
@@ -304,7 +345,7 @@ export async function CategoryListing({
 
         {/* ---------- Sidebar ---------- */}
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          {listedDistricts.length > 0 && (
+          {!nonstopPage && linkableDistricts.length > 0 && (
             <div className="rounded-[var(--radius-card)] bg-surface p-5 shadow-[var(--shadow-card)]">
               <h2 className="font-heading text-base font-bold text-foreground">{t.listing.byDistrict}</h2>
               <ul className="mt-3 space-y-0.5">
@@ -316,7 +357,7 @@ export async function CategoryListing({
                     active={!districtSlug}
                   />
                 </li>
-                {listedDistricts.map((d) => (
+                {linkableDistricts.map((d) => (
                   <li key={d.slug}>
                     <DistrictLink
                       href={listingPath(locale, category, citySlug, d.slug)}

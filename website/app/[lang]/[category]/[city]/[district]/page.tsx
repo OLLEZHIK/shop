@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ALL_CATEGORIES, categoryFromSlug, categoryPlural, categorySeoTitle, categorySingular, categorySlug, listingPath } from "@/lib/categories";
-import { getCityBySlug, getAllCities, getAllDistricts, getDistrictBySlug, getCategoryAggregates } from "@/lib/data";
+import { getCityBySlug, getAllCities, getAllDistricts, getDistrictBySlug, getCategoryAggregates, getNonstopVetCount } from "@/lib/data";
+import { NONSTOP_SEGMENT } from "@/lib/districts";
 import { getDictionary, isLocale, localesForCountry } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
 import { CategoryListing, whereLabel } from "@/components/CategoryListing";
@@ -20,16 +21,22 @@ async function resolve(params: Promise<PageParams>) {
   if (!category) return null;
   const city = await getCityBySlug(citySlug);
   if (!city || !localesForCountry(city.country).includes(lang)) return null;
+  // /<vets>/<city>/nonstop: the 24/7 clinics page, while the city has any.
+  if (districtSlug === NONSTOP_SEGMENT) {
+    if (category !== "VET_CLINIC" || (await getNonstopVetCount(citySlug)) === 0) return null;
+    return { locale: lang, category, city, citySlug, district: null, districtSlug, nonstop: true as const };
+  }
   const district = await getDistrictBySlug(districtSlug);
   if (!district || district.city.slug !== citySlug) return null;
-  return { locale: lang, category, city, citySlug, district, districtSlug };
+  return { locale: lang, category, city, citySlug, district, districtSlug, nonstop: false as const };
 }
 
 export async function generateStaticParams() {
   const [cities, districts] = await Promise.all([getAllCities(), getAllDistricts()]);
-  return cities.flatMap((city) =>
-    localesForCountry(city.country).flatMap((lang) =>
-      ALL_CATEGORIES.flatMap((category) =>
+  const nonstop = await Promise.all(cities.map((c) => getNonstopVetCount(c.slug)));
+  return cities.flatMap((city, i) =>
+    localesForCountry(city.country).flatMap((lang) => [
+      ...ALL_CATEGORIES.flatMap((category) =>
         districts
           .filter((d) => d.cityId === city.id)
           .map((district) => ({
@@ -38,8 +45,11 @@ export async function generateStaticParams() {
             city: city.slug,
             district: district.slug,
           }))
-      )
-    )
+      ),
+      ...(nonstop[i] > 0
+        ? [{ lang, category: categorySlug("VET_CLINIC", lang), city: city.slug, district: NONSTOP_SEGMENT }]
+        : []),
+    ])
   );
 }
 
@@ -47,12 +57,27 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const resolved = await resolve(params);
   if (!resolved) return {};
 
-  const { locale, category, city, district } = resolved;
+  const { locale, category, city } = resolved;
   const t = getDictionary(locale).listing;
+  const locales = localesForCountry(city.country);
+
+  if (resolved.nonstop) {
+    const where = whereLabel(locale, city.slug, city.name);
+    const count = await getNonstopVetCount(city.slug);
+    return {
+      alternates: localeAlternates(
+        locale,
+        Object.fromEntries(locales.map((l) => [l, listingPath(l, category, city.slug, NONSTOP_SEGMENT)]))
+      ),
+      title: { absolute: t.nonstopMetaTitle(where) },
+      description: t.nonstopMetaDescription(count, where),
+    };
+  }
+
+  const { district } = resolved;
   const aggregates = await getCategoryAggregates(category, district.slug);
   const where = whereLabel(locale, city.slug, city.name, district.name);
   const what = aggregates.count === 1 ? categorySingular(category, locale) : categoryPlural(category, locale);
-  const locales = localesForCountry(city.country);
 
   return {
     // Filter variants (?animal=, ?near=, ?sort=, ?rating=) point at the unfiltered page.
@@ -71,13 +96,13 @@ export default async function CategoryCityDistrictPage({
   searchParams,
 }: {
   params: Promise<PageParams>;
-  searchParams: Promise<{ animal?: string; near?: string; sort?: string; rating?: string }>;
+  searchParams: Promise<{ animal?: string; near?: string; sort?: string; rating?: string; open?: string }>;
 }) {
   const resolved = await resolve(params);
   if (!resolved) notFound();
 
-  const { animal, near, sort, rating } = await searchParams;
-  const { locale, category, city, citySlug, district, districtSlug } = resolved;
+  const { animal, near, sort, rating, open } = await searchParams;
+  const { locale, category, city, citySlug } = resolved;
 
   return (
     <CategoryListing
@@ -85,8 +110,10 @@ export default async function CategoryCityDistrictPage({
       category={category}
       citySlug={citySlug}
       cityName={city.name}
-      districtSlug={districtSlug}
-      districtName={district.name}
+      districtSlug={resolved.nonstop ? undefined : resolved.districtSlug}
+      districtName={resolved.nonstop ? undefined : resolved.district.name}
+      nonstopPage={resolved.nonstop}
+      open={open}
       animal={animal}
       near={near}
       sort={sort}

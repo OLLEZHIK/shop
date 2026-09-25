@@ -9,7 +9,12 @@ import { getDictionary, type Locale } from "@/lib/i18n";
 import { AnimalIcon } from "./AnimalIcon";
 import { Dropdown } from "./Dropdown";
 import { MapPinIcon, StarIcon } from "./icons";
-import { MIN_RATINGS, type ListingSort, type MinRating } from "@/lib/listingSort";
+import {
+  MIN_RATINGS,
+  type ListingSort,
+  type MinRating,
+} from "@/lib/listingSort";
+import { NONSTOP_SEGMENT } from "@/lib/districts";
 
 interface FilterPanelProps {
   locale: Locale;
@@ -23,6 +28,16 @@ interface FilterPanelProps {
   near?: string;
   sort?: ListingSort;
   minRating?: MinRating;
+  openNow?: boolean;
+  /** Some place in the list has opening hours (else the chip would only
+   *  ever show an empty list). */
+  showOpenNow?: boolean;
+  /** On the nonstop page (currentDistrictSlug is then "nonstop"). */
+  nonstopPage?: boolean;
+  /** The city has 24/7 vets: offer the chip that leads to their page. */
+  showNonstop?: boolean;
+  /** Pets to offer (ones with at least one place in the category). */
+  animals?: string[];
 }
 
 export function FilterPanel({
@@ -36,24 +51,41 @@ export function FilterPanel({
   near,
   sort,
   minRating,
+  openNow = false,
+  showOpenNow = true,
+  nonstopPage = false,
+  showNonstop = false,
+  animals,
 }: FilterPanelProps) {
   const router = useRouter();
   const t = getDictionary(locale);
-  const locationPath = listingPath(locale, category, citySlug, currentDistrictSlug);
+  const locationPath = listingPath(
+    locale,
+    category,
+    citySlug,
+    currentDistrictSlug,
+  );
 
   // Every filter link keeps the other filters; `changes` overrides one.
   function withQuery(
     path: string,
-    changes: { animal?: string | null; sort?: string | null; rating?: string | null } = {}
+    changes: {
+      animal?: string | null;
+      sort?: string | null;
+      rating?: string | null;
+      open?: string | null;
+    } = {},
   ) {
     const params = new URLSearchParams();
     const animal = "animal" in changes ? changes.animal : currentAnimal;
     const sortValue = "sort" in changes ? changes.sort : sort;
     const rating = "rating" in changes ? changes.rating : minRating;
+    const openValue = "open" in changes ? changes.open : openNow ? "1" : null;
     if (animal) params.set("animal", animal);
     if (near) params.set("near", near);
     if (sortValue) params.set("sort", sortValue);
     if (rating) params.set("rating", rating);
+    if (openValue) params.set("open", openValue);
     const query = params.toString();
     return query ? `${path}?${query}` : path;
   }
@@ -62,7 +94,9 @@ export function FilterPanel({
     `inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-pill)] px-3.5 text-sm font-semibold transition ${
       active ? "bg-ink text-white" : "text-foreground/70 hover:text-brand-blue"
     }`;
-  const numberFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 1 });
+  const numberFormat = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 1,
+  });
 
   return (
     <div className="space-y-3">
@@ -74,7 +108,7 @@ export function FilterPanel({
           role="group"
           aria-label={t.listing.filterAnimal}
         >
-          {[null, ...animalsForService(category)].map((value) => {
+          {[null, ...(animals ?? animalsForService(category))].map((value) => {
             const active = (currentAnimal ?? null) === value;
             return (
               <Link
@@ -91,24 +125,80 @@ export function FilterPanel({
           })}
         </div>
 
-        <Dropdown
-          ariaLabel={t.listing.filterDistrict}
-          placeholder={t.listing.allOf(cityName)}
-          value={currentDistrictSlug ?? "all"}
-          options={[
-            {
-              value: "all",
-              label: t.listing.allOf(cityName),
-              icon: <MapPinIcon className="h-4 w-4 text-foreground/50" />,
-            },
-            ...districts.map((d) => ({ value: d.slug, label: d.name })),
-          ]}
-          onChange={(value) =>
-            router.push(withQuery(listingPath(locale, category, citySlug, value === "all" ? null : value)))
-          }
-          className="shrink-0 sm:w-64"
-        />
+        {!nonstopPage && (
+          <Dropdown
+            ariaLabel={t.listing.filterDistrict}
+            placeholder={t.listing.allOf(cityName)}
+            value={currentDistrictSlug ?? "all"}
+            options={[
+              {
+                value: "all",
+                label: t.listing.allOf(cityName),
+                icon: <MapPinIcon className="h-4 w-4 text-foreground/50" />,
+              },
+              ...districts.map((d) => ({ value: d.slug, label: d.name })),
+            ]}
+            onChange={(value) =>
+              router.push(
+                withQuery(
+                  listingPath(
+                    locale,
+                    category,
+                    citySlug,
+                    value === "all" ? null : value,
+                  ),
+                ),
+              )
+            }
+            className="shrink-0 sm:w-64"
+          />
+        )}
       </div>
+
+      {/* Open now (all categories) and Nonstop 24/7 (vets: a link to the
+          indexable /nonstop page rather than a query filter). */}
+      {(showOpenNow || showNonstop || nonstopPage) && (
+        <div className="flex flex-wrap gap-2">
+          {showOpenNow && (
+            <Link
+              href={withQuery(locationPath, { open: openNow ? null : "1" })}
+              aria-current={openNow ? "true" : undefined}
+              scroll={false}
+              className={`inline-flex min-h-10 items-center gap-1.5 rounded-[var(--radius-pill)] border px-3.5 text-sm font-semibold transition ${
+                openNow
+                  ? "border-transparent bg-brand-green text-white"
+                  : "border-line bg-surface text-foreground/70 hover:text-brand-blue"
+              }`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full ${openNow ? "bg-white" : "bg-brand-green"}`}
+                aria-hidden="true"
+              />
+              {t.listing.openNowFilter}
+            </Link>
+          )}
+          {(showNonstop || nonstopPage) && (
+            <Link
+              href={withQuery(
+                listingPath(
+                  locale,
+                  category,
+                  citySlug,
+                  nonstopPage ? null : NONSTOP_SEGMENT,
+                ),
+              )}
+              aria-current={nonstopPage ? "page" : undefined}
+              className={`inline-flex min-h-10 items-center rounded-[var(--radius-pill)] border px-3.5 text-sm font-semibold transition ${
+                nonstopPage
+                  ? "border-transparent bg-red-600 text-white"
+                  : "border-line bg-surface text-red-700 hover:border-red-300"
+              }`}
+            >
+              {t.listing.nonstopFilter}
+            </Link>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div
@@ -128,7 +218,9 @@ export function FilterPanel({
               >
                 {value ? (
                   <>
-                    <StarIcon className={`h-4 w-4 ${active ? "text-white" : "text-brand-amber"}`} />
+                    <StarIcon
+                      className={`h-4 w-4 ${active ? "text-white" : "text-brand-amber"}`}
+                    />
                     {numberFormat.format(Number(value))}+
                   </>
                 ) : (
@@ -144,11 +236,21 @@ export function FilterPanel({
           placeholder={t.listing.sortLabel}
           value={sort ?? "default"}
           options={[
-            { value: "default", label: near ? t.listing.sortNearest : t.listing.sortRecommended },
+            {
+              value: "default",
+              label: near ? t.listing.sortNearest : t.listing.sortRecommended,
+            },
             { value: "rating", label: t.listing.sortRating },
             { value: "reviews", label: t.listing.sortReviews },
           ]}
-          onChange={(value) => router.push(withQuery(locationPath, { sort: value === "default" ? null : value }), { scroll: false })}
+          onChange={(value) =>
+            router.push(
+              withQuery(locationPath, {
+                sort: value === "default" ? null : value,
+              }),
+              { scroll: false },
+            )
+          }
           className="shrink-0 sm:w-64"
         />
       </div>

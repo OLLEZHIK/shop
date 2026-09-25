@@ -6,6 +6,7 @@ import type { DistrictSummary } from "@/lib/data";
 import { CATEGORY_THEME, categoryLabel, listingPath } from "@/lib/categories";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { CategoryIcon } from "./CategoryIcon";
+import { MIN_DISTRICT_LISTINGS } from "@/lib/districts";
 import { ArrowRightIcon, MapPinIcon } from "./icons";
 
 // Pick a neighbourhood, see what's there. Chips are sized by real
@@ -87,13 +88,9 @@ export function DistrictExplorer({
           </div>
 
           <ul className="mt-6 space-y-2">
-            {district.byCategory.map((c) => (
-              <li key={c.categorySlug}>
-                <Link
-                  href={listingPath(locale, c.category, citySlug, district.slug)}
-                  className="group flex items-center gap-3 rounded-[var(--radius-control)] p-2.5 transition hover:bg-surface-sunken"
-                  style={{ "--accent": CATEGORY_THEME[c.category].accent } as React.CSSProperties}
-                >
+            {district.byCategory.map((c) => {
+              const row = (
+                <>
                   <span className="accent-soft flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
                     <CategoryIcon category={c.category} className="h-5 w-5" />
                   </span>
@@ -101,10 +98,31 @@ export function DistrictExplorer({
                     {categoryLabel(c.category, locale)} <span className="sr-only">– {district.name}</span>
                   </span>
                   <span className="text-sm text-foreground/60">{c.count}</span>
-                  <ArrowRightIcon className="h-4 w-4 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-brand-blue" />
-                </Link>
-              </li>
-            ))}
+                </>
+              );
+              const style = { "--accent": CATEGORY_THEME[c.category].accent } as React.CSSProperties;
+              // Linked only with enough places (lib/districts.ts); smaller
+              // counts stay as plain information.
+              return (
+                <li key={c.categorySlug}>
+                  {c.count >= MIN_DISTRICT_LISTINGS ? (
+                    <Link
+                      href={listingPath(locale, c.category, citySlug, district.slug)}
+                      className="group flex items-center gap-3 rounded-[var(--radius-control)] p-2.5 transition hover:bg-surface-sunken"
+                      style={style}
+                    >
+                      {row}
+                      <ArrowRightIcon className="h-4 w-4 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-brand-blue" />
+                    </Link>
+                  ) : (
+                    <div className="flex items-center gap-3 p-2.5" style={style}>
+                      {row}
+                      <span className="h-4 w-4" aria-hidden="true" />
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       ))}

@@ -1,0 +1,10 @@
+{
+  "name": "Testville",
+  "slug": "testville",
+  "country": "SK",
+  "locale": "sk",
+  "lat": 48.5,
+  "lng": 17.5,
+  "sources": ["fixture"],
+  "observed_at": "2026-09-25"
+}

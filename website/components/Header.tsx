@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getAllDistricts, getDefaultCity, getCityPoints } from "@/lib/data";
+import { getAllDistricts, getDefaultCity, getCityPoints, getDistrictSummaries } from "@/lib/data";
+import { districtCountMap } from "@/lib/districts";
 import { ALL_CATEGORIES, CATEGORY_THEME, categoryBlurb, categoryLabel, categorySlug, listingPath } from "@/lib/categories";
 import { getDictionary, localePath, type Locale } from "@/lib/i18n";
 import { Logo } from "./Logo";
@@ -9,7 +10,12 @@ import { FindCareButton, SearchDialog } from "./SearchDialog";
 import { HeaderShell } from "./HeaderShell";
 
 export async function Header({ locale }: { locale: Locale }) {
-  const [city, cityPoints, districts] = await Promise.all([getDefaultCity(), getCityPoints(), getAllDistricts()]);
+  const [city, cityPoints, districts, districtSummaries] = await Promise.all([
+    getDefaultCity(),
+    getCityPoints(),
+    getAllDistricts(),
+    getDistrictSummaries(),
+  ]);
   const citySlug = city?.slug ?? "";
   const t = getDictionary(locale);
 
@@ -91,6 +97,7 @@ export async function Header({ locale }: { locale: Locale }) {
         categories={searchCategories}
         districts={searchDistricts}
         cities={cities}
+        districtCounts={districtCountMap(districtSummaries)}
       />
     </HeaderShell>
   );
