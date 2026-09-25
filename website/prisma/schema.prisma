@@ -27,6 +27,9 @@ model City {
   currency   String?
   locales    String[]   @default([])
   inPhrases  Json?
+  // Hash of the city's data folder and the seed code at the last seed;
+  // the seed skips a city whose hash hasn't changed (docs/database.md).
+  seedHash   String?
   districts  District[]
   businesses Business[]
 }

@@ -8,7 +8,7 @@
 //   keeps working on the old code. See docs/database.md.
 // - A brand-new database and production builds also run the seed, so
 //   merged CSV changes reach the live site (upserts by slug, safe to
-//   repeat). Previews never seed an existing database, so an unmerged PR
+//   repeat; only cities whose data changed are reseeded). Previews never seed an existing database, so an unmerged PR
 //   can't change live data.
 // - Local builds (no VERCEL env): touch nothing.
 import { execSync } from "child_process";
