@@ -1,0 +1,98 @@
+business_slug,price_code,weight_from_kg,weight_to_kg,price_from,price_to,currency,source_url,observed_at,notes
+psi-salon-vesela-labka-ruzinov,full_groom,,5,40,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava pes do 5 kg (od 40 €)
+psi-salon-vesela-labka-ruzinov,full_groom,5,15,50,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava pes od 5-15 kg (od 50 €)
+psi-salon-vesela-labka-ruzinov,full_groom,15,25,60,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kompletná úprava pes od 15-25 kg (od 60 €)
+psi-salon-vesela-labka-ruzinov,bath_dry,,5,27,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie malý pes do 5 kg (od 27 € / 60 min)
+psi-salon-vesela-labka-ruzinov,bath_dry,5,15,35,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie stredný pes 5-15 kg (od 35 € / 90 min)
+psi-salon-vesela-labka-ruzinov,bath_dry,15,25,45,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Kúpanie veľký pes 15-25 kg (od 45 € / 120 min)
+psi-salon-vesela-labka-ruzinov,hand_stripping,,,25,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Trimovanie: každá začatá hodina 25 €
+psi-salon-vesela-labka-petrzalka,full_groom,,,40,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,"podľa veľkosti psa (MINI/SMALL/MEDIUM), bez hmotnosti v cenníku; Kompletná úprava malý pes (od 40 €); Kompletná úprava stredný pes (od 50 €); Kompletná úprava veľký pes (od 60 €)"
+psi-salon-vesela-labka-petrzalka,bath_dry,,,20,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,"podľa veľkosti psa (MINI/SMALL/MEDIUM), bez hmotnosti v cenníku; Kúpanie malý pes (od 20 €); Kúpanie stredný pes (od 25 €); Kúpanie veľký pes (od 30 €)"
+psi-salon-vesela-labka-petrzalka,hand_stripping,,,25,,EUR,https://veselalabka.sk/sk/cennik,2026-09-20,Trimovanie: 25 € za hodinu
+dog-culture,bath_dry,,,34,74,EUR,https://dogculture.sk/#cennik,2026-09-20,"podľa veľkosti psa (SMALL/MEDIUM/LARGE/XL), bez hmotnosti v cenníku; Kúpanie & česanie (veľkosť S); Kúpanie & česanie (veľkosť M); Kúpanie & česanie (veľkosť L); Kúpanie & česanie (veľkosť XL)"
+dog-culture,full_groom,,,54,94,EUR,https://dogculture.sk/#cennik,2026-09-20,"podľa veľkosti psa (SMALL/MEDIUM/LARGE/XL), bez hmotnosti v cenníku; Strihanie & kúpanie (veľkosť S); Strihanie & kúpanie (veľkosť M); Strihanie & kúpanie (veľkosť L); Strihanie & kúpanie (veľkosť XL)"
+dog-culture,hand_stripping,,,64,104,EUR,https://dogculture.sk/#cennik,2026-09-20,"podľa veľkosti psa (SMALL/MEDIUM/LARGE/XL), bez hmotnosti v cenníku; Trímovanie & kúpanie (veľkosť S); Trímovanie & kúpanie (veľkosť M); Trímovanie & kúpanie (veľkosť L); Trímovanie & kúpanie (veľkosť XL)"
+psi-salon-zuzana,full_groom,,8,43,,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kompletná úprava: malý pes do 8 kg (od 43 €)
+psi-salon-zuzana,full_groom,8,20,48,,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kompletná úprava: stredný pes do 20 kg (od 48 €)
+psi-salon-zuzana,full_groom,20,,65,,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kompletná úprava: veľký pes nad 20 kg (od 65 €)
+psi-salon-zuzana,bath_dry,,8,25,,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kúpanie a sušenie: malý pes do 8 kg (od 25 €)
+psi-salon-zuzana,bath_dry,8,20,35,,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kúpanie a sušenie: stredný pes do 20 kg (od 35 €)
+psi-salon-zuzana,bath_dry,20,,55,,EUR,https://salon-pre-psov.sk/cennik/,2026-09-20,Kúpanie a sušenie: veľký pes nad 20 kg (od 55 €)
+psi-salon-my-champ,full_groom,,5,45,45,EUR,https://mychamp.sk/#cennik,2026-09-20,"Luxusný kompletný balíček: MINI do 5 kg (kúpanie, balzam, fénovanie, strih, hygiena)"
+psi-salon-my-champ,full_groom,5,10,55,55,EUR,https://mychamp.sk/#cennik,2026-09-20,Luxusný kompletný balíček: MALÝ do 10 kg (kompletný strih & úprava)
+psi-salon-my-champ,full_groom,10,20,60,60,EUR,https://mychamp.sk/#cennik,2026-09-20,Luxusný kompletný balíček: STREDNÝ do 20 kg (hĺbkové vyčesávanie & strih)
+psi-salon-my-champ,full_groom,20,,75,75,EUR,https://mychamp.sk/#cennik,2026-09-20,Luxusný kompletný balíček: VEĽKÝ nad 20 kg (náročná profesionálna úprava)
+psi-salon-my-champ,bath_dry,,10,20,20,EUR,https://mychamp.sk/#cennik,2026-09-20,Kúpanie + fénovanie: malý pes do 10 kg
+psi-salon-my-champ,bath_dry,10,20,25,25,EUR,https://mychamp.sk/#cennik,2026-09-20,Kúpanie + fénovanie: stredný pes do 20 kg
+psi-salon-my-champ,bath_dry,20,30,35,35,EUR,https://mychamp.sk/#cennik,2026-09-20,Kúpanie + fénovanie: veľký pes do 30 kg
+psi-salon-my-champ,bath_dry,30,,45,45,EUR,https://mychamp.sk/#cennik,2026-09-20,Kúpanie + fénovanie: obrí pes nad 30 kg
+salon-pre-psov-terra,full_groom,,5,50,,EUR,https://www.salonterra.sk/#price,2026-09-20,Kompletná úprava: malý pes do 5 kg (od 50 €)
+salon-pre-psov-terra,full_groom,5,10,60,,EUR,https://www.salonterra.sk/#price,2026-09-20,Kompletná úprava: malý pes do 10 kg (od 60 €)
+salon-pre-psov-terra,full_groom,10,20,60,,EUR,https://www.salonterra.sk/#price,2026-09-20,Kompletná úprava: stredný pes do 20 kg (od 60 €)
+salon-pre-psov-terra,full_groom,20,,70,,EUR,https://www.salonterra.sk/#price,2026-09-20,Kompletná úprava: veľký pes od 20 kg (od 70 €)
+salon-pre-psov-terra,bath_dry,,,30,,EUR,https://www.salonterra.sk/#price,2026-09-20,"podľa veľkosti psa (SMALL/MEDIUM/LARGE/XL), bez hmotnosti v cenníku; Kúpanie + česanie: malý pes (od 30 €); Kúpanie + česanie: stredný pes (od 40 €); Kúpanie + česanie: veľký pes (od 50 € - 60 €); Kúpanie + česanie: XXL pes (od 80 €)"
+salon-pre-psov-labku-na-to,full_groom,,,25,34,EUR,https://labkunato.sk/#cennik,2026-09-20,"podľa veľkosti psa (MINI/SMALL/MEDIUM), bez hmotnosti v cenníku; Kúpanie, fénovanie, strihanie, uši, pazúriky, žľazy: Čivava (25 €); Kúpanie, fénovanie, strihanie, uši, pazúriky, žľazy: Malý pes do 8 kg (29 €); Kúpanie, fénovanie, strihanie, uši, pazúriky, žľazy: Stredný pes do 18 kg (34 €)"
+salon-pre-psov-labku-na-to,bath_dry,,,25,46,EUR,https://labkunato.sk/#cennik,2026-09-20,"podľa veľkosti psa (SMALL/MEDIUM/LARGE), bez hmotnosti v cenníku; Kúpanie, fénovanie, vyčesávanie: Malý pes (25 €); Kúpanie, fénovanie, vyčesávanie: Stredný pes (35 €); Kúpanie, fénovanie, vyčesávanie: Veľký pes do 30 kg (46 €)"
+dog-s-beauty-wellness,full_groom,,,53,110,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,"podľa veľkosti psa (MINI/SMALL/MEDIUM/LARGE/XL), bez hmotnosti v cenníku; Strihanie psov: XS pes (vyčesávanie, kúpanie, pazúry, strih); Strihanie psov: S pes; Strihanie psov: M pes; Strihanie psov: L pes; Strihanie psov: XL pes"
+dog-s-beauty-wellness,hand_stripping,,,40,,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,Trimovanie: za každú 1 hodinu 40 €
+dog-s-beauty-wellness,bath_dry,,,32,72,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-20,"podľa veľkosti psa (MINI/SMALL/MEDIUM/LARGE/XL), bez hmotnosti v cenníku; Kúpanie a wellness (krátkosrsté psy): XS pes; Kúpanie a wellness (krátkosrsté psy): S pes; Kúpanie a wellness (krátkosrsté psy): M pes; Kúpanie a wellness (krátkosrsté psy): L pes; Kúpanie a wellness (krátkosrsté psy): XL pes"
+sibra-centrum-veterinarnej-mediciny,exam,,,21,21,EUR,https://www.sibra.sk/cennik/zakladne-ukony,2026-09-25,Konzultácia bez iného výkonu do 30 min. (21 € s DPH)
+sibra-centrum-veterinarnej-mediciny,vaccination_dog,,,56.6,,EUR,https://www.sibra.sk/cennik/vakcinacie,2026-09-25,"Infekčné ochorenia – pes (od 56,60 € s DPH; psinka, parvoviróza, hepatitída, parainfluenza, leptospiróza); Kompletná vakcinácia – pes (+ proti besnote a zápisom do CRSZ, od 70,60 € s DPH)"
+sibra-centrum-veterinarnej-mediciny,neuter_cat,,,150,,EUR,https://www.sibra.sk/cennik/ceny-vybranych-operacii,2026-09-25,Kastrácia kocúra (od 150 € s DPH)
+sibra-centrum-veterinarnej-mediciny,spay_cat,,,178,,EUR,https://www.sibra.sk/cennik/ceny-vybranych-operacii,2026-09-25,Sterilizácia mačky (od 178 € s DPH)
+sibra-centrum-veterinarnej-mediciny,spay_dog,,,410,,EUR,https://www.sibra.sk/cennik/ceny-vybranych-operacii,2026-09-25,Sterilizácia sučky v inhalačnej anestézii (od 410 € s DPH)
+vetpoint-veterinarna-klinika,exam,,,33,33,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,Klinické vyšetrenie polysystémové (33 €)
+vetpoint-veterinarna-klinika,vaccination_dog,,,60,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Infekčné choroby pes – psinka, parvoviróza, inf. hepatitída, parainfluenza, leptospiróza (od 60 €); Kompletná vakcinácia* pes – psinka, parvoviróza, hepatitída, parainfluenza, lepto + besnota (od 79 €)"
+vetpoint-veterinarna-klinika,microchip,,,10,10,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,Čipovanie + mikročip (10 €; registrácia/zmeny v CRSZ 25 €)
+vetpoint-veterinarna-klinika,neuter_cat,,,160,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Kastrácia kocúr – celková cena zahŕňa klinické vyšetrenie, anestéziu, úkon, materiál a hospitalizáciu (od 160 €)"
+vetpoint-veterinarna-klinika,spay_cat,,,270,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Sterilizácia mačka – celková cena zahŕňa vyšetrenie, anestéziu, úkon, hospitalizáciu (od 270 €)"
+vetpoint-veterinarna-klinika,spay_dog,,,680,,EUR,https://cdn.prod.website-files.com/60fb110bb47fc6b287d374e8/6aa6c5589fa42d4f2d0ee0b4_cenni%CC%81k_na%CC%81stenkovy%CC%81_20260913.pdf,2026-09-25,"Sterilizácia sučka – celková cena zahŕňa vyšetrenie, krv, inhalačnú anestéziu, úkon, hospitalizáciu (od 680 €)"
+veterinarna-poliklinika-bajvet,exam,,,30,30,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Klinické vyšetrenie a konzultácia (30 €)
+veterinarna-poliklinika-bajvet,vaccination_dog,,,36,,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Komplexná vakcína pes (od 36 €)
+veterinarna-poliklinika-bajvet,neuter_cat,,,80,80,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia kocúr (80 €)
+veterinarna-poliklinika-bajvet,spay_cat,,,120,120,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – mačka (120 €)
+veterinarna-poliklinika-bajvet,spay_dog,,5,180,180,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka do 5 kg (180 €)
+veterinarna-poliklinika-bajvet,spay_dog,5,10,200,200,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka 5–10 kg (200 €)
+veterinarna-poliklinika-bajvet,spay_dog,10,20,220,220,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka 10–20 kg (220 €)
+veterinarna-poliklinika-bajvet,spay_dog,20,40,240,240,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka 20–40 kg (240 €)
+veterinarna-poliklinika-bajvet,spay_dog,40,,270,270,EUR,https://www.bajvet.sk/cennik/,2026-09-25,Kastrácia samice – sučka nad 40 kg (270 €)
+mypet-clinic,exam,,,39,39,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Základné klinické vyšetrenie (39,00 €)"
+mypet-clinic,vaccination_dog,,,39.5,39.5,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Očkovanie pes Nobivac Kompletka (39,50 €)"
+mypet-clinic,microchip,,,29,29,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Čip a čipovanie (29,00 €)"
+mypet-clinic,neuter_cat,,,78,78,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Kastrácia kocúr (78,00 €)"
+mypet-clinic,spay_cat,,,114,114,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Sterilizácia mačka (114,00 €)"
+mypet-clinic,spay_dog,,10,169,169,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Sterilizácia pes do 10 kg (169,00 €)"
+mypet-clinic,spay_dog,10,20,198,198,EUR,https://www.mypet.sk/cennik/,2026-09-25,"Sterilizácia pes do 20 kg (198,00 €)"
+vet-svet-veterinarna-ambulancia,microchip,,,27,27,EUR,https://vetsvet.sk/povinne-cipovanie-psov/,2026-09-25,"Povinné čipovanie psov na počkanie (27,- EUR)"
+super-zoo-veterina,exam,,,28,28,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Klinické vyšetrenie pes, mačka (28,00 €)"
+super-zoo-veterina,vaccination_dog,,,35,,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Vakcinácia pes infekčné ochorenia (od 35,00 €)"
+super-zoo-veterina,microchip,,,33.9,33.9,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Čipovanie a registrácia v CRSZ (33,90 €)"
+super-zoo-veterina,neuter_cat,,,42,,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Kastrácia kocúr – operačný úkon bez anestézy (42,00 €)"
+super-zoo-veterina,spay_cat,,,79,,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Sterilizácia mačka – operačný úkon bez anestézy (79,00 €)"
+super-zoo-veterina,spay_dog,,,130,,EUR,https://www.superzooveterina.sk/_files/ugd/e88797_e29c988a674f4e2181b24efc0159df98.pdf,2026-09-25,"Sterilizácia fena – operačný úkon bez anestézy (130,00 €)"
+veterinarna-klinika-lapvet,exam,,,25,45,EUR,https://www.lapvet.sk#cennik,2026-09-25,"Bežné vyšetrenie – klinické vyšetrenie, konzultácia (25 € – 45 €)"
+veterinarna-klinika-lapvet,vaccination_dog,,,20,50,EUR,https://www.lapvet.sk#cennik,2026-09-25,cena pre psov aj mačky; Očkovanie – kompletné očkovanie + zápis (20 € – 50 €)
+veterinarna-klinika-lapvet,microchip,,,30,50,EUR,https://www.lapvet.sk#cennik,2026-09-25,Čipovanie + pas – mikročip + medzinárodný pas (30 € – 50 €)
+petvet-veterinarna-klinika,exam,,,36.6,36.6,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Konzultácia štandardná do 20 min. (36,60 €; vstupná prehliadka bezplatne)"
+petvet-veterinarna-klinika,vaccination_dog,,,45.3,45.3,EUR,http://www.petvet.sk/#cennik,2026-09-25,"cena pre psov aj mačky; Vakcinácia – základné vakcíny (45,30 €)"
+petvet-veterinarna-klinika,microchip,,,29.5,29.5,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Čipovanie a evidencia v CRSZ (29,50 €)"
+petvet-veterinarna-klinika,neuter_cat,,,74,74,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Kastrácia – kocúr (74,00 €)"
+petvet-veterinarna-klinika,spay_cat,,,109,109,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Sterilizácia – mačka (109,00 €)"
+petvet-veterinarna-klinika,spay_dog,,,222,,EUR,http://www.petvet.sk/#cennik,2026-09-25,"Sterilizácia – fenka (od 222,00 €)"
+veterinarna-ambulancia-spektravet,exam,,,17,17,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Klinické vyšetrenie (17 €; kontrolné vyšetrenie 10 €)
+veterinarna-ambulancia-spektravet,vaccination_dog,,,32,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Kompletná vakcinácia pes – infekčné ochorenia + besnota + zápis do CRSZ (od 32 €)
+veterinarna-ambulancia-spektravet,microchip,,,20,20,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Čipovanie + mikročip + registrácia do CRSZ (20 €)
+veterinarna-ambulancia-spektravet,neuter_cat,,,70,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Kastrácia – kocúr (od 70 € v inhalačnej anestézii)
+veterinarna-ambulancia-spektravet,spay_cat,,,120,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Sterilizácia – mačka (od 120 € v inhalačnej anestézii)
+veterinarna-ambulancia-spektravet,spay_dog,,,150,,EUR,https://www.spektravet.sk/sk/sluzby/cennik-veterinarnych-sluzieb,2026-09-25,Sterilizácia – fena (od 150 € v inhalačnej anestézii)
+vetpetrzalka-veterinarna-ambulancia,exam,,,30.82,30.82,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Klinické vyšetrenie základné (30,82 €)"
+vetpetrzalka-veterinarna-ambulancia,vaccination_dog,,,45.85,45.85,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Kompletná vakcinácia – pes: psinka, parvoviróza, inf. hepatitída, parainfluenza, lepto + besnota (45,85 €)"
+vetpetrzalka-veterinarna-ambulancia,microchip,,,5,5,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,"Čipovanie + mikročip výsledná suma (5,00 €; registrácia v CRSZ 25,42 €)"
+vetpetrzalka-veterinarna-ambulancia,neuter_cat,,,99,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Kastrácia kocúra (od 99 €)
+vetpetrzalka-veterinarna-ambulancia,spay_cat,,,120,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Sterilizácia mačky (od 120 €)
+vetpetrzalka-veterinarna-ambulancia,spay_dog,,,240,,EUR,https://www.vetpetrzalka.sk#cennik,2026-09-25,Sterilizácia fenky (od 240 €)
+dermavet-veterinarna-ambulancia,exam,,,22,22,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Klinické vyšetrenie (22 € s DPH)
+dermavet-veterinarna-ambulancia,vaccination_dog,,,40,,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Kompletná vakcinácia psa – besnota + infekčné ochorenia psov (od 40 €)
+dermavet-veterinarna-ambulancia,microchip,,,25,25,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Čipovanie + registrácia do CRSZ (25 €)
+dermavet-veterinarna-ambulancia,neuter_cat,,,100,,EUR,https://dermavet.sk/assets/files/20260701_DermaVet_Cennk.pdf,2026-09-25,Kastrácia – kocúr s anestéziou (od 100 €)
+veterinarna-ambulancia-mvdr-pavol-cech,exam,,,30,,EUR,https://veterinalamac.sk/cennik,2026-09-25,Vstupné klinické vyšetrenie nový klient (Od 30 €)

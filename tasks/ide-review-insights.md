@@ -4,7 +4,7 @@
 **Роль:** Content / research agent.
 **Тип:** контент по отзывам, объём большой. Делается в 2 PR: пилот на 10 заведений, после ревью — остальные.
 **Ветка:** `antigravity/review-insights`. Для второго PR — `antigravity/review-insights-rest`.
-**Зависимости:** нет. Задача **не трогает** `data/*.csv`, пишет только новые файлы в `data/review-insights/`, поэтому идёт параллельно с очередью CSV-задач.
+**Зависимости:** нет. Задача **не трогает** `data/*.csv`, пишет только новые файлы в `data/cities/bratislava/review-insights/`, поэтому идёт параллельно с очередью CSV-задач.
 
 ## Зачем
 
@@ -23,7 +23,8 @@ Omnibus), а Google за такое наказывает весь сайт. Че
 
 ## Что сделать
 
-Для каждого заведения — один файл `data/review-insights/<slug>.json`.
+Для каждого заведения — один файл `data/cities/bratislava/review-insights/<slug>.json`
+(до 2026-09-25 папка была `data/review-insights/`, файлы пилота перенесены туда же).
 `slug` — как на сайте (`/business/<slug>/`).
 
 **Пилот (PR 1):** 10 заведений с наибольшим `google_rating_count`, из
@@ -112,7 +113,7 @@ Omnibus), а Google за такое наказывает весь сайт. Че
 
 ## Готово, когда
 
-- PR 1: 10 файлов `data/review-insights/*.json` по формату выше.
+- PR 1: 10 файлов `data/review-insights/*.json` (теперь в `data/cities/bratislava/review-insights/`) по формату выше.
   Каждый файл — валидный JSON, `cards` ровно 3, `faq` 3–6, все тексты
   EN+SK, `text` 250–450 символов.
 - В описании PR — таблица: заведение, `reviews_in_period`, темы карточек

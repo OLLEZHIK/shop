@@ -7,10 +7,13 @@
 
 Решение владельца (2026-09-25). Где хранится: для новых городов —
 `data/cities/<город>/businesses.csv` (см. `docs/playbooks/add-city.md`).
-Братислава переезжает туда же (`data/cities/bratislava/`): оркестратор
-переносит старые `data/*-bratislava.csv` скриптом после мерджа текущих
-задач по часам работы, логотипам и ценам ветклиник. Новые задачи по
-Братиславе ставятся уже на новый файл.
+Братислава переехала туда же (`data/cities/bratislava/`, 2026-09-25).
+Пока не смёржены задачи по часам работы (`mac/collect-hours-and-vet-services`)
+и логотипам (PR #73), которые ещё пишут в старые `data/*-bratislava.csv`,
+`businesses.csv` Братиславы генерируется из них скриптом
+(`data/cities/bratislava/README.md`) и руками не правится. Цены
+(`prices.csv`) и сводки отзывов (`review-insights/`) уже только в новой
+папке. Новые задачи по Братиславе ставятся на новые файлы.
 
 ## Два языка
 
@@ -96,7 +99,7 @@
 ### 7. Что говорят клиенты — на двух языках
 
 Отдельный файл на заведение: `data/cities/<город>/review-insights/<slug>.json`
-(для Братиславы — `data/review-insights/<slug>.json`). Формат, правила и
+(для Братиславы тоже). Формат, правила и
 порог (≥ 5 отзывов с текстом за полгода) — `tasks/ide-review-insights.md`.
 Все `title` / `text` / `q` / `a` — парой `{ "en": …, "<locale>": … }`.
 
@@ -209,8 +212,8 @@
 
 ### Файл и правила
 
-Файл — `data/cities/<город>/prices.csv` (для Братиславы сюда переедут
-цены груминга из `data/salon-prices-bratislava.csv` и цены ветклиник):
+Файл — `data/cities/<город>/prices.csv` (для Братиславы сюда 2026-09-25
+перенесены собранные цены груминга и ветклиник):
 
 ```
 business_slug,price_code,weight_from_kg,weight_to_kg,price_from,price_to,currency,source_url,observed_at,notes
