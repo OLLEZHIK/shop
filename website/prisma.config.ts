@@ -1,20 +1,19 @@
 import { config as loadEnv } from "dotenv";
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
+import { directDatabaseUrl } from "./prisma/db-url";
 
 // dotenv/config defaults to `.env`; this project follows Next.js
 // convention and keeps secrets in `.env.local` instead.
-loadEnv({ path: ".env.local" });
+loadEnv({ path: ".env.local", quiet: true });
 
 // Prisma 7 removed `datasource.url`/`directUrl` from schema.prisma in favor
-// of this file. The CLI (migrate, generate, `prisma db seed`) and the
-// db:seed script both need DDL support, which Prisma Postgres's pooled
-// Accelerate endpoint (DATABASE_URL) doesn't provide — so this points at
-// the direct connection instead. The Next.js app's own runtime Prisma
-// Client (added in a later task) should use DATABASE_URL with the
-// Accelerate extension for pooling; see docs/database.md.
+// of this file. The CLI (migrate, generate, `prisma db seed`) needs DDL
+// support, so it uses the direct (unpooled) connection; the app itself
+// uses the pooled one (lib/prisma.ts). See prisma/db-url.ts.
+const url = directDatabaseUrl();
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
-  datasource: {
-    url: env("DIRECT_URL"),
-  },
+  // `prisma generate` (postinstall) runs without any database configured.
+  ...(url ? { datasource: { url } } : {}),
 });

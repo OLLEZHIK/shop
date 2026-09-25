@@ -3,33 +3,67 @@
    below should be hardcoded again in a component. */
 
 :root {
-  /* Brand colors - moved from globals.css as-is, values unchanged */
+  /* Brand colors */
   --brand-orange: #FF6B35;
+  --brand-orange-deep: #E8541F;
   --brand-blue: #004E89;
+  --brand-blue-deep: #0B2545;
   --brand-green: #06A77D;
   --brand-amber: #F59E0B;
-  --background: #F7F9FB;
-  --foreground: #171717;
+
+  /* Surfaces - warm off-white page, pure white cards, a deep navy
+     "ink" surface for contrast bands (footer, CTA). */
+  --background: #FAF7F2;
+  --surface: #FFFFFF;
+  --surface-sunken: #F3EEE6;
+  --ink: #0B2545;
+  --foreground: #14161B;
+  --line: rgba(20, 22, 27, 0.08);
+
+  /* Category accents - one hue per service so a category reads the
+     same everywhere (tiles, card avatars, listing hero). */
+  --cat-grooming: #D6457F;
+  --cat-vet: #0E8A8C;
+  --cat-hotel: #6A56D6;
+  --cat-training: #E8731E;
+  --cat-shop: #2B74D1;
+  --cat-sitting: #1E9A62;
 
   /* Muted brand tones for hover/active surfaces (nav pills, dropdown
      items) - softer than the raw brand colors, still legibly branded. */
-  --brand-orange-muted: color-mix(in srgb, var(--brand-orange) 16%, white);
-  --brand-blue-muted: color-mix(in srgb, var(--brand-blue) 12%, white);
+  --brand-orange-muted: color-mix(in srgb, var(--brand-orange) 14%, white);
+  --brand-blue-muted: color-mix(in srgb, var(--brand-blue) 10%, white);
   --brand-orange-muted-border: color-mix(in srgb, var(--brand-orange) 45%, white);
-  --brand-blue-muted-border: color-mix(in srgb, var(--brand-blue) 40%, white);
+  --brand-blue-muted-border: color-mix(in srgb, var(--brand-blue) 35%, white);
 
   /* Radii */
-  --radius-card: 16px;
-  --radius-control: 12px;
+  --radius-card: 20px;
+  --radius-control: 14px;
   --radius-pill: 999px;
 
   /* Shadows - soft, offset, never a flat colored halo */
-  --shadow-card: 0 1px 2px rgba(23, 23, 23, 0.04), 0 10px 28px -12px rgba(23, 23, 23, 0.14);
-  --shadow-card-hover: 0 2px 6px rgba(23, 23, 23, 0.06), 0 20px 44px -14px rgba(23, 23, 23, 0.22);
-  --shadow-panel: 0 16px 40px -14px rgba(23, 23, 23, 0.22);
+  --shadow-card: 0 1px 2px rgba(20, 22, 27, 0.04), 0 8px 24px -12px rgba(20, 22, 27, 0.12);
+  --shadow-card-hover: 0 2px 6px rgba(20, 22, 27, 0.06), 0 22px 44px -16px rgba(20, 22, 27, 0.24);
+  --shadow-panel: 0 24px 60px -20px rgba(11, 37, 69, 0.28);
+
+  /* Sticky header height (components/Header.tsx: h-11 + py-3 on phones,
+     h-12 + py-4 from md). Used to slide page heroes under it. */
+  --header-h: 68px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 80px;
+  }
 }
 
 @theme inline {
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-line: var(--line);
+  --color-brand-orange-deep: var(--brand-orange-deep);
+  --color-brand-blue-deep: var(--brand-blue-deep);
   --color-brand-orange-muted: var(--brand-orange-muted);
   --color-brand-blue-muted: var(--brand-blue-muted);
   --color-brand-orange-muted-border: var(--brand-orange-muted-border);
@@ -43,9 +77,8 @@
   --shadow-card-hover: var(--shadow-card-hover);
   --shadow-panel: var(--shadow-panel);
 
-  /* Heading font: set from next/font/google's --font-heading variable
-     (applied to <html> in layout.tsx), Inter as fallback if it fails
-     to load - never the system sans as the display voice. */
+  /* Heading font: Plus Jakarta Sans via next/font (layout.tsx), Inter
+     body font as fallback - never the system sans as the display voice. */
   --font-heading: var(--font-plus-jakarta-sans), var(--font-sans);
 }
 
@@ -62,4 +95,75 @@
   border-color: var(--brand-blue-muted-border);
   background-color: var(--brand-blue-muted);
   color: var(--brand-blue);
+}
+
+/* Small uppercase label above section headings. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-orange-deep);
+}
+.eyebrow::before {
+  content: "";
+  width: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+/* Tinted surface for a category accent passed as --accent. */
+.accent-soft {
+  background: color-mix(in srgb, var(--accent) 12%, white);
+  color: var(--accent);
+}
+.accent-solid {
+  background: var(--accent);
+  color: white;
+}
+
+/* Subtle dotted texture for hero/listing header bands. */
+.dot-grid {
+  background-image: radial-gradient(rgba(11, 37, 69, 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Entrance motion - CSS only, no JS. Content is visible even if
+   animation never runs (animation-fill-mode backwards only affects
+   the delay window). */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.rise-in {
+  animation: rise-in 600ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.float-y {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+/* Short shake to point at a step the visitor skipped. */
+@keyframes nudge {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.nudge {
+  animation: nudge 300ms ease-in-out 2;
+}
+
+/* Seamless header: the first band of a page starts under the
+   transparent header, so its background runs to the top of the screen. */
+.under-header {
+  margin-top: calc(-1 * var(--header-h));
+  padding-top: var(--header-h);
 }

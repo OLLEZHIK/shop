@@ -5,47 +5,50 @@
 
 type IconProps = { className?: string };
 
+// Pet heads, 24x24 grid, same round stroke style as the rest of the set.
 export function DogIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M7.2 5.6C8.5 4.6 10.2 4 12 4s3.5.6 4.8 1.6c1.2 1.4 1.8 3.2 1.8 5.4 0 4.8-3 8.5-6.6 8.5S5.4 15.8 5.4 11c0-2.2.6-4 1.8-5.4Z" />
+      <path d="M7.2 5.6C5.3 4.9 2.8 6 2.6 8.8c-.2 2.4.9 4.3 2.9 5" />
+      <path d="M16.8 5.6c1.9-.7 4.4.4 4.6 3.2.2 2.4-.9 4.3-2.9 5" />
+      <circle cx="9.4" cy="10.4" r="1" fill="currentColor" stroke="none" />
+      <circle cx="14.6" cy="10.4" r="1" fill="currentColor" stroke="none" />
       <path
-        d="M5.5 5.5c-1.6-.4-3 .6-3 2.4 0 1.6 1 2.9 2.4 3.4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M14.5 5.5c1.6-.4 3 .6 3 2.4 0 1.6-1 2.9-2.4 3.4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <circle cx="10" cy="10.5" r="5.5" stroke="currentColor" strokeWidth="1.6" />
-      <circle cx="8" cy="9.5" r="0.9" fill="currentColor" />
-      <circle cx="12" cy="9.5" r="0.9" fill="currentColor" />
-      <path
-        d="M8.6 12.2c0-.7.6-1.2 1.4-1.2s1.4.5 1.4 1.2-.9 1.6-1.4 1.6-1.4-.9-1.4-1.6Z"
+        d="M10.5 13.4c0-.7.7-1.1 1.5-1.1s1.5.4 1.5 1.1-.9 1.5-1.5 1.5-1.5-.8-1.5-1.5Z"
         fill="currentColor"
       />
+      <path d="M12 14.9v1.3M10.2 16.8c.7.5 1.3.4 1.8-.2.5.6 1.1.7 1.8.2" />
     </svg>
   );
 }
 
 export function CatIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
-      <path d="M5 4.5 6.5 8.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M15 4.5 13.5 8.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path
-        d="M6.5 8.8c-2 3.7-.3 6.7 3.5 6.7s5.5-3 3.5-6.7"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <circle cx="8.1" cy="10.8" r="0.9" fill="currentColor" />
-      <circle cx="11.9" cy="10.8" r="0.9" fill="currentColor" />
-      <path d="M9.3 12.6h1.4l-.7 1-.7-1Z" fill="currentColor" />
-      <path d="M9.4 13.3 7.5 14.2M10.6 13.3l1.9.9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M4.8 3.8 8.7 7.3c1-.4 2.1-.6 3.3-.6s2.3.2 3.3.6l3.9-3.5v6.6c.6 1 .9 2.2.9 3.5 0 4-3.6 6.8-8.1 6.8s-8.1-2.8-8.1-6.8c0-1.3.3-2.5.9-3.5V3.8Z" />
+      <path d="M9.1 11.6v1.3M14.9 11.6v1.3" />
+      <path d="M11.2 14.6h1.6L12 15.6l-.8-1Z" fill="currentColor" />
+      <path d="M12 15.6v.7M10.7 17.1c.6.4 1 .3 1.3-.1.3.4.7.5 1.3.1" />
+      <path d="M3.2 14.2l3.3.5M3.6 17l3-.7M20.8 14.2l-3.3.5M20.4 17l-3-.7" />
     </svg>
   );
 }
@@ -93,6 +96,230 @@ export function StarIcon({ className, filled = true }: IconProps & { filled?: bo
         strokeWidth={filled ? "0" : "1.3"}
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+// Shared wrapper for the stroke icons below - same 1.6px round-cap
+// style as the icons above.
+function StrokeIcon({ className, children }: IconProps & { children: React.ReactNode }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+export function ScissorsIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <circle cx="5.5" cy="5.5" r="2.5" />
+      <circle cx="5.5" cy="14.5" r="2.5" />
+      <path d="M7.6 6.9 17 14M7.6 13.1 17 6M11 10h.01" />
+    </StrokeIcon>
+  );
+}
+
+export function StethoscopeIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M4.5 3H3.5v4.5a4 4 0 0 0 8 0V3h-1" />
+      <path d="M7.5 11.5v1a4.5 4.5 0 0 0 9 0V11" />
+      <circle cx="16.5" cy="9" r="2" />
+    </StrokeIcon>
+  );
+}
+
+export function HotelIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M2.5 16V5M2.5 12.5h15V16M17.5 12.5V10a2.5 2.5 0 0 0-2.5-2.5H9v5" />
+      <circle cx="5.8" cy="9.5" r="1.6" />
+    </StrokeIcon>
+  );
+}
+
+export function WhistleIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <circle cx="7.5" cy="12" r="4.5" />
+      <path d="M10.5 8.6 17.5 7v3.5l-5.2 1" />
+      <path d="M3 5.5 4.5 7M6.5 3.5 7 5.5M10 3.5 9.2 5.4" />
+    </StrokeIcon>
+  );
+}
+
+export function ShopBagIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M4 7h12l-1 10H5L4 7Z" />
+      <path d="M7 7V5.5a3 3 0 0 1 6 0V7" />
+    </StrokeIcon>
+  );
+}
+
+export function HeartHandIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M10 15.5S3.5 11.7 3.5 7.4A3.2 3.2 0 0 1 10 6a3.2 3.2 0 0 1 6.5 1.4c0 4.3-6.5 8.1-6.5 8.1Z" />
+    </StrokeIcon>
+  );
+}
+
+export function PhoneIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M5.5 2.8h2.2l1.2 3.4-1.7 1.1a9.5 9.5 0 0 0 5.5 5.5l1.1-1.7 3.4 1.2v2.2a1.8 1.8 0 0 1-1.9 1.8A13.6 13.6 0 0 1 3.7 4.7a1.8 1.8 0 0 1 1.8-1.9Z" />
+    </StrokeIcon>
+  );
+}
+
+export function GlobeIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <circle cx="10" cy="10" r="7.2" />
+      <path d="M2.8 10h14.4M10 2.8c2 2.1 2.9 4.5 2.9 7.2s-.9 5.1-2.9 7.2c-2-2.1-2.9-4.5-2.9-7.2s.9-5.1 2.9-7.2Z" />
+    </StrokeIcon>
+  );
+}
+
+export function RouteIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="m3 9.3 13.6-6.1-6.1 13.6-1.6-5.9L3 9.3Z" />
+    </StrokeIcon>
+  );
+}
+
+export function ArrowRightIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M4 10h12M11.5 5.5 16 10l-4.5 4.5" />
+    </StrokeIcon>
+  );
+}
+
+export function MenuIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M3 6h14M3 10h14M3 14h9" />
+    </StrokeIcon>
+  );
+}
+
+export function CloseIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="m5 5 10 10M15 5 5 15" />
+    </StrokeIcon>
+  );
+}
+
+export function ShieldCheckIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M10 2.5 16 5v4.5c0 3.8-2.6 6.6-6 8-3.4-1.4-6-4.2-6-8V5l6-2.5Z" />
+      <path d="m7.3 10 1.9 1.9 3.6-3.8" />
+    </StrokeIcon>
+  );
+}
+
+export function SearchIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <circle cx="8.8" cy="8.8" r="5.3" />
+      <path d="m12.8 12.8 4 4" />
+    </StrokeIcon>
+  );
+}
+
+export function SparkleIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M10 2.5c.6 3.8 2.2 5.4 6 6-3.8.6-5.4 2.2-6 6-.6-3.8-2.2-5.4-6-6 3.8-.6 5.4-2.2 6-6ZM16 13.5c.2 1.3.7 1.8 2 2-1.3.2-1.8.7-2 2-.2-1.3-.7-1.8-2-2 1.3-.2 1.8-.7 2-2Z" />
+    </StrokeIcon>
+  );
+}
+
+export function ClockIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <circle cx="10" cy="10" r="7.2" />
+      <path d="M10 6v4l2.6 1.6" />
+    </StrokeIcon>
+  );
+}
+
+export function TagIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M2.8 10.3V3.5a.7.7 0 0 1 .7-.7h6.8l7.4 7.4a.9.9 0 0 1 0 1.3l-5.8 5.8a.9.9 0 0 1-1.3 0l-7.8-7Z" />
+      <circle cx="6.6" cy="6.6" r="1.1" />
+    </StrokeIcon>
+  );
+}
+
+export function MailIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <rect x="2.8" y="4.5" width="14.4" height="11" rx="2" />
+      <path d="m3.5 5.5 6.5 5 6.5-5" />
+    </StrokeIcon>
+  );
+}
+
+export function RabbitIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M8 8.5C6.8 6.5 6.3 3.8 7.3 3c1-.8 2.4 1.7 2.7 4.6M12 8.5c1.2-2 1.7-4.7.7-5.5-1-.8-2.4 1.7-2.7 4.6" />
+      <circle cx="10" cy="12.2" r="4.5" />
+      <path d="M8.4 11.6h.01M11.6 11.6h.01M9.3 13.6c.4.3 1 .3 1.4 0" />
+    </StrokeIcon>
+  );
+}
+
+export function BirdIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M3 14.5c4 1.2 9 .4 11.5-3.8L17 9l-2.6-.8A4.2 4.2 0 0 0 7 9.7L3 14.5Z" />
+      <path d="M12.2 7.8h.01M8 14.8l-1 2.4M10.5 14.6l-.4 2.6" />
+    </StrokeIcon>
+  );
+}
+
+export function FishIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M2.8 10c2.3-3.4 5.5-4.6 8.6-4.6 2.7 0 4.8 1.9 5.8 4.6-1 2.7-3.1 4.6-5.8 4.6-3.1 0-6.3-1.2-8.6-4.6Z" />
+      <path d="M2.8 10 1.5 7.5M2.8 10l-1.3 2.5M13.4 9.2h.01" />
+    </StrokeIcon>
+  );
+}
+
+export function InstagramIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <rect x="3" y="3" width="14" height="14" rx="4" />
+      <circle cx="10" cy="10" r="3.2" />
+      <circle cx="14.2" cy="5.8" r="0.6" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function FacebookIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <circle cx="10" cy="10" r="7.5" />
+      <path d="M11.2 17.4v-6.2h2.1M11.2 17.4V8.6c0-1.2.7-1.9 1.9-1.9h.9M9 11.2h2.2" />
     </svg>
   );
 }

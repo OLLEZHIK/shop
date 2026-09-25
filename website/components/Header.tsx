@@ -1,100 +1,93 @@
 import Link from "next/link";
-import { getDefaultCity } from "@/lib/data";
-import { ALL_CATEGORY_SLUGS, CATEGORY_LABELS, categoryEnumFromSlug } from "@/lib/categories";
+import { getDefaultCity, getCityPoints } from "@/lib/data";
+import { ALL_CATEGORIES, CATEGORY_THEME, categoryBlurb, categoryLabel, categorySlug, listingPath } from "@/lib/categories";
+import { getDictionary, localePath, type Locale } from "@/lib/i18n";
+import { Logo } from "./Logo";
+import { MobileMenu } from "./MobileMenu";
+import { BrowseMenu, type ServiceLink } from "./BrowseMenu";
+import { FindCareButton, SearchDialog } from "./SearchDialog";
+import { HeaderShell } from "./HeaderShell";
 
-export async function Header() {
-  const city = await getDefaultCity();
+export async function Header({ locale }: { locale: Locale }) {
+  const [city, cityPoints] = await Promise.all([getDefaultCity(), getCityPoints()]);
   const citySlug = city?.slug ?? "";
+  const t = getDictionary(locale);
+
+  const services: ServiceLink[] = ALL_CATEGORIES.map((category) => ({
+    href: listingPath(locale, category, citySlug),
+    label: categoryLabel(category, locale),
+    category,
+    blurb: categoryBlurb(category, locale),
+    accent: CATEGORY_THEME[category].accent,
+  }));
+  const cities = cityPoints.map(({ slug, name, lat, lng }) => ({ slug, name, lat, lng }));
+  const searchCategories = ALL_CATEGORIES.map((category) => ({
+    slug: categorySlug(category, locale),
+    label: categoryLabel(category, locale),
+    category,
+  }));
 
   return (
-    <header className="relative bg-background">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link href="/" aria-label="pawenn home" className="flex items-center">
-          <svg viewBox="0 0 320 80" className="h-9 w-auto" role="img" aria-label="pawenn">
-            <g transform="translate(18, 12)">
-              <ellipse cx="28" cy="30" rx="22" ry="20" fill="#F7F9FB" stroke="#004E89" strokeWidth="2" />
-              <path d="M12 16 C4 18 3 32 10 40 C14 43 18 38 17 28 C16 22 14 16 12 16 Z" fill="#004E89" />
-              <path
-                d="M13 21 C9 22.5 8.5 31 12 35.5 C14 37 15.5 34.5 15 29 C14.7 25.5 14 22 13 21 Z"
-                fill="#F7F9FB"
-                opacity="0.35"
-              />
-              <path d="M44 16 C52 18 53 32 46 40 C42 43 38 38 39 28 C40 22 42 16 44 16 Z" fill="#FF6B35" />
-              <path
-                d="M43 21 C47 22.5 47.5 31 44 35.5 C42 37 40.5 34.5 41 29 C41.3 25.5 42 22 43 21 Z"
-                fill="#F7F9FB"
-                opacity="0.35"
-              />
-              <circle cx="20.5" cy="23" r="2.2" fill="#1A202C" />
-              <circle cx="35.5" cy="23" r="2.2" fill="#1A202C" />
-              <path
-                d="M17 19 Q20.5 17 24 19"
-                stroke="#004E89"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.6"
-              />
-              <path
-                d="M32 19 Q35.5 17 39 19"
-                stroke="#FF6B35"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.6"
-              />
-              <path
-                d="M22 32 C22 30 34 30 34 32 C34 34.5 30 38.5 28 38.5 C26 38.5 22 34.5 22 32 Z"
-                fill="#1A202C"
-              />
-              <ellipse cx="25.5" cy="32.3" rx="1.6" ry="1" fill="#F7F9FB" opacity="0.6" />
-              <path
-                d="M28 38.5 V42 C28 44 24 45 22 43"
-                stroke="#1A202C"
-                strokeWidth="2"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M28 42 C28 44 32 45 34 43"
-                stroke="#1A202C"
-                strokeWidth="2"
-                strokeLinecap="round"
-                fill="none"
-              />
-            </g>
-            <text
-              x="88"
-              y="52"
-              fontFamily="system-ui, -apple-system, 'Inter', sans-serif"
-              fontSize="34"
-              fontWeight="800"
-              fill="#004E89"
-              letterSpacing="-0.5"
-            >
-              Paw<tspan fill="#FF6B35">enn</tspan>
-            </text>
-          </svg>
+    <HeaderShell>
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:py-4">
+        <Link href={localePath(locale, "/")} aria-label="pawenn home" className="flex shrink-0 items-center">
+          <Logo className="h-9 w-auto md:h-10" />
         </Link>
 
-        <nav className="hidden gap-1 text-sm md:flex" aria-label="Categories">
-          {ALL_CATEGORY_SLUGS.map((slug) => {
-            const category = categoryEnumFromSlug(slug)!;
-            return (
-              <Link
-                key={slug}
-                href={`/${slug}/${citySlug}/`}
-                className="pill-hover px-3 py-1.5 text-foreground/80"
-              >
-                {CATEGORY_LABELS[category]}
-              </Link>
-            );
-          })}
-          <Link href="/how-it-works/" className="pill-hover px-3 py-1.5 text-foreground/80">
-            How it Works
+        {/* Zocdoc-style: Browse dropdown, plain text links, a divider,
+            then one bright primary button. No log in / sign up - the
+            product has no accounts (PRODUCT.md). */}
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+          <BrowseMenu
+            locale={locale}
+            t={t.nav}
+            food={t.food}
+            services={services}
+            cities={cities}
+            defaultCitySlug={citySlug}
+          />
+          <Link
+            href="/how-it-works/"
+            className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-4 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
+          >
+            {t.nav.help}
           </Link>
+          <Link
+            href="/add-or-fix-listing/"
+            className="inline-flex h-12 items-center rounded-[var(--radius-control)] px-4 text-[17px] font-medium text-foreground transition hover:bg-surface-sunken"
+          >
+            {t.nav.listBusiness}
+          </Link>
+          <span aria-hidden="true" className="mx-2 h-8 w-px bg-foreground/15" />
+          <FindCareButton
+            label={t.nav.findCare}
+            className="ml-2 inline-flex h-12 items-center rounded-[var(--radius-control)] bg-brand-orange px-6 text-[17px] font-semibold text-white transition hover:bg-brand-orange-deep"
+          />
         </nav>
+
+        {/* Phones: a search button next to Browse opens the same dialog. */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <FindCareButton
+            compact
+            label={t.nav.findCare}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] bg-brand-orange text-white"
+          />
+          <MobileMenu
+          locale={locale}
+          services={services}
+          cities={cities}
+          defaultCitySlug={citySlug}
+          />
+        </div>
       </div>
-    </header>
+
+      <SearchDialog
+        locale={locale}
+        citySlug={citySlug}
+        cityName={city?.name ?? "Bratislava"}
+        categories={searchCategories}
+        cities={cities}
+      />
+    </HeaderShell>
   );
 }

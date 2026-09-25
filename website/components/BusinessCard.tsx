@@ -1,92 +1,110 @@
 import Link from "next/link";
 import type { BusinessWithRelations } from "@/lib/data";
-import { averageRating, publicDescription } from "@/lib/data";
-import { CATEGORY_LABELS } from "@/lib/categories";
+import { averageRating, cardDescription, logoUrl } from "@/lib/data";
+import { CATEGORY_THEME, businessPath, categoryLabel } from "@/lib/categories";
+import { getDictionary, type Locale } from "@/lib/i18n";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { PartnerBadge } from "./PartnerBadge";
 import { QuickActions } from "./QuickActions";
-import { PhotoGallery } from "./PhotoGallery";
+import { BusinessAvatar } from "./BusinessAvatar";
+import { GoogleRating } from "./GoogleRating";
+import { ArrowRightIcon, MapPinIcon, RouteIcon } from "./icons";
+import { PriceTier } from "./PriceTier";
 
 interface BusinessCardProps {
   business: BusinessWithRelations;
   priceTier?: number | null;
+  locale: Locale;
+  /** Distance from the visitor, when the list is sorted by "near me". */
+  distanceKm?: number | null;
+  /** The category eyebrow only helps in mixed lists; a category page
+   *  already says what every card is. */
+  showCategory?: boolean;
 }
 
-export function BusinessCard({ business, priceTier = null }: BusinessCardProps) {
+export function BusinessCard({ business, priceTier = null, locale, distanceKm = null, showCategory = true }: BusinessCardProps) {
+  const t = getDictionary(locale);
   const rating = averageRating(business.reviews);
-  const description = publicDescription(business.notes);
+  const description = cardDescription(business, locale);
+  const accent = CATEGORY_THEME[business.category].accent;
 
   return (
-    <div className="group relative flex flex-col gap-4 rounded-[var(--radius-card)] border border-transparent bg-white p-4 shadow-[var(--shadow-card)] transition duration-200 hover:-translate-y-0.5 hover:border-brand-blue-muted-border hover:shadow-[var(--shadow-card-hover)] sm:flex-row">
-      <Link href={`/business/${business.slug}/`} className="absolute inset-0 z-0" aria-label={business.name} />
+    <article
+      className="group relative flex gap-4 rounded-[var(--radius-card)] border border-transparent bg-surface p-4 shadow-[var(--shadow-card)] transition duration-200 hover:-translate-y-0.5 hover:border-brand-blue-muted-border hover:shadow-[var(--shadow-card-hover)] sm:gap-5 sm:p-5"
+      style={{ "--accent": accent } as React.CSSProperties}
+    >
+      <Link href={businessPath(locale, business.slug)} className="absolute inset-0 z-0 rounded-[var(--radius-card)]" aria-label={business.name} />
 
-      <PhotoGallery
-        photoUrls={business.photoUrls}
-        alt={business.name}
-        variant="card"
-        className="pointer-events-none w-full sm:w-32 sm:shrink-0 md:w-40"
+      {/* Card format (owner, 2026-09-24): the business's logo, or its
+          initials when it has none; photos live on the place page. */}
+      <BusinessAvatar
+        name={business.name}
+        category={business.category}
+        logoUrl={logoUrl(business.logoFile)}
+        className="h-14 w-14 shrink-0 text-lg sm:h-16 sm:w-16"
       />
 
-      <div className="relative z-10 min-w-0 flex-1 pointer-events-none">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-heading text-base font-bold text-foreground md:text-lg">{business.name}</h3>
+      <div className="pointer-events-none relative z-10 min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            {showCategory && (
+              <p className="mb-0.5 text-xs font-semibold uppercase tracking-wider" style={{ color: accent }}>
+                {categoryLabel(business.category, locale)}
+              </p>
+            )}
+            <h3 className="font-heading text-lg font-bold leading-snug text-foreground transition group-hover:text-brand-blue md:text-xl">
+              {business.name}
+            </h3>
+          </div>
+          <ArrowRightIcon className="mt-1 hidden h-5 w-5 shrink-0 text-foreground/25 transition group-hover:translate-x-0.5 group-hover:text-brand-blue sm:block" />
+        </div>
+
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground/65">
+          {business.googleRating !== null && business.googleRatingCount !== null ? (
+            <GoogleRating rating={business.googleRating} count={business.googleRatingCount} locale={locale} />
+          ) : rating !== null && (
+            <span className="inline-flex items-center gap-1">
+              <StarRow rating={rating} />
+              <span className="font-semibold text-foreground">{rating.toFixed(1)}</span>
+              <span>({business.reviews.length})</span>
+            </span>
+          )}
           {business.district && (
-            <span className="rounded-[var(--radius-pill)] bg-gray-100 px-2 py-0.5 text-xs text-foreground/70">
+            <span className="inline-flex items-center gap-1">
+              <MapPinIcon className="h-4 w-4" />
               {business.district.name}
             </span>
           )}
+          {distanceKm !== null && (
+            <span className="inline-flex items-center gap-1 font-semibold text-brand-blue">
+              <RouteIcon className="h-3.5 w-3.5" />
+              {t.listing.kmAway(distanceKm < 10 ? distanceKm.toFixed(1) : distanceKm.toFixed(0))}
+            </span>
+          )}
+          {priceTier !== null && <PriceTier tier={priceTier} currency={business.city?.currency} locale={locale} />}
         </div>
 
-        <p className="mt-0.5 text-xs text-foreground/60">{CATEGORY_LABELS[business.category]}</p>
+        {description && <p className="mt-2 line-clamp-2 text-sm text-foreground/70">{description}</p>}
 
-        {rating !== null && (
-          <div className="mt-1.5 flex items-center gap-1">
-            <StarRow rating={rating} />
-            <span className="text-sm font-medium text-foreground">{rating.toFixed(1)}</span>
-            <span className="text-sm text-foreground/60">({business.reviews.length})</span>
+        {(business.verifiedAt || business.featured) && (
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            <VerifiedBadge verifiedAt={business.verifiedAt} locale={locale} />
+            <PartnerBadge featured={business.featured} locale={locale} />
           </div>
         )}
 
-        {description && (
-          <p className="mt-1.5 line-clamp-2 text-sm text-foreground/70">{description}</p>
-        )}
-
-        {business.animals.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {business.animals.map((animal) => (
-              <span
-                key={animal}
-                className="rounded-[var(--radius-pill)] bg-gray-100 px-2 py-0.5 text-xs capitalize text-foreground/70"
-              >
-                {animal}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {priceTier !== null && (
-          <p className="mt-1.5 text-sm text-foreground/80" aria-label={`Price level ${priceTier} of 5`}>
-            <span className="font-medium text-brand-green">{"$".repeat(priceTier)}</span>
-            <span className="text-foreground/30">{"$".repeat(5 - priceTier)}</span>
-          </p>
-        )}
-
-        <div className="pointer-events-auto mt-3">
+        <div className="pointer-events-auto mt-4">
           <QuickActions
             businessId={business.id}
             phone={business.phone}
             website={business.website}
             address={business.address}
             size="sm"
+            locale={locale}
           />
         </div>
-
-        <div className="pointer-events-none mt-2">
-          <VerifiedBadge verifiedAt={business.verifiedAt} />{" "}
-          <PartnerBadge featured={business.featured} />
-        </div>
       </div>
-    </div>
+    </article>
   );
 }
 

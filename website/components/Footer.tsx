@@ -1,40 +1,94 @@
 import Link from "next/link";
-import { getDefaultCity } from "@/lib/data";
-import { ALL_CATEGORY_SLUGS, CATEGORY_LABELS, categoryEnumFromSlug } from "@/lib/categories";
+import { getAllCities, getDefaultCity } from "@/lib/data";
+import { LanguageSwitch } from "./LanguageSwitch";
+import { ALL_CATEGORIES, categoryLabel, cityPath, listingPath } from "@/lib/categories";
+import { getDictionary, localesForCity, type Locale } from "@/lib/i18n";
+import { Logo } from "./Logo";
+import { ShieldCheckIcon } from "./icons";
 
-export async function Footer() {
-  const city = await getDefaultCity();
+export async function Footer({ locale }: { locale: Locale }) {
+  const [city, cities] = await Promise.all([getDefaultCity(), getAllCities()]);
   const citySlug = city?.slug ?? "";
+  // Name the city only while there is one; with several the site is generic.
+  const cityName = cities.length === 1 ? cities[0].name : null;
+  const t = getDictionary(locale).footer;
+  // Help and legal pages exist in English only; flag that in other locales.
+  const en = t.englishOnly;
 
   return (
-    <footer className="mt-16 border-t border-gray-200 bg-gray-50">
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-foreground/70" aria-label="Footer">
-          {ALL_CATEGORY_SLUGS.map((slug) => {
-            const category = categoryEnumFromSlug(slug)!;
-            return (
-              <Link key={slug} href={`/${slug}/${citySlug}/`} className="hover:text-brand-blue">
-                {CATEGORY_LABELS[category]}
-              </Link>
-            );
-          })}
-          <Link href="/how-it-works/" className="hover:text-brand-blue">
-            How it Works
-          </Link>
-          <Link href="/add-or-fix-listing/" className="hover:text-brand-blue">
-            Add or fix a listing
-          </Link>
-          <Link href="/privacy-policy/" className="hover:text-brand-blue">
-            Privacy Policy
-          </Link>
-          <Link href="/terms-of-use/" className="hover:text-brand-blue">
-            Terms of Use
-          </Link>
-        </nav>
-        <p className="mt-6 text-center text-sm text-foreground/60">
-          &copy; {new Date().getFullYear()} pawenn.com &middot; Trusted pet services in Bratislava
-        </p>
+    <footer className="relative mt-24 overflow-hidden bg-ink text-white">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-25 blur-3xl"
+        style={{ background: "var(--brand-orange)" }}
+      />
+      <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-16">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+          <div>
+            <Logo className="h-10 w-auto" wordmarkColor="#FFFFFF" />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/65">
+              {t.tagline(cityName)}
+            </p>
+            <p className="mt-5 inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-white/10 px-3 py-1.5 text-xs text-white/80">
+              <ShieldCheckIcon className="h-4 w-4 text-brand-green" />
+              {t.sourced}
+            </p>
+          </div>
+
+          <FooterColumn title={t.services}>
+            {ALL_CATEGORIES.map((category) => (
+              <FooterLink key={category} href={listingPath(locale, category, citySlug)}>
+                {categoryLabel(category, locale)}
+              </FooterLink>
+            ))}
+          </FooterColumn>
+
+          {/* Every city's hub, in this language where the city has it. */}
+          <FooterColumn title={t.cities}>
+            {cities.map((c) => (
+              <FooterLink key={c.slug} href={cityPath(localesForCity(c).includes(locale) ? locale : "en", c.slug)}>
+                {c.name}
+              </FooterLink>
+            ))}
+          </FooterColumn>
+
+          <FooterColumn title={t.about}>
+            <FooterLink href="/how-it-works/">{t.howItWorks + en}</FooterLink>
+            <FooterLink href="/add-or-fix-listing/">{t.addBusiness + en}</FooterLink>
+            <FooterLink href="/add-or-fix-listing/">{t.fixListing + en}</FooterLink>
+          </FooterColumn>
+
+          <FooterColumn title={t.legal}>
+            <FooterLink href="/privacy-policy/">{t.privacy + en}</FooterLink>
+            <FooterLink href="/terms-of-use/">{t.terms + en}</FooterLink>
+          </FooterColumn>
+        </div>
+
+        <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row sm:items-center">
+          <p>&copy; {new Date().getFullYear()} pawenn.com</p>
+          <LanguageSwitch locales={localesForCity(city)} />
+          <p>{t.madeWithCare(cityName)}</p>
+        </div>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/40">{title}</p>
+      <ul className="mt-4 space-y-2.5 text-sm">{children}</ul>
+    </div>
+  );
+}
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <li>
+      <Link href={href} className="text-white/75 transition hover:text-brand-orange">
+        {children}
+      </Link>
+    </li>
   );
 }

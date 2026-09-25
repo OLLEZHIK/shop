@@ -1,0 +1,96 @@
+{
+  "slug": "sibra-centrum-veterinarnej-mediciny",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=160918407076768096",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 38,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "results",
+      "sentiment": "positive",
+      "mentions": 26,
+      "title": {
+        "en": "Top diagnostics for complex cases",
+        "sk": "Špičková diagnostika pre náročné prípady"
+      },
+      "text": {
+        "en": "Most reviewers regard this veterinary clinic in Dúbravka as a premier center for complex medical diagnostics and surgery. Pet owners consistently praise advanced on-site imaging, particularly CT and MRI scans, which quickly identified neurological or orthopedic issues that other facilities could not diagnose. Many credit the hospital team with saving their pets.",
+        "sk": "Väčšina recenzentov považuje túto veterinárnu kliniku v Dúbravke za špičkové centrum pre náročnú diagnostiku a operácie. Majitelia zvierat oceňujú najmä pokročilé zobrazovacie metódy ako CT a MRI, vďaka ktorým lekári včas odhalili neurologické či ortopedické problémy. Mnohé hodnotenia vyzdvihujú úspešnú záchranu zvierat v kritických stavoch."
+      }
+    },
+    {
+      "topic": "staff",
+      "sentiment": "positive",
+      "mentions": 21,
+      "title": {
+        "en": "Compassionate doctors explaining procedures thoroughly",
+        "sk": "Empatickí lekári s podrobným vysvetlením"
+      },
+      "text": {
+        "en": "Clients frequently commend the veterinary team for their sensitive bedside manner and detailed communication. Doctors take time to explain treatment plans, surgical risks, and postoperative expectations without rushing anxious owners. Several reviews also mention reassuring telephone updates provided by nursing staff during overnight inpatient hospitalizations.",
+        "sk": "Klienti pravidelne oceňujú citlivý prístup lekárov a detailnú komunikáciu počas celého vyšetrenia. Veterinári si nájdu čas dôkladne vysvetliť plán liečby, možné riziká operácie aj následnú domácu starostlivosť. Viacerí majitelia tiež vyzdvihujú telefonické informovanie o zdravotnom stave hospitalizovaných zvierat personálom kliniky."
+      }
+    },
+    {
+      "topic": "prices",
+      "sentiment": "mixed",
+      "mentions": 16,
+      "title": {
+        "en": "Higher costs reflecting specialized care",
+        "sk": "Vyššie ceny zodpovedajúce špecializovanej starostlivosti"
+      },
+      "text": {
+        "en": "A noticeable portion of reviews points out that specialized procedures, hospital stays, and advanced diagnostics represent significant financial expenses. Nevertheless, most reviewers agree that these higher fees correspond directly to modern high-tech equipment and board-certified specialists in Bratislava. Transparency in treatment estimates is generally appreciated.",
+        "sk": "Časť recenzií upozorňuje, že špecializované zákroky, hospitalizácia a CT vyšetrenia predstavujú citeľnú finančnú položku. Väčšina hodnotiacich však dodáva, že vyššie ceny v Bratislave zodpovedajú špičkovej technike a úzkej špecializácii lekárov. Majitelia zároveň pozitívne vnímajú, keď personál vopred transparentne komunikuje odhadované náklady."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "Do I need an appointment before visiting?",
+        "sk": "Je potrebné sa na vyšetrenie vopred objednať?"
+      },
+      "a": {
+        "en": "Yes, specialized examinations and diagnostic imaging require prior scheduling by phone or web.",
+        "sk": "Áno, na špecializované vyšetrenia a diagnostiku je nutné sa vopred objednať telefonicky alebo online."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Does the clinic perform CT and MRI scans?",
+        "sk": "Poskytuje klinika vyšetrenia CT a MRI?"
+      },
+      "a": {
+        "en": "Yes, the facility is equipped with dedicated veterinary CT and MRI diagnostic units.",
+        "sk": "Áno, nemocnica disponuje vlastným pracoviskom počítačovej tomografie (CT) a magnetickej rezonancie (MRI)."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Is 24/7 overnight emergency care provided?",
+        "sk": "Poskytuje klinika nepretržitú nočnú pohotovosť?"
+      },
+      "a": {
+        "en": "The hospital provides round-the-clock intensive care for admitted patients, but does not run an open night emergency desk for walk-in arrivals.",
+        "sk": "Klinika zabezpečuje 24-hodinovú starostlivosť pre hospitalizovaných pacientov, neprevádzkuje však otvorenú nočnú pohotovosť pre neobjednané akútne príjmy."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Can clients pay by credit card?",
+        "sk": "Je možné platiť platobnou kartou?"
+      },
+      "a": {
+        "en": "Yes, standard debit and credit cards are accepted at the reception desk.",
+        "sk": "Áno, na recepcii kliniky je možné bez problémov platiť platobnou kartou."
+      },
+      "basis": "both"
+    }
+  ]
+}

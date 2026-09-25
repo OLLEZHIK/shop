@@ -1,0 +1,96 @@
+{
+  "slug": "veterinarna-poliklinika-bajvet",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=2076345946400661901",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 26,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "staff",
+      "sentiment": "positive",
+      "mentions": 18,
+      "title": {
+        "en": "Caring veterinarians with clear communication",
+        "sk": "Starostliví lekári s jasnou komunikáciou"
+      },
+      "text": {
+        "en": "Clients warmly appreciate the caring and dedicated approach of the veterinary staff at this polyclinic in Ružinov. Reviews frequently highlight MVDr. Ján Nemčko and his colleagues for their patience, clear explanations of treatment steps, and gentle handling of pets. Owners feel well informed and supported during both checkups and surgeries.",
+        "sk": "Klienti vyzdvihujú starostlivý a ústretový prístup personálu tejto veterinárnej polikliniky v Ružinove. V recenziách sa opakovane spomína MVDr. Ján Nemčko a jeho tím za trpezlivé vysvetlenie liečebných postupov a jemné zaobchádzanie so zvieratami. Majitelia oceňujú otvorenú komunikáciu a podporu pri bežných prehliadkach aj operáciách."
+      }
+    },
+    {
+      "topic": "results",
+      "sentiment": "positive",
+      "mentions": 16,
+      "title": {
+        "en": "Reliable surgery and comprehensive medical care",
+        "sk": "Spoľahlivá chirurgia a všestranná liečba"
+      },
+      "text": {
+        "en": "Most reviewers report positive outcomes for a wide range of veterinary treatments, from dental cleaning under anesthesia to soft-tissue and orthopedic surgeries. Clients appreciate having digital X-ray, in-house laboratory blood work, and ultrasound available in one facility, which allows prompt diagnosis and immediate treatment initiation.",
+        "sk": "Väčšina hodnotení uvádza úspešné výsledky pri širokom spektre zákrokov, od odstraňovania zubného kameňa až po operácie mäkkých tkanív a kostí. Majitelia oceňujú digitálny RTG, vlastné krvné laboratórium a sonografiu na jednom mieste, vďaka čomu lekári dokážu stanoviť diagnózu a začať liečbu bez zbytočného odkladu."
+      }
+    },
+    {
+      "topic": "prices",
+      "sentiment": "mixed",
+      "mentions": 12,
+      "title": {
+        "en": "Reasonable rates with occasional invoice questions",
+        "sk": "Primerané ceny s občasnými otázkami"
+      },
+      "text": {
+        "en": "General veterinary procedures and preventative care are typically evaluated by clients as reasonably priced and fair for Bratislava. However, a few reviews mention that unexpected additional medications or complex surgical items can increase the final bill, with reviewers advising that detailed cost breakdowns be requested beforehand.",
+        "sk": "Bežné vyšetrenia a preventívna starostlivosť sú zákazníkmi hodnotené ako cenovo primerané a férové na pomery Bratislavy. Pár recenzií však poznamenáva, že nečakané doplnkové lieky či zložitejšie úkony môžu zvýšiť výsledný účet, pričom majitelia odporúčajú nechať si pred zákrokom podrobne vysvetliť jednotlivé položky."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "What diagnostic equipment is available on-site?",
+        "sk": "Akou diagnostickou technikou poliklinika disponuje?"
+      },
+      "a": {
+        "en": "The facility is equipped with digital X-ray, ultrasound, ECG, and an in-house biochemical and hematological laboratory.",
+        "sk": "Poliklinika je vybavená digitálnym RTG, sonografom, EKG a vlastným biochemickým a hematologickým laboratóriom."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Can I have dental tartar removed under anesthesia here?",
+        "sk": "Vykonáva poliklinika odstraňovanie zubného kameňa?"
+      },
+      "a": {
+        "en": "Yes, ultrasonic dental scaling and polishing under safe inhalation anesthesia are routinely provided.",
+        "sk": "Áno, ultrazvukové čistenie a leštenie zubov v bezpečnej inhalačnej anestézii patrí k bežným úkonom."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Is appointment booking recommended before coming?",
+        "sk": "Odporúča sa na vyšetrenie vopred objednať?"
+      },
+      "a": {
+        "en": "Yes, scheduling an appointment by phone ensures minimal waiting time, though acute emergency cases are addressed promptly.",
+        "sk": "Áno, telefonické objednanie minimalizuje čas v čakárni, akútne prípady však personál ošetrí prednostne."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "How can clients reach the clinic by public transit?",
+        "sk": "Ako je poliklinika dostupná mestskou hromadnou dopravou?"
+      },
+      "a": {
+        "en": "The clinic on Bajzova is conveniently located near major transit hubs on Bajkalská and Trnavská cesta with frequent bus and tram connections.",
+        "sk": "Poliklinika na Bajzovej ulici má dobrú dostupnosť vďaka blízkosti zastávok MHD na Bajkalskej a Trnavskej ceste."
+      },
+      "basis": "both"
+    }
+  ]
+}

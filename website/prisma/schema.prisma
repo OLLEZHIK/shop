@@ -11,21 +11,40 @@ datasource db {
 
 // Core entities
 model City {
-  id        Int        @id @default(autoincrement())
-  name      String
-  slug      String     @unique
-  country   String
-  locale    String
-  districts District[]
+  id         Int        @id @default(autoincrement())
+  name       String
+  slug       String     @unique
+  country    String
+  locale     String
+  // City centre from city.json (docs/playbooks/add-city.md).
+  lat        Float?
+  lng        Float?
+  // Everything that differs between cities and countries lives here, not
+  // in code (docs/architecture/multi-city.md): IANA time zone for "Open
+  // now", currency for prices, the city's languages besides English, and
+  // "in <city>" per language ({"en": "in Košice", "sk": "v Košiciach"}).
+  timezone   String?
+  currency   String?
+  locales    String[]   @default([])
+  inPhrases  Json?
+  // Hash of the city's data folder and the seed code at the last seed;
+  // the seed skips a city whose hash hasn't changed (docs/database.md).
+  seedHash   String?
+  districts  District[]
+  businesses Business[]
 }
 
 model District {
   id         Int        @id @default(autoincrement())
   cityId     Int
   name       String
-  slug       String     @unique
+  // Unique within its city only (@@unique below): Košice and Bratislava
+  // both have "stare-mesto".
+  slug       String
   city       City       @relation(fields: [cityId], references: [id])
   businesses Business[]
+
+  @@unique([cityId, slug])
 }
 
 model Breed {
@@ -47,30 +66,61 @@ enum SizeClass {
 
 // Business model (generalized from the grooming-only Salon model)
 model Business {
-  id           Int              @id @default(autoincrement())
-  name         String
-  slug         String           @unique
-  category     BusinessCategory
-  address      String
-  districtId   Int?
-  lat          Float?
-  lng          Float?
-  phone        String?
-  email        String?
-  website      String?
-  openingHours Json?
-  animals      String[]
-  specialties  String[]
-  status       BusinessStatus   @default(DRAFT)
-  featured     Boolean          @default(false)
-  verifiedAt   DateTime?
-  sourceUrls   String[]
-  notes        String?
-  photoUrls    String[]         @default([])
-  district     District?        @relation(fields: [districtId], references: [id])
-  priceItems   PriceItem[]
-  clickEvents  ClickEvent[]
-  reviews      Review[]
+  id                    Int              @id @default(autoincrement())
+  name                  String
+  slug                  String           @unique
+  category              BusinessCategory
+  address               String
+  districtId            Int?
+  // Direct city link: a place outside every district polygon (or in a
+  // city without districts) still belongs to its city.
+  cityId                Int?
+  lat                   Float?
+  lng                   Float?
+  phone                 String?
+  email                 String?
+  website               String?
+  openingHours          Json?
+  animals               String[]
+  specialties           String[]
+  status                BusinessStatus   @default(DRAFT)
+  featured              Boolean          @default(false)
+  verifiedAt            DateTime?
+  sourceUrls            String[]
+  notes                 String?
+  photoUrls             String[]         @default([])
+  // Listing-card data (tasks/done/antigravity-collect-ratings-and-review-summaries.md).
+  // Texts are our own words; the Google rating is shown with a "Google"
+  // label and only with 5+ ratings (the CSV leaves it empty otherwise).
+  description           String?
+  shortDescription      String?
+  shortDescriptionLocal String?
+  logoFile              String?
+  googlePlaceId         String?
+  googleMapsUrl         String?
+  googleRating          Float?
+  googleRatingCount     Int?
+  ratingObservedAt      DateTime?
+  // "What customers say" summary from data/review-insights/<slug>.json
+  // (tasks/ide-review-insights.md): our summary of public Google reviews,
+  // never shown or marked up as reviews. Validated in lib/reviewInsights.ts.
+  reviewInsights        Json?
+  // docs/card-spec.md (2026-09-25). openingHours (above) holds the raw
+  // opening_hours string, parsed by lib/hours.ts.
+  descriptionLocal      String?
+  instagram             String?
+  facebook              String?
+  hoursSourceUrl        String?
+  hoursObservedAt       DateTime?
+  emergency247          Boolean          @default(false)
+  emergencyNote         String?
+  homeVisits            Boolean          @default(false)
+  languagesSpoken       String[]         @default([])
+  district              District?        @relation(fields: [districtId], references: [id])
+  city                  City?            @relation(fields: [cityId], references: [id])
+  priceItems            PriceItem[]
+  clickEvents           ClickEvent[]
+  reviews               Review[]
 }
 
 enum BusinessCategory {
@@ -106,27 +156,43 @@ enum ReviewStatus {
 }
 
 // Services and pricing
+// The 6 priced services per category (docs/card-spec.md, "Цены").
+// slug = "<category>:<code>" (daycare_day exists in two categories);
+// labels live in lib/services.ts, name is the English one for reference.
 model Service {
-  id         Int         @id @default(autoincrement())
+  id         Int               @id @default(autoincrement())
   name       String
-  slug       String      @unique
+  slug       String            @unique
+  code       String?
+  category   BusinessCategory?
   priceItems PriceItem[]
 }
 
 model PriceItem {
-  id         Int        @id @default(autoincrement())
-  businessId Int
-  serviceId  Int
-  sizeClass  SizeClass?
-  breedId    Int?
-  priceFrom  Decimal
-  priceTo    Decimal?
-  currency   String     @default("EUR")
-  sourceUrl  String
-  observedAt DateTime
-  business   Business   @relation(fields: [businessId], references: [id])
-  service    Service    @relation(fields: [serviceId], references: [id])
-  breed      Breed?     @relation(fields: [breedId], references: [id])
+  id           Int        @id @default(autoincrement())
+  businessId   Int
+  serviceId    Int
+  // Legacy; replaced by the weight range below. Dropped in a later PR
+  // (additive-only migrations, docs/database.md).
+  sizeClass    SizeClass?
+  weightFromKg Float?
+  weightToKg   Float?
+  breedId      Int?
+  priceFrom    Decimal
+  priceTo      Decimal?
+  currency     String     @default("EUR")
+  sourceUrl    String
+  observedAt   DateTime
+  // Comparability (docs/card-spec.md, "Цены"): a price per hour/km
+  // ("per_hour", "per_km") or one missing part of the standard service
+  // (partial) is shown with its note but left out of comparisons.
+  unit         String?
+  partial      Boolean    @default(false)
+  note         String?
+  noteLocal    String?
+  business     Business   @relation(fields: [businessId], references: [id])
+  service      Service    @relation(fields: [serviceId], references: [id])
+  breed        Breed?     @relation(fields: [breedId], references: [id])
 }
 
 // Analytics

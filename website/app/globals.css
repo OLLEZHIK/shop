@@ -10,9 +10,13 @@
   --color-brand-green: var(--brand-green);
   --color-brand-amber: var(--brand-amber);
 
-  /* Typography */
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  /* Typography - Inter loaded via next/font in layout.tsx */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -25,6 +29,12 @@ body {
 
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--brand-orange-muted);
+  color: var(--brand-blue-deep);
 }
 
 /* Focus visible for accessibility */
@@ -33,10 +43,28 @@ h1, h2, h3, h4 {
   outline-offset: 2px;
 }
 
+/* Hide the default disclosure marker on FAQ accordions */
+summary::-webkit-details-marker {
+  display: none;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   * {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* City field in the search (HomeSearch): the whole segment shows focus
+   (focus-within), not the bare input; no native datalist arrow. */
+.search-city:focus-visible {
+  outline: none;
+}
+.search-city::-webkit-calendar-picker-indicator {
+  display: none !important;
 }

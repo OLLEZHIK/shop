@@ -1,0 +1,96 @@
+{
+  "slug": "vetline-veterinarna-nemocnica",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=7369388707985592520",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 35,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "waiting",
+      "sentiment": "positive",
+      "mentions": 22,
+      "title": {
+        "en": "Crucial 24/7 central emergency care",
+        "sk": "Kľúčová pohotovosť 24/7 v centre"
+      },
+      "text": {
+        "en": "Pet owners frequently highlight this veterinary hospital in Staré Mesto as a critical lifeline thanks to its round-the-clock emergency service. Reviews consistently emphasize that doctors were immediately available in the middle of the night to manage acute poisonings, traumas, and urgent surgical interventions, giving owners vital peace of mind when other clinics were closed.",
+        "sk": "Majitelia zvierat opakovane vyzdvihujú túto veterinárnu nemocnicu v Starom Meste ako kľúčové pracovisko vďaka nepretržitej pohotovosti. Recenzie zdôrazňujú okamžitú dostupnosť lekárov počas nocí a sviatkov pri akútnych otravách či úrazoch. Klienti oceňujú istotu, že v centre Bratislavy nájdu otvorené dvere aj v hodinách, kedy iné ambulancie neordinujú."
+      }
+    },
+    {
+      "topic": "staff",
+      "sentiment": "mixed",
+      "mentions": 19,
+      "title": {
+        "en": "Skilled surgeons with variable communication",
+        "sk": "Odborní lekári s premenlivou komunikáciou"
+      },
+      "text": {
+        "en": "Many reviewers praise the professionalism and determination of attending veterinarians during life-saving operations and intensive treatments. At the same time, a subset of visitors reports that nighttime staff communication can occasionally feel rushed or detached during high-stress hours. Most acknowledge, however, that clinical competence remains strong.",
+        "sk": "Mnohí klienti chvália odbornú pripravenosť a rozhodnosť veterinárov pri záchrane života zvierat a náročných zákrokoch. Menšia časť recenzií však upozorňuje, že komunikácia personálu počas nočných pohotovostných služieb môže pod vplyvom stresu a vyťaženosti pôsobiť chladnejšie. Väčšina majiteľov napriek tomu hodnotí odborný výkon personálu pozitívne."
+      }
+    },
+    {
+      "topic": "prices",
+      "sentiment": "mixed",
+      "mentions": 14,
+      "title": {
+        "en": "Night emergency surcharges increase costs",
+        "sk": "Nočné pohotovostné príplatky zvyšujú účet"
+      },
+      "text": {
+        "en": "Comments on pricing recurrently mention that visits outside regular working hours involve mandatory night emergency surcharges. While reviewers recognize that nonstop clinical staffing carries substantial operational costs, they advise new clients to anticipate higher total invoices. Daytime routine care fees are viewed as standard for central Bratislava.",
+        "sk": "Hodnotenia cien často pripomínajú, že ošetrenie mimo bežných ordinačných hodín zahŕňa povinný pohotovostný príplatok. Zákazníci chápu, že nepretržitá služba s vlastným laboratóriom si vyžaduje vyššie náklady, no odporúčajú rátať s vyšším účtom za nočné ošetrenie. Bežné denné vyšetrenia a vakcinácie hodnotia klienti ako cenovo porovnateľné s okolím."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "Is the emergency service open non-stop without breaks?",
+        "sk": "Funguje pohotovosť nepretržite 24 hodín denne?"
+      },
+      "a": {
+        "en": "Yes, the hospital operates 24/7 every day, including weekends and public holidays.",
+        "sk": "Áno, nemocnica poskytuje pohotovostné služby nonstop 24 hodín denne vrátane víkendov a sviatkov."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Should I phone ahead before arriving with an emergency?",
+        "sk": "Je potrebné pred príchodom na pohotovosť zavolať?"
+      },
+      "a": {
+        "en": "Calling ahead is strongly recommended so the medical team can prepare the examination room and equipment.",
+        "sk": "Telefonát vopred sa dôrazne odporúča, aby personál mohol vopred pripraviť vyšetrovňu a prístroje."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Are there parking options available near the clinic?",
+        "sk": "Ako je to s parkovaním pri nemocnici?"
+      },
+      "a": {
+        "en": "The clinic is located in the city center where street parking falls under the municipal PAAS parking system.",
+        "sk": "Nemocnica sídli v centre mesta, kde je parkovanie na ulici regulované mestským systémom PAAS."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Can I pay by card during nighttime emergency hours?",
+        "sk": "Dá sa platiť kartou aj počas nočnej pohotovosti?"
+      },
+      "a": {
+        "en": "Yes, card payment terminal is accessible around the clock at the reception desk.",
+        "sk": "Áno, platobný terminál je k dispozícii na recepcii nepretržite aj počas nočných hodín."
+      },
+      "basis": "both"
+    }
+  ]
+}

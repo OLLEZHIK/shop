@@ -18,7 +18,16 @@
 - Brand: Warm orange `#FF6B35` (friendly, pet-related warmth)
 - Trust: Deep blue `#004E89` (reliability, professionalism)
 - Success: Green `#06A77D` (verified status)
-- Background: Off-white `#F7F9FB` (reduced eye strain)
+- Background: Warm off-white `#FAF7F2` (was `#F7F9FB`; warmer, friendlier)
+- Ink: Deep navy `#0B2545` - contrast bands (footer, quiz, CTA cards, primary dark buttons)
+- Surfaces: `--surface` white cards, `--surface-sunken` `#F3EEE6` for inset fields/chips
+
+**Category accents** (`--cat-*` in `design-tokens.css`, mapped in
+`CATEGORY_THEME` in `lib/categories.ts`): Grooming rose `#D6457F`, Vet
+teal `#0E8A8C`, Hotels violet `#6A56D6`, Training orange `#E8731E`,
+Shops blue `#2B74D1`, Sitting green `#1E9A62`. A category reads the same
+everywhere - home tiles, listing header, card label, business avatar.
+Apply via `style={{"--accent": ...}}` + `.accent-soft` / `.accent-solid`.
 
 **Semantic:**
 - Links: `#004E89` (blue, standard web convention)
@@ -40,7 +49,7 @@ brand color as a background.
   `--font-heading` token in `design-tokens.css`. Geometric grotesk
   with more character than Inter for large display type; swap it by
   editing that one file if it doesn't land.
-- Body: Inter Regular
+- Body: Inter Regular (loaded via `next/font/google`, `latin-ext` for Slovak diacritics)
 - UI elements: Inter Medium
 - Monospace (data): JetBrains Mono (phone numbers, addresses)
 
@@ -67,8 +76,8 @@ brand color as a background.
 - Tablet: 2 columns for cards
 - Desktop: 3 columns for cards, sidebar + main for detail
 
-**Radii & Shadows** (`design-tokens.css`): `--radius-card` 16px (cards),
-`--radius-control` 12px (inputs/dropdown containers), `--radius-pill`
+**Radii & Shadows** (`design-tokens.css`): `--radius-card` 20px (cards),
+`--radius-control` 14px (inputs/dropdown containers), `--radius-pill`
 999px (nav/hover pills, badges). `--shadow-card`/`--shadow-card-hover`
 for listing cards, `--shadow-panel` for dropdowns/overlays - always an
 offset + soft blur, never a flat colored halo.
@@ -109,18 +118,37 @@ shapes (irregular `border-radius`, `filter: blur`) in brand colors at
 per page - used on the homepage hero and the business detail page.
 Decoration only, never a stand-in for a photographic subject.
 
+### Business avatar (no photos)
+`components/BusinessAvatar.tsx` - initials on a category-tinted tile with
+the category icon as a corner badge. Used instead of an empty photo
+placeholder; never a stock photo pretending to be the place.
+
+### Engagement blocks (homepage)
+- **District explorer** (`DistrictExplorer.tsx`): district chips sized by
+  real listing count; the selected district shows its categories as
+  links into district listing pages.
+- **Myth or fact?** (`MythOrFact.tsx`): 7-question quiz on general,
+  well-established pet-care knowledge (never claims about businesses).
+
 ### Header
-No bottom border, sits on the page background (not a white bar). Nav
-links carry no border at rest; on hover/focus a muted-brand pill
-(`.pill-hover` in `design-tokens.css`) fades in around the link,
-200ms ease-out. Logo SVG unchanged.
+Zocdoc pattern: logo left; on the right a tinted **Browse ▾** button
+(dropdown panel with all 6 categories, `BrowseMenu.tsx`), plain text
+links **Help** (→ `/how-it-works/`) and **List your business on
+pawenn**, a thin vertical divider, then one bright primary button
+**Find pet care** (brand orange, → `/#search`). No "Log in / Sign up" -
+the product has no accounts. Sticky and translucent (`backdrop-blur`).
+Below `lg` only logo + a **Browse ▾** button that opens a full-screen
+category menu (`MobileMenu.tsx`, rendered through a portal because the
+header's backdrop-filter would clip a fixed overlay).
 
 ## Motion & Interaction
 
 **Principles:**
 - Instant feedback: button states <100ms
 - Smooth transitions: 200ms ease-out
-- No decoration animations: all motion is functional
+- Decoration motion is minimal and CSS-only (`.rise-in` entrance,
+  `.float-y` on hero category chips); all of it is disabled under
+  prefers-reduced-motion
 - Reduced motion: instant state changes for prefers-reduced-motion
 
 **Key Interactions:**

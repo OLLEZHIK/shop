@@ -1,0 +1,96 @@
+{
+  "slug": "veterinarna-klinika-primavet",
+  "source": "google",
+  "google_maps_url": "https://maps.google.com/?cid=14939500541081923202",
+  "period_from": "2026-03-24",
+  "period_to": "2026-09-24",
+  "reviews_in_period": 32,
+  "observed_at": "2026-09-24",
+  "cards": [
+    {
+      "topic": "staff",
+      "sentiment": "positive",
+      "mentions": 23,
+      "title": {
+        "en": "Gentle approach and patient veterinarians",
+        "sk": "Milý prístup a trpezliví veterinári"
+      },
+      "text": {
+        "en": "The veterinary team at this clinic in Rača receives consistent praise for their warm, empathetic bedside manner. Reviewers repeatedly emphasize how calmly doctors and veterinary technicians interact with nervous animals, minimizing stress during examinations. Owners also appreciate thorough consultations where doctors answer all questions clearly.",
+        "sk": "Tím tejto veterinárnej kliniky v Rači získava pravidelné pochvaly za príjemný a ústretový prístup. Recenzenti opakovane vyzdvihujú pokojné zaobchádzanie lekárov a sestier so zvieratami, čo výrazne znižuje stres pacientov počas vyšetrenia. Majitelia si pochvaľujú aj trpezlivé konzultácie, pri ktorých personál zrozumiteľne zodpovie všetky otázky."
+      }
+    },
+    {
+      "topic": "place",
+      "sentiment": "positive",
+      "mentions": 17,
+      "title": {
+        "en": "Clean clinic with dedicated cat room",
+        "sk": "Čisté priestory s čakárňou pre mačky"
+      },
+      "text": {
+        "en": "Clients regularly highlight the immaculate cleanliness and modern diagnostic setup of the clinic. A standout feature frequently lauded in reviews is the separate cat waiting area, which shields feline patients from dog barking and agitation. Ample street parking around Rustaveliho street also contributes to a stress-free arrival.",
+        "sk": "Zákazníci pravidelne chvália čisté, príjemné prostredie a moderné prístrojové vybavenie pracoviska. Veľkým benefitom, ktorý majitelia mačiek opakovane spomínajú, je samostatná mačacia čakáreň chrániaca mačky pred kontaktom so psami. Bezproblémové parkovanie v okolí Rustaveliho ulice prispieva k pohodlnej návšteve ambulancie."
+      }
+    },
+    {
+      "topic": "waiting",
+      "sentiment": "positive",
+      "mentions": 14,
+      "title": {
+        "en": "Reliable emergency availability until late midnight",
+        "sk": "Dostupná večerná pohotovosť až do polnoci"
+      },
+      "text": {
+        "en": "Reviewers frequently value the extended operating hours and on-call emergency service available until midnight. Several pet owners note that having telephone triage and acute intervention accessible in northeastern Bratislava spared them from driving across town to central hospitals. Daytime appointments usually proceed on schedule with minimal waiting.",
+        "sk": "Hodnotenia často vyzdvihujú predĺžené ordinačné hodiny a dostupnosť pohotovosti na telefóne až do polnoci. Viacerí majitelia oceňujú možnosť akútneho ošetrenia v severovýchodnej časti Bratislavy bez nutnosti nočného presunu do centra mesta. Pri bežných objednaných termínoch počas dňa prebieha vyšetrenie spravidla načas s minimálnym čakaním."
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "Do cats have a separate waiting area?",
+        "sk": "Má klinika oddelenú čakáreň pre mačky?"
+      },
+      "a": {
+        "en": "Yes, the clinic features a dedicated cat room designed to keep feline patients calm and separated from dogs.",
+        "sk": "Áno, klinika disponuje špeciálnou čakárňou pre mačky, ktorá zabraňuje stresu z kontaktu so psami."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Until what time is emergency care available?",
+        "sk": "Dokedy je na klinike dostupná pohotovosť?"
+      },
+      "a": {
+        "en": "Emergency service operates until 24:00 (midnight) after prior telephone consultation.",
+        "sk": "Pohotovostná služba pre akútne stavy je k dispozícii po telefonickom dohovore do 24:00 (polnoci)."
+      },
+      "basis": "both"
+    },
+    {
+      "q": {
+        "en": "Does the clinic treat exotic and small animals?",
+        "sk": "Ošetrujú na klinike aj exotické a drobné zvieratá?"
+      },
+      "a": {
+        "en": "Yes, the medical staff includes veterinarians specialized in reptiles, birds, and small mammals.",
+        "sk": "Áno, v tíme kliniky pôsobia špecialisti na plazy, vtáky a drobné cicavce."
+      },
+      "basis": "website"
+    },
+    {
+      "q": {
+        "en": "Where can visitors park during their visit?",
+        "sk": "Kde môžu návštevníci počas vyšetrenia zaparkovať?"
+      },
+      "a": {
+        "en": "Convenient street parking is available along Rustaveliho street in the immediate vicinity of the clinic.",
+        "sk": "Parkovanie je možné na vyznačených parkovacích miestach priamo na Rustaveliho ulici pri klinike."
+      },
+      "basis": "both"
+    }
+  ]
+}
