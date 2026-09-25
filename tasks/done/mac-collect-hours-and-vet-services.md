@@ -3,6 +3,8 @@
 **Исполнитель:** Antigravity (Mac)
 **Роль:** Data agent.
 **Тип:** сбор данных, объём большой (76 записей, 4 CSV; для ветклиник — больше полей).
+**Статус (2026-09-25):** данные перенесены в `data/cities/bratislava/` облачным Claude Code (часы — из ветки, логотипы — из PR #73, кроме 7 непригодных). Остаток — в `tasks/antigravity-complete-bratislava-cards.md`.
+
 **Ветка:** `mac/collect-hours-and-vet-services`
 **Зависимости:** нет, брать сразу от свежего `main`. Задача правит `data/*.csv`: пока она не смёржена, другие задачи, которые правят эти же файлы (`antigravity-slovak-descriptions`), не брать.
 
