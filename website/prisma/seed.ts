@@ -224,14 +224,18 @@ async function seedDistricts(cityId: number, citySlug: string): Promise<District
   const file = path.join(CITIES_DIR, citySlug, "districts.geojson");
   if (!fs.existsSync(file)) return [];
   const geo = JSON.parse(fs.readFileSync(file, "utf-8")) as {
-    features: { properties: { name: string; slug: string }; geometry: { type: string; coordinates: number[][][][] } }[];
+    features: {
+      properties: { name: string; slug: string; in?: Record<string, string> };
+      geometry: { type: string; coordinates: number[][][][] };
+    }[];
   };
   return inBatches(geo.features, BATCH, async (f) => {
     const { name, slug } = f.properties;
+    const inPhrases = f.properties.in ?? { en: `in ${name}` };
     const district = await prisma.district.upsert({
       where: { cityId_slug: { cityId, slug } },
-      update: { name },
-      create: { name, slug, cityId },
+      update: { name, inPhrases },
+      create: { name, slug, cityId, inPhrases },
     });
     return { id: district.id, slug, coordinates: f.geometry.coordinates };
   });

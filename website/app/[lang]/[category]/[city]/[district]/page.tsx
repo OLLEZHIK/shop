@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 
   const { district } = resolved;
   const aggregates = await getCategoryAggregates(category, city.slug, district.slug);
-  const where = whereLabel(locale, city, district.name);
+  const where = whereLabel(locale, city, district);
   const what = aggregates.count === 1 ? categorySingular(category, locale) : categoryPlural(category, locale);
 
   return {
@@ -108,6 +108,7 @@ export default async function CategoryCityDistrictPage({
       city={city}
       districtSlug={resolved.nonstop ? undefined : resolved.districtSlug}
       districtName={resolved.nonstop ? undefined : resolved.district.name}
+      districtInPhrases={resolved.nonstop ? undefined : resolved.district.inPhrases}
       nonstopPage={resolved.nonstop}
       open={open}
       animal={animal}
