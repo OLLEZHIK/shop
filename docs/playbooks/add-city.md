@@ -117,7 +117,7 @@ category,name,slug,address,lat,lng,phone,email,website,instagram,facebook,short_
 | `category` | тип заведения | ровно одно из: `GROOMING`, `VET_CLINIC`, `PET_HOTEL`, `DOG_TRAINING`, `PET_SHOP`, `PET_SITTING` |
 | `name` | название | как у самого заведения (вывеска или сайт), без «s.r.o.», если его нет в вывеске |
 | `address` | адрес | улица, номер, индекс, город: `Hlavná 12, 040 01 Košice` |
-| `lat`, `lng` | координаты | 5–6 знаков после точки; из Google Maps или OpenStreetMap по адресу |
+| `lat`, `lng` | координаты | 5–6 знаков после точки; из Google Maps или OpenStreetMap по адресу. Мобильная служба без помещения — пусто и `coords: none (mobile service, no premises)` в `notes`; центр города не ставить |
 | `phone` | телефон | в международном формате: `+421 905 123 456` |
 | `email` | почта | только публично указанная самим заведением |
 | `website` | сайт | официальный сайт или официальная страница в соцсети; `https://…` |
