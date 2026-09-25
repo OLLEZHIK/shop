@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { BusinessCategory } from "@prisma/client";
@@ -9,19 +10,16 @@ import { getDictionary, type Locale } from "@/lib/i18n";
 import { AnimalIcon } from "./AnimalIcon";
 import { Dropdown } from "./Dropdown";
 import { MapPinIcon, StarIcon } from "./icons";
-import {
-  MIN_RATINGS,
-  type ListingSort,
-  type MinRating,
-} from "@/lib/listingSort";
+import { MIN_RATINGS, type ListingSort, type MinRating } from "@/lib/listingSort";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
 
+// No district picker (owner, 2026-09-25): location is "Near me" (sort by
+// distance); district pages stay for SEO and are linked from place texts.
 interface FilterPanelProps {
   locale: Locale;
   category: BusinessCategory;
   citySlug: string;
-  cityName: string;
-  districts: { slug: string; name: string }[];
+  /** District page the visitor is on (or "nonstop"), kept by the filters. */
   currentDistrictSlug?: string;
   currentAnimal?: string;
   /** "lat,lng" when the list is sorted by distance - kept across filters. */
@@ -44,8 +42,6 @@ export function FilterPanel({
   locale,
   category,
   citySlug,
-  cityName,
-  districts,
   currentDistrictSlug,
   currentAnimal,
   near,
@@ -59,12 +55,9 @@ export function FilterPanel({
 }: FilterPanelProps) {
   const router = useRouter();
   const t = getDictionary(locale);
-  const locationPath = listingPath(
-    locale,
-    category,
-    citySlug,
-    currentDistrictSlug,
-  );
+  const locationPath = listingPath(locale, category, citySlug, currentDistrictSlug);
+  const [locating, setLocating] = useState(false);
+  const [geoOff, setGeoOff] = useState(false);
 
   // Every filter link keeps the other filters; `changes` overrides one.
   function withQuery(
@@ -74,15 +67,17 @@ export function FilterPanel({
       sort?: string | null;
       rating?: string | null;
       open?: string | null;
-    } = {},
+      near?: string | null;
+    } = {}
   ) {
     const params = new URLSearchParams();
     const animal = "animal" in changes ? changes.animal : currentAnimal;
     const sortValue = "sort" in changes ? changes.sort : sort;
     const rating = "rating" in changes ? changes.rating : minRating;
     const openValue = "open" in changes ? changes.open : openNow ? "1" : null;
+    const nearValue = "near" in changes ? changes.near : near;
     if (animal) params.set("animal", animal);
-    if (near) params.set("near", near);
+    if (nearValue) params.set("near", nearValue);
     if (sortValue) params.set("sort", sortValue);
     if (rating) params.set("rating", rating);
     if (openValue) params.set("open", openValue);
@@ -90,119 +85,96 @@ export function FilterPanel({
     return query ? `${path}?${query}` : path;
   }
 
+  // "Near me": asked only on tap; the list re-sorts by distance.
+  function toggleNear() {
+    if (near) return router.push(withQuery(locationPath, { near: null }), { scroll: false });
+    if (!("geolocation" in navigator)) return setGeoOff(true);
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        const value = `${pos.coords.latitude.toFixed(4)},${pos.coords.longitude.toFixed(4)}`;
+        router.push(withQuery(locationPath, { near: value }), { scroll: false });
+      },
+      () => {
+        setLocating(false);
+        setGeoOff(true);
+      },
+      { timeout: 8000, maximumAge: 10 * 60 * 1000 }
+    );
+  }
+
   const chip = (active: boolean) =>
     `inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-pill)] px-3.5 text-sm font-semibold transition ${
       active ? "bg-ink text-white" : "text-foreground/70 hover:text-brand-blue"
     }`;
-  const numberFormat = new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 1,
-  });
+  const toggle = (active: boolean, on: string) =>
+    `inline-flex min-h-10 items-center gap-1.5 rounded-[var(--radius-pill)] border px-3.5 text-sm font-semibold transition ${
+      active ? `border-transparent ${on} text-white` : "border-line bg-surface text-foreground/70 hover:text-brand-blue"
+    }`;
+  const numberFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 1 });
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* Wraps onto a second line on phones instead of hiding pets
-            behind a sideways scroll nobody discovers. */}
-        <div
-          className="flex flex-wrap gap-1 self-start rounded-[22px] bg-surface p-1 shadow-[var(--shadow-card)]"
-          role="group"
-          aria-label={t.listing.filterAnimal}
-        >
-          {[null, ...(animals ?? animalsForService(category))].map((value) => {
-            const active = (currentAnimal ?? null) === value;
-            return (
-              <Link
-                key={value ?? "any"}
-                href={withQuery(locationPath, { animal: value })}
-                aria-current={active ? "true" : undefined}
-                scroll={false}
-                className={chip(active)}
-              >
-                {value && <AnimalIcon animal={value} className="h-4 w-4" />}
-                {value ? t.animals[value] : t.animals.any}
-              </Link>
-            );
-          })}
-        </div>
-
-        {!nonstopPage && (
-          <Dropdown
-            ariaLabel={t.listing.filterDistrict}
-            placeholder={t.listing.allOf(cityName)}
-            value={currentDistrictSlug ?? "all"}
-            options={[
-              {
-                value: "all",
-                label: t.listing.allOf(cityName),
-                icon: <MapPinIcon className="h-4 w-4 text-foreground/50" />,
-              },
-              ...districts.map((d) => ({ value: d.slug, label: d.name })),
-            ]}
-            onChange={(value) =>
-              router.push(
-                withQuery(
-                  listingPath(
-                    locale,
-                    category,
-                    citySlug,
-                    value === "all" ? null : value,
-                  ),
-                ),
-              )
-            }
-            className="shrink-0 sm:w-64"
-          />
-        )}
+      {/* Wraps onto a second line on phones instead of hiding pets
+          behind a sideways scroll nobody discovers. */}
+      <div
+        className="flex w-fit flex-wrap gap-1 rounded-[22px] bg-surface p-1 shadow-[var(--shadow-card)]"
+        role="group"
+        aria-label={t.listing.filterAnimal}
+      >
+        {[null, ...(animals ?? animalsForService(category))].map((value) => {
+          const active = (currentAnimal ?? null) === value;
+          return (
+            <Link
+              key={value ?? "any"}
+              href={withQuery(locationPath, { animal: value })}
+              aria-current={active ? "true" : undefined}
+              scroll={false}
+              className={chip(active)}
+            >
+              {value && <AnimalIcon animal={value} className="h-4 w-4" />}
+              {value ? t.animals[value] : t.animals.any}
+            </Link>
+          );
+        })}
       </div>
 
-      {/* Open now (all categories) and Nonstop 24/7 (vets: a link to the
-          indexable /nonstop page rather than a query filter). */}
-      {(showOpenNow || showNonstop || nonstopPage) && (
-        <div className="flex flex-wrap gap-2">
-          {showOpenNow && (
-            <Link
-              href={withQuery(locationPath, { open: openNow ? null : "1" })}
-              aria-current={openNow ? "true" : undefined}
-              scroll={false}
-              className={`inline-flex min-h-10 items-center gap-1.5 rounded-[var(--radius-pill)] border px-3.5 text-sm font-semibold transition ${
-                openNow
-                  ? "border-transparent bg-brand-green text-white"
-                  : "border-line bg-surface text-foreground/70 hover:text-brand-blue"
-              }`}
-            >
-              <span
-                className={`h-2 w-2 rounded-full ${openNow ? "bg-white" : "bg-brand-green"}`}
-                aria-hidden="true"
-              />
-              {t.listing.openNowFilter}
-            </Link>
-          )}
-          {(showNonstop || nonstopPage) && (
-            <Link
-              href={withQuery(
-                listingPath(
-                  locale,
-                  category,
-                  citySlug,
-                  nonstopPage ? null : NONSTOP_SEGMENT,
-                ),
-              )}
-              aria-current={nonstopPage ? "page" : undefined}
-              className={`inline-flex min-h-10 items-center rounded-[var(--radius-pill)] border px-3.5 text-sm font-semibold transition ${
-                nonstopPage
-                  ? "border-transparent bg-red-600 text-white"
-                  : "border-line bg-surface text-red-700 hover:border-red-300"
-              }`}
-            >
-              {t.listing.nonstopFilter}
-            </Link>
-          )}
-        </div>
-      )}
+      {/* Near me, Open now (all categories) and Nonstop 24/7 (vets: a link
+          to the indexable /nonstop page rather than a query filter). */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={toggleNear} aria-pressed={!!near} className={toggle(!!near, "bg-brand-blue")}>
+          <MapPinIcon className={`h-4 w-4 ${locating ? "animate-pulse" : ""}`} />
+          {locating ? t.search.locatingYou : near ? t.search.nearYou : t.search.nearMe}
+        </button>
+        {showOpenNow && (
+          <Link
+            href={withQuery(locationPath, { open: openNow ? null : "1" })}
+            aria-current={openNow ? "true" : undefined}
+            scroll={false}
+            className={toggle(openNow, "bg-brand-green")}
+          >
+            <span className={`h-2 w-2 rounded-full ${openNow ? "bg-white" : "bg-brand-green"}`} aria-hidden="true" />
+            {t.listing.openNowFilter}
+          </Link>
+        )}
+        {(showNonstop || nonstopPage) && (
+          <Link
+            href={withQuery(listingPath(locale, category, citySlug, nonstopPage ? null : NONSTOP_SEGMENT))}
+            aria-current={nonstopPage ? "page" : undefined}
+            className={`inline-flex min-h-10 items-center rounded-[var(--radius-pill)] border px-3.5 text-sm font-semibold transition ${
+              nonstopPage ? "border-transparent bg-red-600 text-white" : "border-line bg-surface text-red-700 hover:border-red-300"
+            }`}
+          >
+            {t.listing.nonstopFilter}
+          </Link>
+        )}
+        {geoOff && <span className="text-sm text-foreground/60">{t.listing.geoOff}</span>}
+      </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div
-          className="flex flex-wrap gap-1 self-start rounded-[22px] bg-surface p-1 shadow-[var(--shadow-card)]"
+          className="flex w-fit flex-wrap gap-1 rounded-[22px] bg-surface p-1 shadow-[var(--shadow-card)]"
           role="group"
           aria-label={t.listing.filterRating}
         >
@@ -218,9 +190,7 @@ export function FilterPanel({
               >
                 {value ? (
                   <>
-                    <StarIcon
-                      className={`h-4 w-4 ${active ? "text-white" : "text-brand-amber"}`}
-                    />
+                    <StarIcon className={`h-4 w-4 ${active ? "text-white" : "text-brand-amber"}`} />
                     {numberFormat.format(Number(value))}+
                   </>
                 ) : (
@@ -236,20 +206,12 @@ export function FilterPanel({
           placeholder={t.listing.sortLabel}
           value={sort ?? "default"}
           options={[
-            {
-              value: "default",
-              label: near ? t.listing.sortNearest : t.listing.sortRecommended,
-            },
+            { value: "default", label: near ? t.listing.sortNearest : t.listing.sortRecommended },
             { value: "rating", label: t.listing.sortRating },
             { value: "reviews", label: t.listing.sortReviews },
           ]}
           onChange={(value) =>
-            router.push(
-              withQuery(locationPath, {
-                sort: value === "default" ? null : value,
-              }),
-              { scroll: false },
-            )
+            router.push(withQuery(locationPath, { sort: value === "default" ? null : value }), { scroll: false })
           }
           className="shrink-0 sm:w-64"
         />

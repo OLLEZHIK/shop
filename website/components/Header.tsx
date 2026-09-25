@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { getAllDistricts, getDefaultCity, getCityPoints, getDistrictSummaries } from "@/lib/data";
-import { districtCountMap } from "@/lib/districts";
+import { getDefaultCity, getCityPoints } from "@/lib/data";
 import { ALL_CATEGORIES, CATEGORY_THEME, categoryBlurb, categoryLabel, categorySlug, listingPath } from "@/lib/categories";
 import { getDictionary, localePath, type Locale } from "@/lib/i18n";
 import { Logo } from "./Logo";
@@ -10,12 +9,7 @@ import { FindCareButton, SearchDialog } from "./SearchDialog";
 import { HeaderShell } from "./HeaderShell";
 
 export async function Header({ locale }: { locale: Locale }) {
-  const [city, cityPoints, districts, districtSummaries] = await Promise.all([
-    getDefaultCity(),
-    getCityPoints(),
-    getAllDistricts(),
-    getDistrictSummaries(),
-  ]);
+  const [city, cityPoints] = await Promise.all([getDefaultCity(), getCityPoints()]);
   const citySlug = city?.slug ?? "";
   const t = getDictionary(locale);
 
@@ -26,15 +20,12 @@ export async function Header({ locale }: { locale: Locale }) {
     blurb: categoryBlurb(category, locale),
     accent: CATEGORY_THEME[category].accent,
   }));
-  const cities = cityPoints.map(({ slug, lat, lng }) => ({ slug, lat, lng }));
+  const cities = cityPoints.map(({ slug, name, lat, lng }) => ({ slug, name, lat, lng }));
   const searchCategories = ALL_CATEGORIES.map((category) => ({
     slug: categorySlug(category, locale),
     label: categoryLabel(category, locale),
     category,
   }));
-  const searchDistricts = districts
-    .filter((d) => !city || d.cityId === city.id)
-    .map((d) => ({ slug: d.slug, label: d.name }));
 
   return (
     <HeaderShell>
@@ -95,9 +86,7 @@ export async function Header({ locale }: { locale: Locale }) {
         citySlug={citySlug}
         cityName={city?.name ?? "Bratislava"}
         categories={searchCategories}
-        districts={searchDistricts}
         cities={cities}
-        districtCounts={districtCountMap(districtSummaries)}
       />
     </HeaderShell>
   );

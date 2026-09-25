@@ -1,7 +1,6 @@
 "use client";
 
-import { MIN_DISTRICT_LISTINGS } from "@/lib/districts";
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { BusinessCategory } from "@prisma/client";
 import { Dropdown } from "./Dropdown";
@@ -28,24 +27,28 @@ interface HomeSearchProps {
   cityName: string;
   categories: SearchCategory[];
   popularCategorySlugs: string[];
-  districts: SearchOption[];
-  popularDistrictSlugs: string[];
-  /** Places per district and category; a district is only used in the
-   *  results URL when it has enough (lib/districts.ts). */
-  districtCounts?: Record<string, Partial<Record<BusinessCategory, number>>>;
   /** "hero" = homepage (pill bar on desktop, card on phones).
    *  "dialog" = the stepped card at every size, for the Find pet care dialog. */
   layout?: "hero" | "dialog";
   /** Called right before navigating to the results (e.g. to close a dialog). */
   onNavigate?: () => void;
-  /** Covered cities with a centre point - enables "Near me". */
+  /** Covered cities (name + centre): the city field's suggestions and "Near me". */
   cities?: CityPointLite[];
 }
 
-const NEAR = "__near";
 type GeoStatus = "idle" | "locating" | "denied" | "far";
 
-type Overlay = "category" | "district" | null;
+// "Where" is a city, typed (owner, 2026-09-25): no district picker. The
+// visitor types a city (suggestions from the cities we cover) or taps
+// "Near me"; an empty field means the default city.
+
+function normalize(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim();
+}
 
 export function HomeSearch({
   locale,
@@ -53,61 +56,75 @@ export function HomeSearch({
   cityName,
   categories,
   popularCategorySlugs,
-  districts,
-  popularDistrictSlugs,
-  districtCounts = {},
   layout = "hero",
   onNavigate,
   cities = [],
 }: HomeSearchProps) {
   const router = useRouter();
   const t = getDictionary(locale);
+  const listId = useId();
+  // Phone card / dialog field and desktop bar field: both render (one is
+  // hidden by CSS), so focus goes to whichever is visible.
+  const boxedInput = useRef<HTMLInputElement>(null);
+  const barInput = useRef<HTMLInputElement>(null);
+  const focusCity = () =>
+    [boxedInput.current, barInput.current].find((el) => el && el.offsetParent !== null)?.focus();
   const [animal, setAnimalState] = useState<Animal | null>(null);
   const [categorySlug, setCategorySlug] = useState<string | null>(null);
-  const [districtSlug, setDistrictSlug] = useState<string | null>(null);
-  const [overlay, setOverlay] = useState<Overlay>(null);
+  const [categoryOverlay, setCategoryOverlay] = useState(false);
   // Bumped when Search is pressed with no service: remounts the Service
   // dropdown already open.
   const [serviceNudge, setServiceNudge] = useState(0);
+  const [cityText, setCityText] = useState("");
+  const [cityError, setCityError] = useState<string | null>(null);
   // "Near me": asked only when the visitor taps it (never on page load),
   // then results open in the nearest covered city sorted by distance.
   const [near, setNear] = useState<{ lat: number; lng: number; citySlug: string } | null>(null);
   const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
   const canLocate = cities.length > 0;
-  // Bumped to reopen the Where picker for a manual choice.
-  const [whereNudge, setWhereNudge] = useState(0);
 
   // Location refused, unavailable or outside our cities: never a dead
-  // end - open the district picker so the visitor chooses by hand.
-  function chooseByHand(status: "denied" | "far") {
+  // end - send the visitor to the city field.
+  function typeByHand(status: "denied" | "far") {
     setNear(null);
     setGeoStatus(status);
-    const desktop = window.matchMedia("(min-width: 768px)").matches;
-    if (layout === "hero" && !desktop) setOverlay("district");
-    else setWhereNudge((n) => n + 1);
+    focusCity();
   }
 
   function locate() {
-    if (!("geolocation" in navigator)) return chooseByHand("denied");
+    if (!("geolocation" in navigator)) return typeByHand("denied");
     setGeoStatus("locating");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
         const city = nearestCity(cities, latitude, longitude);
-        if (!city) return chooseByHand("far");
+        if (!city) return typeByHand("far");
         setNear({ lat: latitude, lng: longitude, citySlug: city.slug });
-        setDistrictSlug(null);
+        setCityText("");
+        setCityError(null);
         setGeoStatus("idle");
       },
-      () => chooseByHand("denied"),
+      () => typeByHand("denied"),
       { timeout: 8000, maximumAge: 10 * 60 * 1000 }
     );
   }
 
-  function pickDistrict(slug: string | null) {
+  function onCityChange(value: string) {
+    setCityText(value);
+    setCityError(null);
     setNear(null);
     setGeoStatus("idle");
-    setDistrictSlug(slug);
+  }
+
+  /** The covered city the visitor typed: exact name/slug, else a unique prefix. */
+  function resolveCity(text: string): string | null {
+    const q = normalize(text);
+    if (!q) return citySlug;
+    const named = cities.map((c) => ({ slug: c.slug, key: normalize(c.name ?? c.slug) }));
+    const exact = named.find((c) => c.key === q || c.slug === q);
+    if (exact) return exact.slug;
+    const prefix = named.filter((c) => c.key.startsWith(q));
+    return prefix.length === 1 ? prefix[0].slug : null;
   }
 
   // Services that make sense for the chosen pet, and pets that make
@@ -126,16 +143,16 @@ export function HomeSearch({
     if (allowed && selectedCategory && !allowed.includes(selectedCategory.category)) setCategorySlug(null);
   }
 
-  const categoryLabel = selectedCategory?.label;
-  const districtLabel = near ? t.search.nearYou : districts.find((d) => d.slug === districtSlug)?.label;
-
   function goSearch() {
     if (!categorySlug) return;
-    let path = localePath(locale, `/${categorySlug}/${near?.citySlug ?? citySlug}/`);
-    // A thin district (< 3 places of this kind) has no page we link to:
-    // show the whole city instead.
-    const inDistrict = selectedCategory ? (districtCounts[districtSlug ?? ""]?.[selectedCategory.category] ?? 0) : 0;
-    if (districtSlug && !near && inDistrict >= MIN_DISTRICT_LISTINGS) path += `${districtSlug}/`;
+    const targetCity = near?.citySlug ?? resolveCity(cityText);
+    if (!targetCity) {
+      const covered = cities.map((c) => c.name ?? c.slug).join(", ") || cityName;
+      setCityError(t.search.cityNotCovered(cityText.trim(), covered));
+      focusCity();
+      return;
+    }
+    let path = localePath(locale, `/${categorySlug}/${targetCity}/`);
     const params = new URLSearchParams();
     if (animal) params.set("animal", animal);
     if (near) params.set("near", `${near.lat.toFixed(4)},${near.lng.toFixed(4)}`);
@@ -176,7 +193,7 @@ export function HomeSearch({
       type="button"
       onClick={locate}
       aria-pressed={!!near}
-      className={`inline-flex items-center gap-1 rounded-[var(--radius-pill)] px-2.5 py-1 text-xs font-semibold normal-case tracking-normal transition ${
+      className={`inline-flex shrink-0 items-center gap-1 rounded-[var(--radius-pill)] px-2.5 py-1 text-xs font-semibold normal-case tracking-normal transition ${
         near ? "bg-brand-blue text-white" : "bg-brand-blue-muted text-brand-blue hover:bg-brand-blue hover:text-white"
       }`}
     >
@@ -185,8 +202,37 @@ export function HomeSearch({
     </button>
   );
 
-  const geoMessage =
-    geoStatus === "denied" ? t.search.geoDenied : geoStatus === "far" ? t.search.geoFar(cityName) : null;
+  const message =
+    cityError ??
+    (geoStatus === "denied" ? t.search.geoDenied : geoStatus === "far" ? t.search.geoFar(cityName) : null);
+
+  const suggestions = (id: string) => (
+    <datalist id={id}>
+      {cities.map((c) => (
+        <option key={c.slug} value={c.name ?? c.slug} />
+      ))}
+    </datalist>
+  );
+
+  // Boxed city field for the phone card and the dialog.
+  const cityField = (
+    <label className="mt-2 flex min-h-12 w-full items-center gap-2 rounded-[var(--radius-control)] bg-surface-sunken px-4 focus-within:ring-2 focus-within:ring-brand-blue/40">
+      <MapPinIcon className={`h-4 w-4 shrink-0 ${near ? "text-brand-blue" : "text-foreground/50"}`} />
+      <span className="sr-only">{t.search.cityLabel}</span>
+      <input
+        ref={boxedInput}
+        list={`${listId}-boxed`}
+        value={near ? t.search.nearYou : cityText}
+        onChange={(e) => onCityChange(e.target.value)}
+        onFocus={() => near && onCityChange("")}
+        onKeyDown={(e) => e.key === "Enter" && (categorySlug ? goSearch() : setServiceNudge((n) => n + 1))}
+        placeholder={cityName}
+        autoComplete="off"
+        className="min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 font-medium text-foreground outline-none placeholder:text-foreground/55 search-city"
+      />
+      {suggestions(`${listId}-boxed`)}
+    </label>
+  );
 
   if (layout === "dialog") {
     return (
@@ -230,21 +276,8 @@ export function HomeSearch({
           {t.search.stepWhere}
           {nearButton}
         </div>
-        <Dropdown
-          key={`${near ? "near" : "district"}-${whereNudge}`}
-          defaultOpen={whereNudge > 0}
-          ariaLabel={t.search.where}
-          placeholder={t.search.all(cityName)}
-          value={near ? NEAR : (districtSlug ?? "all")}
-          options={[
-            ...(near ? [{ value: NEAR, label: t.search.nearYou, icon: <MapPinIcon className="h-4 w-4 text-brand-blue" /> }] : []),
-            { value: "all", label: t.search.all(cityName), icon: <MapPinIcon className="h-4 w-4 text-foreground/50" /> },
-            ...districts.map((d) => ({ value: d.slug, label: d.label })),
-          ]}
-          onChange={(v) => (v === NEAR ? undefined : pickDistrict(v === "all" ? null : v))}
-          className="mt-2"
-        />
-        {geoMessage && <p className="mt-2 px-1 text-sm text-foreground/70">{geoMessage}</p>}
+        {cityField}
+        {message && <p className="mt-2 px-1 text-sm text-foreground/70">{message}</p>}
 
         <button
           type="button"
@@ -260,7 +293,7 @@ export function HomeSearch({
 
   return (
     <>
-      {/* Mobile: one compact card - pet, then service and place */}
+      {/* Mobile: one compact card - pet, then service and city */}
       <div className="rounded-[var(--radius-card)] bg-surface p-4 text-left shadow-[var(--shadow-panel)] md:hidden">
         <p className={stepLabel}>{t.search.stepPet}</p>
         {petChips}
@@ -268,11 +301,11 @@ export function HomeSearch({
         <p className={`mt-4 ${stepLabel}`}>{t.search.stepService}</p>
         <button
           type="button"
-          onClick={() => setOverlay("category")}
+          onClick={() => setCategoryOverlay(true)}
           className="mt-2 flex min-h-12 w-full items-center justify-between rounded-[var(--radius-control)] bg-surface-sunken px-4 text-left font-medium"
         >
-          <span className={categoryLabel ? "text-foreground" : "text-foreground/55"}>
-            {categoryLabel ?? t.search.servicePlaceholder}
+          <span className={selectedCategory ? "text-foreground" : "text-foreground/55"}>
+            {selectedCategory?.label ?? t.search.servicePlaceholder}
           </span>
           <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
         </button>
@@ -281,22 +314,12 @@ export function HomeSearch({
           {t.search.stepWhere}
           {nearButton}
         </div>
-        <button
-          type="button"
-          onClick={() => setOverlay("district")}
-          className="mt-2 flex min-h-12 w-full items-center justify-between rounded-[var(--radius-control)] bg-surface-sunken px-4 text-left font-medium"
-        >
-          <span className="flex items-center gap-2">
-            <MapPinIcon className="h-4 w-4 text-foreground/50" />
-            {districtLabel ?? t.search.all(cityName)}
-          </span>
-          <ChevronDownIcon className="h-4 w-4 text-foreground/50" />
-        </button>
-        {geoMessage && <p className="mt-2 px-1 text-sm text-foreground/70">{geoMessage}</p>}
+        {cityField}
+        {message && <p className="mt-2 px-1 text-sm text-foreground/70">{message}</p>}
 
         <button
           type="button"
-          onClick={() => (categorySlug ? goSearch() : setOverlay("category"))}
+          onClick={() => (categorySlug ? goSearch() : setCategoryOverlay(true))}
           className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-orange px-6 font-semibold text-white transition hover:bg-brand-orange-deep"
         >
           <SearchIcon className="h-5 w-5" />
@@ -334,23 +357,37 @@ export function HomeSearch({
           className="min-w-0 flex-[1.25]"
         />
         <span aria-hidden="true" className="h-8 w-px bg-line" />
-        <Dropdown
-          key={`where-${whereNudge}`}
-          defaultOpen={whereNudge > 0}
-          variant="bar"
-          label={t.search.where}
-          ariaLabel={t.search.where}
-          placeholder={geoStatus === "locating" ? t.search.locatingYou : t.search.all(cityName)}
-          value={near ? NEAR : districtSlug}
-          options={[
-            ...(canLocate
-              ? [{ value: NEAR, label: near ? t.search.nearYou : t.search.nearMe, icon: <MapPinIcon className="h-4 w-4 text-brand-blue" /> }]
-              : []),
-            ...districts.map((d) => ({ value: d.slug, label: d.label })),
-          ]}
-          onChange={(v) => (v === NEAR ? locate() : pickDistrict(v))}
-          className="min-w-0 flex-[1.1]"
-        />
+        <label className="flex min-w-0 flex-[1.1] cursor-text flex-col rounded-[var(--radius-pill)] px-4 py-2.5 transition-colors hover:bg-surface-sunken focus-within:bg-surface-sunken focus-within:ring-2 focus-within:ring-brand-blue/40">
+          <span className="block text-xs font-semibold uppercase tracking-wider text-foreground/50">{t.search.where}</span>
+          <span className="flex items-center gap-1.5">
+            <input
+              ref={barInput}
+              list={`${listId}-bar`}
+              value={near ? t.search.nearYou : cityText}
+              onChange={(e) => onCityChange(e.target.value)}
+              onFocus={() => near && onCityChange("")}
+              onKeyDown={(e) => e.key === "Enter" && (categorySlug ? goSearch() : setServiceNudge((n) => n + 1))}
+              placeholder={cityName}
+              autoComplete="off"
+              className="min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[15px] font-medium text-foreground outline-none placeholder:text-foreground/60 search-city"
+            />
+            {canLocate && (
+              <button
+                type="button"
+                onClick={locate}
+                aria-pressed={!!near}
+                title={t.search.nearMe}
+                aria-label={t.search.nearMe}
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition ${
+                  near ? "bg-brand-blue text-white" : "bg-brand-blue-muted text-brand-blue hover:bg-brand-blue hover:text-white"
+                }`}
+              >
+                <MapPinIcon className={`h-4 w-4 ${geoStatus === "locating" ? "animate-pulse" : ""}`} />
+              </button>
+            )}
+          </span>
+          {suggestions(`${listId}-bar`)}
+        </label>
         <button
           type="button"
           // Always clickable: without a service it opens the Service list
@@ -363,24 +400,18 @@ export function HomeSearch({
           {t.search.search}
         </button>
       </div>
-      {geoMessage && (
-        <p className="mt-3 hidden px-6 text-left text-sm text-foreground/70 md:block">{geoMessage}</p>
-      )}
+      {message && <p className="mt-3 hidden px-6 text-left text-sm text-foreground/70 md:block">{message}</p>}
 
-      {overlay && (
+      {categoryOverlay && (
         <StepOverlay
-          title={overlay === "category" ? t.search.servicePlaceholder : t.search.where}
-          options={
-            overlay === "category" ? visibleCategories : [{ slug: "", label: t.search.all(cityName) }, ...districts]
-          }
-          popularSlugs={overlay === "category" ? popularCategorySlugs : popularDistrictSlugs}
+          title={t.search.servicePlaceholder}
+          options={visibleCategories}
+          popularSlugs={popularCategorySlugs}
           labels={{ close: t.search.close, popular: t.search.popular }}
-          note={overlay === "district" ? geoMessage : null}
-          onClose={() => setOverlay(null)}
+          onClose={() => setCategoryOverlay(false)}
           onSelect={(slug) => {
-            if (overlay === "category") setCategorySlug(slug);
-            else pickDistrict(slug || null);
-            setOverlay(null);
+            setCategorySlug(slug);
+            setCategoryOverlay(false);
           }}
         />
       )}
@@ -393,7 +424,6 @@ function StepOverlay({
   options,
   popularSlugs,
   labels,
-  note,
   onClose,
   onSelect,
 }: {
@@ -401,7 +431,6 @@ function StepOverlay({
   options: SearchOption[];
   popularSlugs: string[];
   labels: { close: string; popular: string };
-  note?: string | null;
   onClose: () => void;
   onSelect: (slug: string) => void;
 }) {
@@ -426,9 +455,6 @@ function StepOverlay({
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {note && (
-          <p className="mb-4 rounded-[var(--radius-control)] bg-brand-blue-muted px-4 py-3 text-sm text-brand-blue">{note}</p>
-        )}
         {popular.length > 0 && (
           <div className="mb-6">
             <p className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground/50">{labels.popular}</p>
@@ -449,7 +475,7 @@ function StepOverlay({
 
         <ul className="divide-y divide-gray-100">
           {options.map((o) => (
-            <li key={o.slug || "all"}>
+            <li key={o.slug}>
               <button
                 type="button"
                 onClick={() => onSelect(o.slug)}

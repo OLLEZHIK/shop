@@ -3,8 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getDefaultCity,
-  getAllDistricts,
-  getPopularNearby,
   getFeaturedBusinesses,
   getBusinessCount,
   getDistrictSummaries,
@@ -19,12 +17,10 @@ import {
 } from "@/lib/categories";
 import { getDictionary, inCity, isLocale, localePath, localesForCountry } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
-import { districtCountMap } from "@/lib/districts";
 import { HomeSearch } from "@/components/HomeSearch";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { BusinessCard } from "@/components/BusinessCard";
 import { CategoryIcon } from "@/components/CategoryIcon";
-import { DistrictExplorer } from "@/components/DistrictExplorer";
 import { MythOrFact } from "@/components/MythOrFact";
 import {
   ArrowRightIcon,
@@ -57,10 +53,8 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   if (!isLocale(lang)) notFound();
   const locale = lang;
   const t = getDictionary(locale).home;
-  const [city, districts, popularNearby, featured, counts, districtSummaries, cityPoints] = await Promise.all([
+  const [city, featured, counts, districtSummaries, cityPoints] = await Promise.all([
     getDefaultCity(),
-    getAllDistricts(),
-    getPopularNearby(),
     getFeaturedBusinesses(),
     getBusinessCount(),
     getDistrictSummaries(),
@@ -84,8 +78,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
     .sort((a, b) => b.count - a.count)
     .slice(0, 3)
     .map((c) => c.slug);
-
-  const districtOptions = districts.map((d) => ({ slug: d.slug, label: d.name }));
 
   const stats = [
     { value: counts.total, label: t.statPlaces },
@@ -129,10 +121,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 cityName={cityName}
                 categories={categories.map((c) => ({ slug: c.slug, label: c.label, category: c.category }))}
                 popularCategorySlugs={popularCategorySlugs}
-                districts={districtOptions}
-                popularDistrictSlugs={popularNearby.map((p) => p.districtSlug)}
-                districtCounts={districtCountMap(districtSummaries)}
-                cities={cityPoints.map(({ slug, lat, lng }) => ({ slug, lat, lng }))}
+                cities={cityPoints.map(({ slug, name, lat, lng }) => ({ slug, name, lat, lng }))}
               />
             </div>
 
@@ -212,20 +201,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           ))}
         </div>
       </section>
-
-      {/* ---------- Explore by district ---------- */}
-      {districtSummaries.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 pt-24">
-          <SectionHeading
-            eyebrow={t.exploreEyebrow}
-            title={t.exploreTitle(cityName)}
-            body={t.exploreBody}
-          />
-          <div className="mt-10">
-            <DistrictExplorer locale={locale} districts={districtSummaries} citySlug={citySlug} cityName={cityName} />
-          </div>
-        </section>
-      )}
 
       {/* ---------- Featured partners ---------- */}
       {featured.length > 0 && (
