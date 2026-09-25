@@ -15,10 +15,11 @@ import {
   categoryBlurb,
   categoryLabel,
   categoryPlural, categorySingular,
+  cityPath,
   listingPath,
 } from "@/lib/categories";
 import { getDictionary, inCity, localePath, type Locale } from "@/lib/i18n";
-import { animalsForService, isAnimal } from "@/lib/animals";
+import { ANIMALS, animalsForService, isAnimal } from "@/lib/animals";
 import { BusinessCard } from "./BusinessCard";
 import { FilterPanel } from "./FilterPanel";
 import { NONSTOP_SEGMENT } from "@/lib/districts";
@@ -28,11 +29,12 @@ import { EmptyState } from "./EmptyState";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { CategoryIcon } from "./CategoryIcon";
 import { AnimalIcon } from "./AnimalIcon";
-import { ArrowRightIcon, RouteIcon } from "./icons";
+import { ArrowRightIcon, PawIcon, RouteIcon } from "./icons";
 
 interface CategoryListingProps {
   locale: Locale;
-  category: BusinessCategory;
+  /** null: the city page (/city/<slug>/) listing every service. */
+  category: BusinessCategory | null;
   city: City;
   districtSlug?: string;
   districtName?: string;
@@ -72,25 +74,39 @@ export async function CategoryListing({
   const sort = parseSort(requestedSort);
   const minRating = parseMinRating(requestedRating);
   // Ignore a pet this service isn't for (e.g. ?animal=bird on dog training).
-  const animal =
-    isAnimal(requestedAnimal) && animalsForService(category).includes(requestedAnimal) ? requestedAnimal : undefined;
+  const servicePets: readonly string[] = category ? animalsForService(category) : ANIMALS;
+  const animal = isAnimal(requestedAnimal) && servicePets.includes(requestedAnimal) ? requestedAnimal : undefined;
   // With a pet filter we still load the whole list: most places haven't
   // told us every pet they cater for yet (Business.animals is mostly just
   // dog/cat), so an unconfirmed place is shown in a second, clearly
   // labelled group instead of vanishing from an empty result.
-  const [all, aggregates, priceTiers, nonstopCount, animalsPresent] = await Promise.all([
-    searchBusinesses({ category, citySlug, districtSlug }),
-    getCategoryAggregates(category, citySlug, districtSlug),
-    getPriceTierMap(category, citySlug),
-    category === "VET_CLINIC" ? getNonstopVetCount(citySlug) : Promise.resolve(0),
-    getAnimalsInCategory(category, citySlug),
+  // The city page (no category) lists every service; tiers still compare
+  // each place with its own category.
+  const [all, categoryAggregates, priceTiers, nonstopCount, categoryAnimals] = await Promise.all([
+    searchBusinesses({ category: category ?? undefined, citySlug, districtSlug }),
+    category ? getCategoryAggregates(category, citySlug, districtSlug) : Promise.resolve(null),
+    category
+      ? getPriceTierMap(category, citySlug)
+      : Promise.all(ALL_CATEGORIES.map((c) => getPriceTierMap(c, citySlug))).then(
+          (maps) => new Map(maps.flatMap((m) => [...m]))
+        ),
+    !category || category === "VET_CLINIC" ? getNonstopVetCount(citySlug) : Promise.resolve(0),
+    category ? getAnimalsInCategory(category, citySlug) : Promise.resolve(null),
   ]);
+  const aggregates = categoryAggregates ?? {
+    count: all.length,
+    verifiedCount: all.filter((b) => b.verifiedAt !== null).length,
+    priceFrom: null,
+    priceTo: null,
+    currency: city.currency ?? "EUR",
+  };
+  const animalsPresent = categoryAnimals ?? [...new Set(all.flatMap((b) => b.animals))];
 
   const t = getDictionary(locale);
-  const label = categoryLabel(category, locale);
-  const theme = CATEGORY_THEME[category];
+  const label = category ? categoryLabel(category, locale) : t.cityHub.h1Before;
+  const accent = category ? CATEGORY_THEME[category].accent : "var(--brand-orange)";
   const where = whereLabel(locale, city, districtName);
-  const resetHref = listingPath(locale, category, citySlug, districtSlug);
+  const resetHref = category ? listingPath(locale, category, citySlug, districtSlug) : cityPath(locale, citySlug);
 
   // "Near me": sort by distance from the visitor, places without
   // coordinates last (in their usual daily order).
@@ -120,24 +136,23 @@ export async function CategoryListing({
   const listItems = ordered(withDistance);
   const unconfirmedList = ordered(unconfirmedItems);
 
-  const faqs = buildFaqs({ locale, category, where, aggregates });
-  const countLabel = aggregates.count === 1 ? categorySingular(category, locale) : categoryPlural(category, locale);
+  const faqs = category ? buildFaqs({ locale, category, where, aggregates }) : [];
 
   return (
-    <main style={{ "--accent": theme.accent } as React.CSSProperties}>
+    <main style={{ "--accent": accent } as React.CSSProperties}>
       {/* ---------- Header band ---------- */}
       <section className="under-header relative overflow-hidden border-b border-line">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full opacity-[0.14] blur-3xl"
-          style={{ background: theme.accent }}
+          style={{ background: accent }}
         />
         <div className="dot-grid pointer-events-none absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 md:pb-10 md:pt-10">
           <Breadcrumbs
             items={[
               { label: t.listing.home, href: localePath(locale, "/") },
-              { label, href: listingPath(locale, category, citySlug) },
+              ...(category ? [{ label, href: listingPath(locale, category, citySlug) }] : []),
               ...(nonstopPage
                 ? [{ label: t.listing.nonstopCrumb }]
                 : districtName
@@ -148,7 +163,7 @@ export async function CategoryListing({
 
           <div className="mt-6 flex items-start gap-4">
             <span className="accent-solid hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-[var(--shadow-card)] sm:flex">
-              <CategoryIcon category={category} className="h-7 w-7" />
+              {category ? <CategoryIcon category={category} className="h-7 w-7" /> : <PawIcon className="h-7 w-7" />}
             </span>
             <div>
               {nonstopPage ? (
@@ -163,7 +178,13 @@ export async function CategoryListing({
                     {where.split(" ").slice(1).join(" ")}
                   </h1>
                   <p className="mt-2 text-lg text-foreground/65">
-                    {t.listing.browseCount(aggregates.count, countLabel, where)} {categoryBlurb(category, locale)}.
+                    {category
+                      ? `${t.listing.browseCount(
+                          aggregates.count,
+                          aggregates.count === 1 ? categorySingular(category, locale) : categoryPlural(category, locale),
+                          where
+                        )} ${categoryBlurb(category, locale)}.`
+                      : t.cityHub.intro}
                   </p>
                 </>
               )}
@@ -180,6 +201,20 @@ export async function CategoryListing({
               sideways scroll. */}
           <nav aria-label={t.listing.otherServices} className="mt-6">
             <ul className="flex flex-wrap gap-2">
+              <li className="shrink-0">
+                <Link
+                  href={cityPath(locale, citySlug)}
+                  aria-current={category ? undefined : "page"}
+                  className={`inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border px-3.5 py-2 text-sm font-medium transition ${
+                    category
+                      ? "border-line bg-surface text-foreground/70 hover:border-brand-blue-muted-border hover:text-brand-blue"
+                      : "accent-solid border-transparent"
+                  }`}
+                >
+                  <PawIcon className="h-4 w-4" />
+                  {t.listing.allServices}
+                </Link>
+              </li>
               {ALL_CATEGORIES.map((other) => {
                 const active = other === category;
                 return (
@@ -219,7 +254,7 @@ export async function CategoryListing({
             showOpenNow={openNowOnly || all.some((b) => b.emergency247 || b.openingHours !== null)}
             nonstopPage={nonstopPage}
             showNonstop={nonstopCount > 0}
-            animals={animalsForService(category).filter((a) => a === animal || animalsPresent.includes(a))}
+            animals={servicePets.filter((a) => a === animal || animalsPresent.includes(a))}
           />
 
           <p className="mt-6 flex items-center gap-1.5 text-sm text-foreground/60">
@@ -248,7 +283,7 @@ export async function CategoryListing({
                   priceTier={priceTiers.get(business.id) ?? null}
                   locale={locale}
                   distanceKm={km}
-                  showCategory={false}
+                  showCategory={!category}
                 />
               ))
             )}
@@ -271,7 +306,7 @@ export async function CategoryListing({
                     priceTier={priceTiers.get(business.id) ?? null}
                     locale={locale}
                     distanceKm={km}
-                    showCategory={false}
+                    showCategory={!category}
                   />
                 ))}
               </div>

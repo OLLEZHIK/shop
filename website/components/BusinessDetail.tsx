@@ -43,6 +43,7 @@ import {
   PhoneIcon,
 } from "@/components/icons";
 import { AnimalIcon } from "@/components/AnimalIcon";
+import { PriceTier } from "./PriceTier";
 
 // Business detail page, shared by /business/{slug}/ (English) and
 // /{locale}/{localized segment}/{slug}/ (e.g. /sk/podnik/{slug}/).
@@ -234,6 +235,9 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
                     href={business.googleMapsUrl}
                     className="text-sm text-foreground/70"
                   />
+                )}
+                {priceTiers.has(business.id) && (
+                  <PriceTier tier={priceTiers.get(business.id)!} currency={city?.currency} locale={locale} className="text-sm" />
                 )}
                 {rating !== null && (
                   <a href="#reviews" className="flex items-center gap-1.5 hover:opacity-80">

@@ -45,8 +45,7 @@ export const en = {
     metaDescription: (n: number, where: string) =>
       `${n} pet ${n === 1 ? "service" : "services"} ${where}: vets, groomers, pet hotels, dog trainers, pet shops and sitters, with opening hours, prices and one-tap contact.`,
     h1Before: "Pet services",
-    intro: "Choose a service to see every place, with opening hours, prices where published and a source for each listing.",
-    nonstop: "Nonstop 24/7 vets",
+    intro: "All pet services in one list: vets, groomers, pet hotels, trainers, pet shops and sitters, each with its source. Pick a service above to narrow it down.",
   },
   animals: {
     any: "Any pet",
@@ -141,8 +140,6 @@ export const en = {
     all: (city: string) => `All ${city}`,
     search: "Search",
     showResults: "Show results",
-    pickService: "Pick a service to search",
-    chooseServiceFirst: "Choose a service first",
     stepPet: "1 · Your pet",
     stepService: "2 · Service",
     stepWhere: "3 · Where",
@@ -256,6 +253,7 @@ export const en = {
     ratingAny: "Any rating",
     hiddenUnrated: (n: number) => `${n} without a rating hidden`,
     openNowFilter: "Open now",
+    allServices: "All services",
     geoOff: "Location is off - showing all places.",
     nonstopFilter: "Nonstop 24/7",
     hiddenNoHours: (n: number) => `${n} without opening hours hidden`,

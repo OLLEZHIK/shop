@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { BusinessCategory } from "@prisma/client";
 import { animalsForService } from "@/lib/animals";
-import { listingPath } from "@/lib/categories";
+import { cityPath, listingPath } from "@/lib/categories";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { AnimalIcon } from "./AnimalIcon";
 import { Dropdown } from "./Dropdown";
@@ -17,7 +17,8 @@ import { NONSTOP_SEGMENT } from "@/lib/districts";
 // distance); district pages stay for SEO and are linked from place texts.
 interface FilterPanelProps {
   locale: Locale;
-  category: BusinessCategory;
+  /** null: the city page listing every service. */
+  category: BusinessCategory | null;
   citySlug: string;
   /** District page the visitor is on (or "nonstop"), kept by the filters. */
   currentDistrictSlug?: string;
@@ -55,7 +56,7 @@ export function FilterPanel({
 }: FilterPanelProps) {
   const router = useRouter();
   const t = getDictionary(locale);
-  const locationPath = listingPath(locale, category, citySlug, currentDistrictSlug);
+  const locationPath = category ? listingPath(locale, category, citySlug, currentDistrictSlug) : cityPath(locale, citySlug);
   const [locating, setLocating] = useState(false);
   const [geoOff, setGeoOff] = useState(false);
 
@@ -123,7 +124,7 @@ export function FilterPanel({
         role="group"
         aria-label={t.listing.filterAnimal}
       >
-        {[null, ...(animals ?? animalsForService(category))].map((value) => {
+        {[null, ...(animals ?? (category ? animalsForService(category) : []))].map((value) => {
           const active = (currentAnimal ?? null) === value;
           return (
             <Link
@@ -160,7 +161,7 @@ export function FilterPanel({
         )}
         {(showNonstop || nonstopPage) && (
           <Link
-            href={withQuery(listingPath(locale, category, citySlug, nonstopPage ? null : NONSTOP_SEGMENT))}
+            href={withQuery(listingPath(locale, category ?? "VET_CLINIC", citySlug, nonstopPage ? null : NONSTOP_SEGMENT))}
             aria-current={nonstopPage ? "page" : undefined}
             className={`inline-flex min-h-10 items-center rounded-[var(--radius-pill)] border px-3.5 text-sm font-semibold transition ${
               nonstopPage ? "border-transparent bg-red-600 text-white" : "border-line bg-surface text-red-700 hover:border-red-300"

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { categoryFromSlug, categoryPlural, categorySeoTitle, categorySingular, cityPath, isCitySegment, listingPath } from "@/lib/categories";
-import { getBusinessCount, getCityBySlug, getCategoryAggregates, getNonstopVetCount } from "@/lib/data";
+import { getBusinessCount, getCityBySlug, getCategoryAggregates } from "@/lib/data";
 import { getDictionary, inCity, isLocale, localesForCity } from "@/lib/i18n";
 import { localeAlternates } from "@/lib/seo";
 import { CategoryListing, whereLabel } from "@/components/CategoryListing";
-import { CityHub } from "@/components/CityHub";
 
 interface PageParams {
   lang: string;
@@ -79,11 +78,7 @@ export default async function CategoryCityPage({
   const { animal, near, sort, rating, open } = await searchParams;
   const { locale, category, city } = resolved;
 
-  if (!category) {
-    const [counts, nonstopCount] = await Promise.all([getBusinessCount(city.slug), getNonstopVetCount(city.slug)]);
-    return <CityHub locale={locale} city={city} counts={counts.byCategory} nonstopCount={nonstopCount} />;
-  }
-
+  // No category: the city page, one list with every service.
   return (
     <CategoryListing
       locale={locale}
