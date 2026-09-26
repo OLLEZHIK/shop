@@ -48,7 +48,7 @@
 |---|---|---|---|---|---|---|
 | Круглосуточно | `…/nonstop/` | emergency vet bratislava | 0–10 | 100 | áno | **главный**: в `<title>`: «Emergency Vet in Bratislava (24/7)» |
 | | | 24 hour vet bratislava | 0–10 | 30 | nie | второй: в description, текст |
-| | | 24/7 vet bratislava | 0–10 | 20 | nie | второй: в description, бейджи |
+| | | 24/7 vet bratislava | 0–10 | 20 | nie | второй: в description, текст (без бейджей) |
 | Выходные | `…/open-saturday/`, `…/open-sunday/` | weekend vet bratislava | 0–10 | 100 | áno | **главный**: для страниц ухода в выходные (подсказывает `emergency vet`) |
 | | | vet open sunday bratislava | 0–10 | 25 | nie | второй: для страницы `…/open-sunday/` |
 | Экзоты | `…/exotic-animals/` | exotic vet bratislava | 0–10 | 100 | nie | **главный**: title «Exotic Animal Vets in Bratislava» |
