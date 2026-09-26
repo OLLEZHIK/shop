@@ -36,7 +36,6 @@ export const en = {
     fixListing: "Fix a listing",
     privacy: "Privacy Policy",
     terms: "Terms of Use",
-    englishOnly: "",
     madeWithCare: (where: string | null) => `Made with care for pets${where ? ` ${where}` : ""}`,
     cities: "Cities",
   },

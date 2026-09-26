@@ -12,8 +12,6 @@ export async function Footer({ locale }: { locale: Locale }) {
   // Name the city only while there is one; with several the site is generic.
   const cityWhere = cities.length === 1 ? inCity(locale, cities[0]) : null;
   const t = getDictionary(locale).footer;
-  // Help and legal pages exist in English only; flag that in other locales.
-  const en = t.englishOnly;
 
   return (
     <footer className="relative mt-24 overflow-hidden bg-ink text-white">
@@ -53,14 +51,14 @@ export async function Footer({ locale }: { locale: Locale }) {
           </FooterColumn>
 
           <FooterColumn title={t.about}>
-            <FooterLink href="/en/how-it-works/">{t.howItWorks + en}</FooterLink>
-            <FooterLink href="/en/add-or-fix-listing/">{t.addBusiness + en}</FooterLink>
-            <FooterLink href="/en/add-or-fix-listing/">{t.fixListing + en}</FooterLink>
+            <FooterLink href="/en/how-it-works/">{t.howItWorks}</FooterLink>
+            <FooterLink href="/en/add-or-fix-listing/">{t.addBusiness}</FooterLink>
+            <FooterLink href="/en/add-or-fix-listing/">{t.fixListing}</FooterLink>
           </FooterColumn>
 
           <FooterColumn title={t.legal}>
-            <FooterLink href="/en/privacy-policy/">{t.privacy + en}</FooterLink>
-            <FooterLink href="/en/terms-of-use/">{t.terms + en}</FooterLink>
+            <FooterLink href="/en/privacy-policy/">{t.privacy}</FooterLink>
+            <FooterLink href="/en/terms-of-use/">{t.terms}</FooterLink>
           </FooterColumn>
         </div>
 

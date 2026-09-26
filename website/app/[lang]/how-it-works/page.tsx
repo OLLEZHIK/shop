@@ -7,11 +7,12 @@ import { MarkdownContent } from "@/components/MarkdownContent";
 export const metadata: Metadata = {
   title: "How It Works - pawenn",
   description: "How pawenn finds, verifies and ranks pet service listings in Bratislava.",
-  // English only for now; v2 URL with the /en/ prefix.
+  // English only; v2 URL with the /en/ prefix.
   alternates: { canonical: `${SITE_URL}/en/how-it-works/` },
 };
 
-// English only for now - the Slovak site links here with an "(EN)" hint.
+// English only, in every language of the site (owner, 2026-09-26): all
+// locales link here without a language hint.
 export function generateStaticParams() {
   return [{ lang: "en" }];
 }
