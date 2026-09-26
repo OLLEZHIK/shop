@@ -141,7 +141,7 @@ cd website && npm run check-city -- <город>
 
 Отдельный файл на заведение: `data/cities/<город>/review-insights/<slug>.json`
 (для Братиславы тоже). Формат, правила и
-порог (≥ 5 отзывов с текстом за полгода) — `tasks/ide-review-insights.md`.
+порог (≥ 5 отзывов с текстом за полгода) — `tasks/mac-review-insights.md`.
 Все `title` / `text` / `q` / `a` — парой `{ "en": …, "<locale>": … }`.
 
 Главное правило оттуда: это **наша сводка** отзывов («N из M пишут…»),

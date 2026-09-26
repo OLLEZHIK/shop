@@ -1,5 +1,5 @@
 // "What customers say": our summary of public Google reviews for a place
-// (data/review-insights/<slug>.json, tasks/ide-review-insights.md).
+// (data/review-insights/<slug>.json, tasks/mac-review-insights.md).
 // Display rules: docs/design-plan.md, "Сводка отзывов". Stored as JSON on
 // Business.reviewInsights; parsed defensively here so one malformed file
 // hides its block instead of breaking the page.
