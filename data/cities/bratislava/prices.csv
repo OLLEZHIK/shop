@@ -144,3 +144,37 @@ opatrovanie-maciek-bratislava-adriana-tankova,cat_visit,,,20,20,EUR,https://opat
 pohodog-team-vencenie-a-opatrovanie-na-doma,boarding_night,,,40,40,EUR,https://www.pohodog.sk/cennik/,2026-09-25,Celodenné s prespaním (12 hodín +) 40 €,,,,
 pohodog-team-vencenie-a-opatrovanie-na-doma,daycare_day,,,20,20,EUR,https://www.pohodog.sk/cennik/,2026-09-25,Denné stráženie počas pracovnej doby (7:00 – 15:00) 20 €,,,,
 zvieratkovo-raca-opatrovanie-doma,cat_visit,,,10,10,EUR,https://www.zvieratkovo-raca.sk/wp-content/uploads/2025/11/Cennik-sluzieb-Zvieratkovo-platny-od-1.11.2025.pdf,2026-09-25,"Starostlivosť v domácnosti (1-2 zvieratá): 10 € za návštevu + cestovné 0,5 €/km",,,,
+veterinarna-klinika-know-hau,exam,,,30,30,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Klinické vyšetrenie 30 EUR,,,clinical examination,klinické vyšetrenie
+veterinarna-klinika-know-hau,microchip,,,25,25,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Čipovanie a registrácia čipu 25 EUR,,,microchipping and registration,čipovanie a registrácia čipu
+veterinarna-klinika-know-hau,vaccination_dog,,,33,33,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Vakcinácia pes – infekčné ochorenia a besnota 33 EUR,,,core infectious diseases and rabies vaccine,vakcinácia infekčné ochorenia a besnota
+veterinarna-klinika-know-hau,vaccination_cat,,,60.50,60.50,EUR,https://www.knowhau.sk/cennik/,2026-09-26,"Vakcinácia mačka – infekčné ochorenia a besnota 60,50 EUR",,,core infectious diseases and rabies vaccine,vakcinácia infekčné ochorenia a besnota
+veterinarna-klinika-know-hau,neuter_cat,,,80,80,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Kastrácia kocúr 80 EUR,,,cat castration,kastrácia kocúr
+veterinarna-klinika-know-hau,spay_cat,,,120,120,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Sterilizácia mačka 120 EUR,,,cat spaying,sterilizácia mačka
+veterinarna-klinika-know-hau,spay_dog,,10,240,240,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Sterilizácia fena malá (do 10 kg) 240 EUR,,,small dog spaying,sterilizácia fena malá
+veterinarna-klinika-know-hau,spay_dog,10,25,290,290,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Sterilizácia fena stredná (10-25 kg) 290 EUR,,,medium dog spaying,sterilizácia fena stredná
+veterinarna-klinika-know-hau,spay_dog,25,45,330,330,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Sterilizácia fena veľká (25-45 kg) 330 EUR,,,large dog spaying,sterilizácia fena veľká
+veterinarna-klinika-know-hau,spay_dog,45,,400,400,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Sterilizácia fena obrovská (nad 45 kg) 400 EUR,,,giant dog spaying,sterilizácia fena obrovská
+veterinarna-klinika-know-hau,nail_trim,,,7,7,EUR,https://www.knowhau.sk/cennik/,2026-09-26,Strihanie drápov 7 EUR,,,nail trim,strihanie drápov
+veterinarna-ambulancia-veterinka,exam,,,30,,EUR,https://www.veterinkabratislava.sk/pricing/,2026-09-26,Klinické vyšetrenie od 30 eur,,,clinical examination from 30 EUR,klinické vyšetrenie od 30 eur
+veterinarna-ambulancia-veterinka,microchip,,,40,40,EUR,https://www.veterinkabratislava.sk/pricing/,2026-09-26,Čipovanie a registrácia čipu 40 eur,,,microchipping and registration,čipovanie a registrácia čipu
+veterinarna-ambulancia-veterinka,vaccination_dog,,,45,45,EUR,https://www.veterinkabratislava.sk/pricing/,2026-09-26,Vakcinácia - pes kompletná 45 eur,,,complete dog vaccination,vakcinácia pes kompletná
+veterinarna-ambulancia-veterinka,vaccination_cat,,,50,50,EUR,https://www.veterinkabratislava.sk/pricing/,2026-09-26,Vakcinácia - mačka kompletná 50 eur,,,complete cat vaccination,vakcinácia mačka kompletná
+veterinarna-ambulancia-veterinka,neuter_cat,,,85,,EUR,https://www.veterinkabratislava.sk/pricing/,2026-09-26,Kastrácia kocúr od 85 eur,,,cat castration from 85 EUR,kastrácia kocúr od 85 eur
+veterinarna-ambulancia-veterinka,spay_cat,,,125,,EUR,https://www.veterinkabratislava.sk/pricing/,2026-09-26,Sterilizácia mačka od 125 eur,,,cat spaying from 125 EUR,sterilizácia mačka od 125 eur
+veterinarna-ambulancia-veterinka,spay_dog,,,290,,EUR,https://www.veterinkabratislava.sk/pricing/,2026-09-26,Sterilizácia fena od 290 eur,,,dog spaying from 290 EUR,sterilizácia fena od 290 eur
+veterinarna-ambulancia-veterinka,nail_trim,,,15,18,EUR,https://www.veterinkabratislava.sk/pricing/,2026-09-26,Strihanie pazúrikov 15 eur (s asistenciou 18 eur),,,nail trim,strihanie pazúrikov
+zvieraci-doktor,exam,,,30,50,EUR,https://zvieracidoktor.sk/,2026-09-26,Klinické vyšetrenie 30-50 € (k cene sa pripočítava výjazdový poplatok podľa mestskej časti od 10 € do 23 €),,,in-home clinical examination (travel fee 10-23 EUR extra),klinické vyšetrenie doma (výjazdový poplatok 10-23 €)
+zvieraci-doktor,microchip,,,25,25,EUR,https://zvieracidoktor.sk/,2026-09-26,Čipovanie 25 €,,,microchipping,čipovanie
+zvieraci-doktor,vaccination_dog,,,36,36,EUR,https://zvieracidoktor.sk/,2026-09-26,Kompletné očkovanie pes DHPPiL+besnota 36 €,,,complete dog vaccination DHPPiL + rabies,kompletná vakcína pes DHPPiL + besnota
+zvieraci-doktor,vaccination_cat,,,36,36,EUR,https://zvieracidoktor.sk/,2026-09-26,Kompletné očkovanie mačka RCP+besnota 36 €,,,complete cat vaccination RCP + rabies,kompletná vakcína mačka RCP + besnota
+zvieraci-doktor,nail_trim,,,8,12,EUR,https://zvieracidoktor.sk/,2026-09-26,Strihanie pazúrov 8-12 €,,,nail trim,strihanie pazúrov
+dog-s-beauty-wellness,nail_trim,,,7,7,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-26,Strihanie pazúrov 7 €,,,nail trim,strihanie pazúrov
+dog-s-beauty-wellness,deshedding,,,20,20,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-26,Vyčesávanie podsady 30 min. 20 €,,,undercoat deshedding 30 min,vyčesávanie podsady 30 min.
+dog-s-beauty-wellness,hand_stripping,,,58,,EUR,https://dogsbeauty.sk/psi-salon-cennik/,2026-09-26,Aromaterapia kúpeľ + trimovanie Od 58 €,,,bath and hand stripping from 58 EUR,kúpeľ a trimovanie od 58 €
+psi-salon-zuzana,nail_trim,,,10,10,EUR,https://salon-pre-psov.sk/cennik/,2026-09-26,Strihanie pazúrov 10 €,,,nail trim,strihanie pazúrov
+pohodog-team-vencenie-a-opatrovanie-na-doma,nail_trim,,,3,5,EUR,https://www.pohodog.sk/cennik/,2026-09-26,Strihanie pazúrikov 3-5 €,,,nail trim,strihanie pazúrikov
+pohodog-team-vencenie-a-opatrovanie-na-doma,private_lesson,,,25,25,EUR,https://www.pohodog.sk/cennik/,2026-09-26,Individuálny výcvik 1h / 25 €,per_hour,,individual dog training 1 hour,individuálny výcvik 1 hodina
+pohodog-team-vencenie-a-opatrovanie-na-doma,behavior_consult,,,35,35,EUR,https://www.pohodog.sk/cennik/,2026-09-26,Problémové správanie v rámci tréningu 1h / 35 €,per_hour,,problem behavior consultation 1 hour,problémové správanie 1 hodina
+psi-salon-vesela-labka-ruzinov,cat_groom,,,27,,EUR,https://veselalabka.sk/sk/cennik,2026-09-26,Strihanie mačka od 27 € / 60 min.,,,cat grooming from 27 EUR,strihanie mačka od 27 €
+psi-salon-vesela-labka-petrzalka,cat_groom,,,23,,EUR,https://veselalabka.sk/sk/cennik,2026-09-26,Mačka úprava od 23 €,,,cat grooming from 23 EUR,úprava mačky od 23 €
+veterina-inak-centrum,exam,,,50,50,EUR,https://veterinainakcentrum.sk/cennik,2026-09-26,Vstupné fyzioterapeutické vyšetrenie / konzultácia 60 min 50 €,,,initial physiotherapy examination / consultation 60 min,vstupné vyšetrenie / konzultácia 60 min.
