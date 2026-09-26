@@ -387,6 +387,11 @@ business_slug,price_code,weight_from_kg,weight_to_kg,price_from,price_to,currenc
 
 ## Проверка перед PR (для каждого агента)
 
+Общий стандарт и блок самопроверки для описания PR —
+`docs/playbooks/quality.md`. Здесь — то, что относится к данным карточки.
+
+- Логотип — до 200 КБ (достаточно 512 px); `check-city` не пропустит
+  файл тяжелее.
 - `npm run check-city -- <город>` печатает `READY` (раздел «Минимум
   качества»); его вывод — в описании PR.
 

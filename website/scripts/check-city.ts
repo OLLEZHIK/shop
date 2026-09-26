@@ -32,7 +32,7 @@ const rows: Row[] = fs
   .flatMap((f) => Papa.parse<Row>(fs.readFileSync(path.join(dir, f), "utf-8"), { header: true, skipEmptyLines: true }).data);
 const insights = new Set(
   fs.existsSync(path.join(dir, "review-insights"))
-    ? fs.readdirSync(path.join(dir, "review-insights")).map((f) => f.replace(/\.json$/, ""))
+    ? fs.readdirSync(path.join(dir, "review-insights")).filter((f) => f.endsWith(".json")).map((f) => f.replace(/\.json$/, ""))
     : []
 );
 
@@ -115,7 +115,69 @@ if (atCentre.length) {
   for (const r of atCentre) console.log(`  ${r.slug}: ${r.lat}, ${r.lng}`);
 }
 
-// Review summaries are a second pass; reported, not enforced here.
+// Logos are shown at avatar size: a heavy file only slows the page
+// (docs/card-spec.md, "Логотип").
+const MAX_LOGO_KB = 200;
+const heavyLogos = rows.filter(
+  (r) => logoOk(r) && fs.statSync(path.join(logosDir, r.logo_file.trim())).size > MAX_LOGO_KB * 1024
+);
+if (heavyLogos.length) {
+  failed = true;
+  console.log(`\nLogos over ${MAX_LOGO_KB} KB - compress or resize to 512 px (${heavyLogos.length}):`);
+  for (const r of heavyLogos) {
+    const kb = Math.round(fs.statSync(path.join(logosDir, r.logo_file.trim())).size / 1024);
+    console.log(`  ${r.slug}: ${r.logo_file} ${kb} KB`);
+  }
+}
+
+// Review summaries follow one format (tasks/mac-review-insights.md,
+// "Формат файла"); a broken file would break the place page.
+const slugs = new Set(rows.map((r) => r.slug));
+const bothLangs = (v: unknown) => {
+  const o = v as Record<string, unknown> | undefined;
+  return typeof o?.en === "string" && typeof o?.sk === "string" && o.en.trim() !== "" && o.sk.trim() !== "";
+};
+const insightErrors: string[] = [];
+for (const slug of insights) {
+  const file = path.join(dir, "review-insights", `${slug}.json`);
+  let data: {
+    slug?: string;
+    cards?: { title?: unknown; text?: unknown; mentions?: number }[];
+    faq?: { q?: unknown; a?: unknown }[];
+  };
+  try {
+    data = JSON.parse(fs.readFileSync(file, "utf-8"));
+  } catch {
+    insightErrors.push(`${slug}: not valid JSON`);
+    continue;
+  }
+  const err = (m: string) => insightErrors.push(`${slug}: ${m}`);
+  if (!slugs.has(slug)) err("no place with this slug in businesses.csv");
+  if (data.slug !== slug) err(`"slug" is "${data.slug}", file name says "${slug}"`);
+  const cards = data.cards ?? [];
+  if (cards.length !== 3) err(`${cards.length} cards, need exactly 3`);
+  cards.forEach((c, i) => {
+    if (!bothLangs(c.title) || !bothLangs(c.text)) err(`card ${i + 1}: title and text need both en and sk`);
+    if ((c.mentions ?? 0) < 3) err(`card ${i + 1}: mentions ${c.mentions}, a topic needs 3+ reviewers`);
+    const text = c.text as Record<string, string> | undefined;
+    for (const l of ["en", "sk"]) {
+      const n = text?.[l]?.length ?? 0;
+      if (n && (n < 250 || n > 450)) err(`card ${i + 1}: text.${l} is ${n} characters, need 250-450`);
+    }
+  });
+  const faq = data.faq ?? [];
+  if (faq.length < 3 || faq.length > 6) err(`${faq.length} FAQ, need 3-6`);
+  faq.forEach((f, i) => {
+    if (!bothLangs(f.q) || !bothLangs(f.a)) err(`FAQ ${i + 1}: q and a need both en and sk`);
+  });
+}
+if (insightErrors.length) {
+  failed = true;
+  console.log(`\nreview-insights format (${insightErrors.length}):`);
+  for (const e of insightErrors) console.log(`  ${e}`);
+}
+
+// Review summaries are a second pass; coverage reported, not enforced.
 const rated = rows.filter((r) => Number(r.google_rating_count) >= 10);
 const withInsights = rated.filter((r) => insights.has(r.slug)).length;
 console.log(`\nWhat customers say: ${withInsights}/${rated.length} places with 10+ Google ratings have review-insights`);
