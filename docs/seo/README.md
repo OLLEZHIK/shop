@@ -36,7 +36,7 @@
 |---|---|---|
 | Страница категории | Один сегмент на категорию: `/grooming/bratislava/`, район — `/grooming/bratislava/petrzalka/` | Люди ищут «vet clinic Bratislava», а не «pet services vet»; `design-plan.md` §3 |
 | Английские слаги | `grooming`, `vet-clinics`, `pet-hotels`, `dog-training`, `pet-shops`, `pet-sitting` | 5 слагов подтверждены исследованием, `pet-training` → `dog-training`: весь спрос про собак; `english-keywords.md` §2 |
-| Словацкие слаги | `psi-salon`, `veterinar`, `hotel-pre-zvierata`, `vycvik-psov`, `chovatelske-potreby`, `opatrovanie-zvierat` | **Временные**, до `tasks/antigravity-slovak-keyword-research.md` |
+| Словацкие слаги | `psi-salon`, `veterinar`, `hotel-pre-zvierata`, `vycvik-psov`, `chovatelske-potreby`, `opatrovanie-zvierat` | Живые с v2; заменить, только если исследование покажет явную разницу в спросе (`tasks/antigravity-slovak-keyword-research.md`) |
 | Карточка заведения | `/business/{slug}/`, `/sk/podnik/{slug}/` | `design-plan.md` §3 |
 | Страница города (хаб) | `/city/{город}/`, `/sk/mesto/{город}/`: общий список всех служб города с фильтрами (как у категорий) и чипами категорий; сюда ведёт поиск на главной, если выбран только город (владелец, 2026-09-25) | Точка входа для запросов «pet services {город}» и внутренние ссылки на все категории; ссылки из футера («Города»). Индексируется от 3 заведений. `docs/architecture/multi-city.md` |
 | Языки города | Страница на местном языке есть, только если язык указан в `locales` города (`city.json`), иначе 404 | Не создавать словацкие страницы для Нью-Йорка; `docs/architecture/multi-city.md` §3 |
@@ -267,9 +267,10 @@
 
 | Что | Кто | Статус |
 |---|---|---|
-| Языковая модель v2 (`/en/`, 301, выбор языка на `/`) | CLI или «правая рука» по решению владельца | Не начато; чем раньше, тем дешевле |
-| Словацкие слаги и title по реальным запросам | Antigravity, `tasks/antigravity-slovak-keyword-research.md` | Ждёт |
-| Рейтинги и сводки отзывов (контент + звёзды в выдаче) | Antigravity, `tasks/antigravity-collect-ratings-and-review-summaries.md` | Ждёт |
+| Языковая модель v2 (`/en/`, 301, выбор языка на `/`) | «Левая рука», PR #93 | Сделано |
+| Аудит английских строк на `/sk/` (интерфейс, meta, alt, aria-label, ошибки форм) | Редизайн | Ждёт; из закрытой `tasks/done/cli-full-local-language-sk.md` |
+| Словацкие title (и слаги при явной разнице) по реальным запросам | Antigravity, `tasks/antigravity-slovak-keyword-research.md` | Ждёт |
+| Рейтинги и сводки отзывов (контент + звёзды в выдаче) | Antigravity: рейтинги сделаны; сводки — пилот 10 мест, остальные `tasks/ide-review-insights.md` (PR 2) | В работе |
 | Google Search Console: подтвердить домен, отправить `sitemap.xml`, проверить ошибки 5xx после инцидента | Владелец | Сделать |
 | Bing Webmaster Tools, отправить `sitemap.xml` | Владелец | Сделать |
 | Ссылки на сайт: каталоги бизнесов Словакии, r/Bratislava, группы экспатов | Владелец | Идея |
