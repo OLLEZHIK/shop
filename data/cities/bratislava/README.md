@@ -39,5 +39,5 @@ python3 scripts/migrate-bratislava.py
   где не пишет — одна строка «от — до» и размеры в `notes`; цены
   «od X €» — как «от»; услуги не из стандарта (стоматология, УЗИ,
   паспорт, кастрация кобеля) не переносились.
-- `review-insights/<slug>.json` — сводки отзывов (`tasks/mac-review-insights.md`).
+- `review-insights/<slug>.json` — сводки отзывов (`docs/playbooks/review-insights.md`).
 - `districts.geojson` — полигоны районов (`website/scripts/fetch-districts.ts`).

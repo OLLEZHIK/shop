@@ -1,11 +1,14 @@
 // "What customers say": our summary of public Google reviews for a place
-// (data/review-insights/<slug>.json, tasks/mac-review-insights.md).
+// (data/cities/<city>/review-insights/<slug>.json,
+// docs/playbooks/review-insights.md).
 // Display rules: docs/design-plan.md, "Сводка отзывов". Stored as JSON on
 // Business.reviewInsights; parsed defensively here so one malformed file
 // hides its block instead of breaking the page.
 
 export type Sentiment = "positive" | "mixed" | "negative";
-type Localized = { en: string; sk: string };
+/** Text per language: English plus the city's language(s), e.g.
+ *  { en, sk } for Bratislava, { en, cs } for Brno. */
+type Localized = Record<string, string>;
 
 export interface InsightCard {
   topic: string;
@@ -34,9 +37,10 @@ const SENTIMENTS: Sentiment[] = ["positive", "mixed", "negative"];
 /** Older summaries are hidden: the task summarises the last 6 months. */
 const MAX_AGE_DAYS = 7 * 31;
 
-function isLocalized(v: unknown): v is Localized {
+/** The text exists in English and in the language being shown. */
+function hasText(v: unknown, locale: string): v is Localized {
   const o = v as Localized;
-  return !!o && typeof o.en === "string" && typeof o.sk === "string" && o.en.trim() !== "" && o.sk.trim() !== "";
+  return !!o && ["en", locale].every((l) => typeof o[l] === "string" && o[l].trim() !== "");
 }
 
 function toDate(v: unknown): Date | null {
@@ -45,7 +49,9 @@ function toDate(v: unknown): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-export function parseReviewInsights(raw: unknown, now: Date = new Date()): ReviewInsights | null {
+/** Parse for one page language: cards and FAQ without text in that
+ *  language are dropped, so a page never mixes languages. */
+export function parseReviewInsights(raw: unknown, locale: string, now: Date = new Date()): ReviewInsights | null {
   if (!raw || typeof raw !== "object") return null;
   const o = raw as Record<string, unknown>;
   const periodFrom = toDate(o.period_from);
@@ -60,11 +66,11 @@ export function parseReviewInsights(raw: unknown, now: Date = new Date()): Revie
       !!c &&
       SENTIMENTS.includes((c as InsightCard).sentiment) &&
       typeof (c as InsightCard).mentions === "number" &&
-      isLocalized((c as InsightCard).title) &&
-      isLocalized((c as InsightCard).text)
+      hasText((c as InsightCard).title, locale) &&
+      hasText((c as InsightCard).text, locale)
   );
   const faq = (Array.isArray(o.faq) ? o.faq : []).filter(
-    (f): f is InsightFaq => !!f && isLocalized((f as InsightFaq).q) && isLocalized((f as InsightFaq).a)
+    (f): f is InsightFaq => !!f && hasText((f as InsightFaq).q, locale) && hasText((f as InsightFaq).a, locale)
   );
   if (cards.length === 0) return null;
 

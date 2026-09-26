@@ -191,7 +191,7 @@ function businessFields(row: CsvRow, citySlug: string, rep: CityReport, logoDir:
 }
 
 // "What customers say" summaries, one JSON file per business slug
-// (tasks/mac-review-insights.md). Validated again when rendered.
+// (docs/playbooks/review-insights.md). Validated again when rendered.
 function readReviewInsights(dir: string, slug: string, rep: CityReport): Prisma.InputJsonValue | typeof Prisma.DbNull {
   const file = path.join(dir, `${slug}.json`);
   if (!fs.existsSync(file)) return Prisma.DbNull;

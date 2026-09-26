@@ -424,7 +424,7 @@ vet»), и совпадает с `docs/ux-flow.md` (SEO-страница усл�
 #### Сводка отзывов «Что говорят клиенты» (решение владельца 2026-09-24)
 
 Данные: `data/review-insights/<slug>.json` (задача
-`tasks/mac-review-insights.md`): 3 тематические карточки + 3-6 FAQ,
+`docs/playbooks/review-insights.md`): 3 тематические карточки + 3-6 FAQ,
 EN/SK, по отзывам Google за последние 6 месяцев. Правила показа:
 
 - Заголовок блока: «What customers say» / «Čo hovoria zákazníci»,
