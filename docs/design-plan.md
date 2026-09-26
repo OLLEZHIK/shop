@@ -153,7 +153,7 @@ PR #40) и не смешивается с новым `description`. Интегр
 > уже поддерживаемой стране — только данные. Новый язык — один словарь
 > и набор слагов. Страницы Help и юридические пока только на английском.
 > Словацкие слаги живые с v2; менять их только при явной разнице в спросе
-> (`tasks/antigravity-slovak-keyword-research.md`).
+> (`docs/seo/keywords/`, `tasks/antigravity-keywords-sk.md`).
 
 Решение владельца (2026-09-21): в будущем новые города добавляются
 как данные, а не как задача на разработку — «настроили один раз,
@@ -224,7 +224,7 @@ PR #40) и не смешивается с новым `description`. Интегр
 >    `/sk/psi-salon/bratislava/`, `/en/grooming/bratislava/`,
 >    `/sk/podnik/{slug}/`, `/en/business/{slug}/`,
 >    `/en/how-it-works/` (словацкие слаги — после
->    `tasks/antigravity-slovak-keyword-research.md`). Старые адреса без
+>    `docs/seo/keywords/`). Старые адреса без
 >    префикса — 301 на `/en/...`. Каждая страница — self-canonical +
 >    hreflang на все свои языковые версии, `x-default` — корень `/`.
 > 4. **Выбор языка — только на корне `/`:** cookie с последним

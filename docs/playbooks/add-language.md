@@ -36,8 +36,9 @@ TypeScript сам показывает, что ещё не переведено:
    - «В городе» не собирать в словаре: оно приходит из `in_city` в
      `city.json`.
 3. **`website/lib/categories.ts`:**
-   - `SLUGS` — адреса категорий на новом языке (по исследованию
-     запросов, как `docs/seo/english-keywords.md`). **Слаг — это
+   - `SLUGS` — адреса категорий на новом языке — **по исследованию
+     запросов до запуска**: карта `docs/seo/keywords/<locale>.md` с
+     цифрами по методике `docs/seo/keywords/README.md`. **Слаг — это
      адрес: после запуска его не менять.**
    - `LABELS`, `SINGULAR`, `PLURAL`, `SEO_TITLE`, `BLURBS` — названия.
    - `BUSINESS_SEGMENT` (`podnik` → `betrieb`), `CITY_SEGMENT`
