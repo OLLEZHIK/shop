@@ -246,8 +246,8 @@ PR #40) и не смешивается с новым `description`. Интегр
 > Задачи: `tasks/cli-language-model-v2.md` (п. 1, 3-6),
 > `tasks/antigravity-slovak-descriptions.md`,
 > `tasks/done/cli-full-local-language-sk.md` (п. 7 — через `description_local`;
-> п. 2 отменён 2026-09-25: Help и юридические переводим по мере надобности,
-> пока ссылка «(EN)»).
+> п. 2 отменён: Help и юридические — только на английском, без пометки
+> «(EN)», не переводятся; решение владельца 2026-09-26).
 
 ---
 

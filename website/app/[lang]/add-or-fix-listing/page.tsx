@@ -6,7 +6,7 @@ import { ArrowRightIcon, MailIcon, ShieldCheckIcon, SparkleIcon, TagIcon } from 
 export const metadata: Metadata = {
   title: "Add or Fix a Listing - pawenn",
   description: "Add your business or correct details on an existing pawenn listing.",
-  // English only for now; v2 URL with the /en/ prefix.
+  // English only; v2 URL with the /en/ prefix.
   alternates: { canonical: `${SITE_URL}/en/add-or-fix-listing/` },
 };
 
@@ -16,7 +16,8 @@ const WHAT_TO_INCLUDE = [
   { icon: ShieldCheckIcon, title: "What to change", body: "For a fix, what's wrong and a link that shows the correct info." },
 ];
 
-// English only for now - the Slovak site links here with an "(EN)" hint.
+// English only, in every language of the site (owner, 2026-09-26): all
+// locales link here without a language hint.
 export function generateStaticParams() {
   return [{ lang: "en" }];
 }

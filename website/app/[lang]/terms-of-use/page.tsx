@@ -8,11 +8,12 @@ export const metadata: Metadata = {
   title: "Terms of Use - pawenn",
   description: "Terms governing the use of pawenn.",
   robots: { index: false, follow: true },
-  // English only for now; v2 URL with the /en/ prefix.
+  // English only; v2 URL with the /en/ prefix.
   alternates: { canonical: `${SITE_URL}/en/terms-of-use/` },
 };
 
-// English only for now - the Slovak site links here with an "(EN)" hint.
+// English only, in every language of the site (owner, 2026-09-26): all
+// locales link here without a language hint.
 export function generateStaticParams() {
   return [{ lang: "en" }];
 }

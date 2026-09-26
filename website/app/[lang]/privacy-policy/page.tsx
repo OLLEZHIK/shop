@@ -8,11 +8,12 @@ export const metadata: Metadata = {
   title: "Privacy Policy - pawenn",
   description: "How pawenn collects, uses and protects data.",
   robots: { index: false, follow: true },
-  // English only for now; v2 URL with the /en/ prefix.
+  // English only; v2 URL with the /en/ prefix.
   alternates: { canonical: `${SITE_URL}/en/privacy-policy/` },
 };
 
-// English only for now - the Slovak site links here with an "(EN)" hint.
+// English only, in every language of the site (owner, 2026-09-26): all
+// locales link here without a language hint.
 export function generateStaticParams() {
   return [{ lang: "en" }];
 }

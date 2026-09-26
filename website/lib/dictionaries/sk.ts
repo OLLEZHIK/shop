@@ -48,7 +48,6 @@ export const sk: Dictionary = {
     fixListing: "Opraviť záznam",
     privacy: "Ochrana osobných údajov",
     terms: "Podmienky používania",
-    englishOnly: " (EN)",
     madeWithCare: (where: string | null) => `S láskou k zvieratám${where ? ` ${skIn(where)}` : ""}`,
     cities: "Mestá",
   },
