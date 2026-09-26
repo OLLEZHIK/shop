@@ -9,6 +9,7 @@
 - `PRODUCT.md` — концепция владельца: трафик из SEO и LLM, mobile
   first, работа по всему миру;
 - `docs/design-plan.md` §2.2 (языки), §3 (URL), раздел про LLM;
+- `docs/seo/keywords/` — ключевые слова по языкам: методика, карты запросов (`sk.md`, `en.md`), правила применения.
 - `docs/seo/english-keywords.md` — исследование английских запросов
   (Antigravity);
 - `docs/database.md` — база и кэш (связь с доступностью сайта).
@@ -36,7 +37,7 @@
 |---|---|---|
 | Страница категории | Один сегмент на категорию: `/grooming/bratislava/`, район — `/grooming/bratislava/petrzalka/` | Люди ищут «vet clinic Bratislava», а не «pet services vet»; `design-plan.md` §3 |
 | Английские слаги | `grooming`, `vet-clinics`, `pet-hotels`, `dog-training`, `pet-shops`, `pet-sitting` | 5 слагов подтверждены исследованием, `pet-training` → `dog-training`: весь спрос про собак; `english-keywords.md` §2 |
-| Словацкие слаги | `psi-salon`, `veterinar`, `hotel-pre-zvierata`, `vycvik-psov`, `chovatelske-potreby`, `opatrovanie-zvierat` | Живые с v2; заменить, только если исследование покажет явную разницу в спросе (`tasks/antigravity-slovak-keyword-research.md`) |
+| Словацкие слаги | `psi-salon`, `veterinar`, `hotel-pre-zvierata`, `vycvik-psov`, `chovatelske-potreby`, `opatrovanie-zvierat` | Живые с v2; заменить, только если исследование покажет явную разницу в спросе (`docs/seo/keywords/`) |
 | Карточка заведения | `/business/{slug}/`, `/sk/podnik/{slug}/` | `design-plan.md` §3 |
 | Страница города (хаб) | `/city/{город}/`, `/sk/mesto/{город}/`: общий список всех служб города с фильтрами (как у категорий) и чипами категорий; сюда ведёт поиск на главной, если выбран только город (владелец, 2026-09-25) | Точка входа для запросов «pet services {город}» и внутренние ссылки на все категории; ссылки из футера («Города»). Индексируется от 3 заведений. `docs/architecture/multi-city.md` |
 | Языки города | Страница на местном языке есть, только если язык указан в `locales` города (`city.json`), иначе 404 | Не создавать словацкие страницы для Нью-Йорка; `docs/architecture/multi-city.md` §3 |
@@ -185,7 +186,7 @@
   неверно). Код: `PLURAL` в `lib/categories.ts`.
 - **Словацкие title** пока совпадают с названиями разделов (плюс
   `| Pawenn`). Формулировку поменяем после
-  `tasks/antigravity-slovak-keyword-research.md`.
+  `docs/seo/keywords/sk.md` (`tasks/antigravity-keywords-sk.md`).
 - **H1 пока не меняли:** он остаётся коротким («Grooming in
   Bratislava»), потому что это элемент дизайна. Можно вернуться к нему,
   если позиции не вырастут.
@@ -269,7 +270,7 @@
 |---|---|---|
 | Языковая модель v2 (`/en/`, 301, выбор языка на `/`) | «Левая рука», PR #93 | Сделано |
 | Аудит английских строк на `/sk/` (интерфейс, meta, alt, aria-label, ошибки форм) | Редизайн | Ждёт; из закрытой `tasks/done/cli-full-local-language-sk.md` |
-| Словацкие title (и слаги при явной разнице) по реальным запросам | Antigravity, `tasks/antigravity-slovak-keyword-research.md` | Ждёт |
+| Ключевые слова по языкам: title (и слаги при явной разнице) по реальным запросам | Карта — «левая рука» (`docs/seo/keywords/`); цифры — Antigravity, `tasks/antigravity-keywords-sk.md`, затем `-en.md`; применение на сайте — после мерджа цифр | Карта готова, ждёт цифр |
 | Рейтинги и сводки отзывов (контент + звёзды в выдаче) | Antigravity: рейтинги сделаны; сводки — пилот 10 мест, остальные `tasks/ide-review-insights.md` (PR 2) | В работе |
 | Google Search Console: подтвердить домен, отправить `sitemap.xml`, проверить ошибки 5xx после инцидента | Владелец | Сделать |
 | Bing Webmaster Tools, отправить `sitemap.xml` | Владелец | Сделать |

@@ -131,7 +131,7 @@ const PLURAL: Record<Locale, Record<BusinessCategory, string>> = {
 // Page <title> wording: the phrases people actually type. "Grooming in
 // Bratislava" alone also matches barbershops, so the English titles say
 // which animals. Slovak stays on the labels until the keyword research
-// task (tasks/antigravity-slovak-keyword-research.md) says otherwise.
+// research (docs/seo/keywords/sk.md) says otherwise.
 const SEO_TITLE: Record<Locale, Record<BusinessCategory, string>> = {
   en: {
     GROOMING: "Dog & Cat Grooming",
