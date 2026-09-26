@@ -129,7 +129,7 @@ nullable, пока не докончен `cli-backfill-districts-all-datasets`).
 инфраструктуры хранения. `Business.notes` при этом остаётся
 внутренним служебным полем (не текстом для посетителей — см. разбор в
 PR #40) и не смешивается с новым `description`. Интеграция в схему/seed
-— `tasks/cli-integrate-descriptions-and-photos.md` (миграция против
+— `tasks/done/cli-integrate-descriptions-and-photos.md` (миграция против
 реальной БД, поэтому CLI, не Antigravity — см. `AGENTS.md`).
 **Отзывы по-прежнему только первого лица через `/api/reviews`** — не
 переносятся с других платформ ни при каких обстоятельствах, это не
@@ -152,7 +152,8 @@ PR #40) и не смешивается с новым `description`. Интегр
 > `website/lib/seo.ts` (hreflang), sitemap с `xhtml:link`. Новый город в
 > уже поддерживаемой стране — только данные. Новый язык — один словарь
 > и набор слагов. Страницы Help и юридические пока только на английском.
-> Словацкие слаги временные до `tasks/antigravity-slovak-keyword-research.md`.
+> Словацкие слаги живые с v2; менять их только при явной разнице в спросе
+> (`tasks/antigravity-slovak-keyword-research.md`).
 
 Решение владельца (2026-09-21): в будущем новые города добавляются
 как данные, а не как задача на разработку — «настроили один раз,
@@ -244,8 +245,9 @@ PR #40) и не смешивается с новым `description`. Интегр
 >
 > Задачи: `tasks/cli-language-model-v2.md` (п. 1, 3-6),
 > `tasks/antigravity-slovak-descriptions.md`,
-> `tasks/antigravity-translate-content-sk.md`,
-> `tasks/cli-full-local-language-sk.md` (п. 2, 7).
+> `tasks/done/cli-full-local-language-sk.md` (п. 7 — через `description_local`;
+> п. 2 отменён 2026-09-25: Help и юридические переводим по мере надобности,
+> пока ссылка «(EN)»).
 
 ---
 
