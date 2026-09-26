@@ -128,10 +128,11 @@ const PLURAL: Record<Locale, Record<BusinessCategory, string>> = {
   },
 };
 
-// Page <title> wording: the phrases people actually type. "Grooming in
-// Bratislava" alone also matches barbershops, so the English titles say
-// which animals. Slovak stays on the labels until the keyword research
-// research (docs/seo/keywords/sk.md) says otherwise.
+// Page <title> wording: the phrases people actually type, per language
+// (docs/seo/keywords/<locale>.md, "главный" first, then the site's own
+// term). A pattern for every city of the language, not for one city.
+// "Grooming in Bratislava" alone also matches barbershops, so the
+// English titles say which animals.
 const SEO_TITLE: Record<Locale, Record<BusinessCategory, string>> = {
   en: {
     GROOMING: "Dog & Cat Grooming",
@@ -141,7 +142,14 @@ const SEO_TITLE: Record<Locale, Record<BusinessCategory, string>> = {
     PET_SHOP: "Pet Shops",
     PET_SITTING: "Pet Sitters & Dog Walkers",
   },
-  sk: LABELS.sk,
+  sk: {
+    GROOMING: "Strihanie psov a psie salóny",
+    VET_CLINIC: "Veterinári a veterinárne ambulancie",
+    PET_HOTEL: "Hotely pre psov a mačky",
+    DOG_TRAINING: "Výcvik psov a kynológovia",
+    PET_SHOP: "Zverimex a chovateľské potreby",
+    PET_SITTING: "Venčenie a stráženie psov",
+  },
 };
 
 const BLURBS: Record<Locale, Record<BusinessCategory, string>> = {

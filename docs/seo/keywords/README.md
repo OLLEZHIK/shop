@@ -7,8 +7,8 @@
 
 | Язык | Файл | Статус |
 |---|---|---|
-| Словацкий (`sk`) | `sk.md` | Карта запросов готова, цифры собирает Antigravity: `tasks/antigravity-keywords-sk.md` |
-| Английский (`en`) | `en.md` | Качественное исследование категорий — `../english-keywords.md` (без цифр). Цифры для новых типов страниц — `tasks/antigravity-keywords-en.md` |
+| Словацкий (`sk`) | `sk.md` | Собрано (Trends + подсказки, без Planner), PR #100; title на сайте применены 2026-09-26 |
+| Английский (`en`) | `en.md` | Собрано (Trends + подсказки, без Planner), PR #101; title признаков применены 2026-09-26. Категории — ещё `../english-keywords.md` |
 | Новый язык | `<locale>.md` | Шаг в `docs/playbooks/add-language.md`: сначала запросы, потом слаги |
 
 ## 1. Как собирать цифры

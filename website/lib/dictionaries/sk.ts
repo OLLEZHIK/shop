@@ -409,10 +409,10 @@ export const sk: Dictionary = {
   attributes: {
     nonstop: {
       chip: "Nonstop 24/7",
-      h1: (where: string) => `Veterinár nonstop ${skIn(where)}`,
+      h1: (where: string) => `Veterinárna pohotovosť nonstop ${skIn(where)}`,
       lead: (n: number, total: number) =>
         `${n} z ${total} veterinárnych ambulancií prijíma pacientov 24 hodín denne, 7 dní v týždni. Pred cestou zavolajte.`,
-      metaTitle: (where: string) => `Veterinár nonstop ${skIn(where)} – pohotovosť 24/7 | Pawenn`,
+      metaTitle: (where: string) => `Veterinárna pohotovosť nonstop ${skIn(where)} – 24/7 | Pawenn`,
       metaDescription: (n: number, where: string) =>
         `Nonstop veterinárne ambulancie ${skIn(where)}: ${n} ${plural("sk", n, { one: "ambulancia", few: "ambulancie", other: "ambulancií" })} otvorených 24 hodín denne, 7 dní v týždni – adresa, telefón a trasa.`,
     },
@@ -439,7 +439,7 @@ export const sk: Dictionary = {
       h1: (where: string) => `Veterinár pre exotické zvieratá ${skIn(where)}`,
       lead: (n: number, total: number) =>
         `Exotické zvieratá – plazy, vtáky, hlodavce – ošetruje ${n} z ${total} veterinárnych ambulancií. Pred návštevou si overte váš druh.`,
-      metaTitle: (where: string) => `Veterinár pre exoty ${skIn(where)} | Pawenn`,
+      metaTitle: (where: string) => `Exotický veterinár ${skIn(where)} – plazy, vtáky, hlodavce | Pawenn`,
       metaDescription: (n: number, where: string) =>
         `${n} ${plural("sk", n, { one: "veterinárna ambulancia", few: "veterinárne ambulancie", other: "veterinárnych ambulancií" })} ${skIn(where)} pre exotické zvieratá: plazy, vtáky, hlodavce. Hodiny, telefón a trasa.`,
     },
@@ -447,7 +447,7 @@ export const sk: Dictionary = {
       chip: "Výjazd domov",
       h1: (where: string) => `Veterinár s výjazdom domov ${skIn(where)}`,
       lead: (n: number, total: number) => `Výjazd k vám domov ponúka ${n} z ${total} veterinárnych ambulancií.`,
-      metaTitle: (where: string) => `Veterinár domov ${skIn(where)} – výjazd | Pawenn`,
+      metaTitle: (where: string) => `Veterinár domov ${skIn(where)} – výjazdový veterinár | Pawenn`,
       metaDescription: (n: number, where: string) =>
         `${n} ${plural("sk", n, { one: "veterinárna ambulancia", few: "veterinárne ambulancie", other: "veterinárnych ambulancií" })} ${skIn(where)} s výjazdom domov – telefón, hodiny a služby.`,
     },
@@ -455,7 +455,7 @@ export const sk: Dictionary = {
   prices: {
     crumb: "Ceny",
     overviewH1: (label: string, where: string) => `${cap(label)} ${skIn(where)} – ceny`,
-    overviewMetaTitle: (label: string, where: string) => `${cap(label)} ${skIn(where)} – koľko čo stojí | Pawenn`,
+    overviewMetaTitle: (label: string, where: string) => `${cap(label)} ${skIn(where)} – cenník a ceny | Pawenn`,
     overviewIntro:
       "Koľko stojí ktorá služba – porovnanie podnikov, ktoré zverejňujú cenník. Medián je stredná cena: polovica podnikov je lacnejšia, polovica drahšia.",
     overviewMetaDescription: (label: string, where: string, services: number) =>

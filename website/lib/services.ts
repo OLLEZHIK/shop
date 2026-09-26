@@ -14,7 +14,7 @@ export const SERVICES: Partial<Record<BusinessCategory, ServiceDef[]>> = {
     { code: "bath_dry", en: "Bath & blow-dry", sk: "Kúpanie a fénovanie" },
     { code: "hand_stripping", en: "Hand stripping", sk: "Trimovanie" },
     { code: "deshedding", en: "De-shedding", sk: "Vyčesávanie podsady" },
-    { code: "nail_trim", en: "Nail trim", sk: "Strihanie pazúrikov" },
+    { code: "nail_trim", en: "Nail trim", sk: "Strihanie pazúrov" },
     { code: "cat_groom", en: "Cat grooming", sk: "Úprava mačky" },
   ],
   VET_CLINIC: [
@@ -22,8 +22,8 @@ export const SERVICES: Partial<Record<BusinessCategory, ServiceDef[]>> = {
     { code: "vaccination_dog", en: "Dog vaccination", sk: "Očkovanie psa" },
     { code: "microchip", en: "Microchip", sk: "Čipovanie" },
     { code: "neuter_cat", en: "Cat neutering (male)", sk: "Kastrácia kocúra" },
-    { code: "spay_cat", en: "Cat spaying (female)", sk: "Kastrácia mačky" },
-    { code: "spay_dog", en: "Dog spaying (female)", sk: "Kastrácia suky" },
+    { code: "spay_cat", en: "Cat spaying (female)", sk: "Kastrácia (sterilizácia) mačky" },
+    { code: "spay_dog", en: "Dog spaying (female)", sk: "Kastrácia fenky" },
   ],
   PET_HOTEL: [
     { code: "dog_night", en: "Dog, per night", sk: "Pes, noc" },
