@@ -112,7 +112,7 @@ export async function BusinessDetail({ locale, slug }: { locale: Locale; slug: s
   const rating = averageRating(business.reviews);
   const sourceUrl = business.sourceUrls[0];
   const description = aboutDescription(business, locale);
-  const insights = parseReviewInsights(business.reviewInsights);
+  const insights = parseReviewInsights(business.reviewInsights, locale);
   const timeZone = cityTimezone(business.city ?? business.district?.city);
 
   const [similarRaw, priceTiers, marketPrices, districtSummaries] = await Promise.all([

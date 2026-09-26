@@ -99,7 +99,12 @@ if (falseNonstop.length) {
 // Coordinates at the city centre are a placeholder, not a place: they put
 // a pin where the business is not (docs/card-spec.md, section 3).
 const cityMeta = fs.existsSync(path.join(dir, "city.json"))
-  ? (JSON.parse(fs.readFileSync(path.join(dir, "city.json"), "utf-8")) as { lat?: number; lng?: number })
+  ? (JSON.parse(fs.readFileSync(path.join(dir, "city.json"), "utf-8")) as {
+      lat?: number;
+      lng?: number;
+      locale?: string;
+      locales?: string[];
+    })
   : {};
 const atCentre = rows.filter(
   (r) =>
@@ -130,12 +135,13 @@ if (heavyLogos.length) {
   }
 }
 
-// Review summaries follow one format (tasks/mac-review-insights.md,
-// "Формат файла"); a broken file would break the place page.
+// Review summaries follow one format (docs/playbooks/review-insights.md);
+// every text in English and in each language of the city.
 const slugs = new Set(rows.map((r) => r.slug));
+const cityLangs = ["en", ...(cityMeta.locales ?? (cityMeta.locale ? [cityMeta.locale] : []))];
 const bothLangs = (v: unknown) => {
   const o = v as Record<string, unknown> | undefined;
-  return typeof o?.en === "string" && typeof o?.sk === "string" && o.en.trim() !== "" && o.sk.trim() !== "";
+  return cityLangs.every((l) => typeof o?.[l] === "string" && (o[l] as string).trim() !== "");
 };
 const insightErrors: string[] = [];
 for (const slug of insights) {
@@ -157,10 +163,10 @@ for (const slug of insights) {
   const cards = data.cards ?? [];
   if (cards.length !== 3) err(`${cards.length} cards, need exactly 3`);
   cards.forEach((c, i) => {
-    if (!bothLangs(c.title) || !bothLangs(c.text)) err(`card ${i + 1}: title and text need both en and sk`);
+    if (!bothLangs(c.title) || !bothLangs(c.text)) err(`card ${i + 1}: title and text need ${cityLangs.join(" + ")}`);
     if ((c.mentions ?? 0) < 3) err(`card ${i + 1}: mentions ${c.mentions}, a topic needs 3+ reviewers`);
     const text = c.text as Record<string, string> | undefined;
-    for (const l of ["en", "sk"]) {
+    for (const l of cityLangs) {
       const n = text?.[l]?.length ?? 0;
       if (n && (n < 250 || n > 450)) err(`card ${i + 1}: text.${l} is ${n} characters, need 250-450`);
     }
@@ -168,7 +174,7 @@ for (const slug of insights) {
   const faq = data.faq ?? [];
   if (faq.length < 3 || faq.length > 6) err(`${faq.length} FAQ, need 3-6`);
   faq.forEach((f, i) => {
-    if (!bothLangs(f.q) || !bothLangs(f.a)) err(`FAQ ${i + 1}: q and a need both en and sk`);
+    if (!bothLangs(f.q) || !bothLangs(f.a)) err(`FAQ ${i + 1}: q and a need ${cityLangs.join(" + ")}`);
   });
 }
 if (insightErrors.length) {
