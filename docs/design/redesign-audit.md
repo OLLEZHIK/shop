@@ -163,6 +163,8 @@
 - «privacy-preserving analytics like Plausible / Umami» — а в коде
   `@vercel/analytics`;
 - `contact@pawenn.com (placeholder)`.
+- на `/en/add-or-fix-listing/` кнопка «Email us» ведёт на
+  `mailto:{EMAIL}` — адрес не подставлен, письмо уйти не может.
 
 Это юридически значимые тексты — решает владелец (или «левая рука» по
 его поручению).
@@ -359,6 +361,14 @@
    ![5 · Rover](audit/design-5-rover.png)
 
 Все пять — на том же холсте, что и вариант A (ряды 1–5, A внизу).
+
+### Выбор владельца: Zocdoc с цветами pawenn (2026-09-26)
+
+Владелец выбрал направление 1 («как Zocdoc»), но с цветами и функциями
+pawenn. Сделан кликабельный прототип всего сайта на реальных данных —
+`docs/design/prototype/` (описание там же в README). Приватный артефакт
+владельца «Pawenn prototyp».
+
 
 ---
 
