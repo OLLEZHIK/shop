@@ -383,7 +383,7 @@ export const en = {
       h1: (where: string) => `Nonstop vets ${where}`,
       lead: (n: number, total: number) =>
         `${n} of ${total} vet clinics take patients 24 hours a day, 7 days a week. Call before you go.`,
-      metaTitle: (where: string) => `Nonstop vets ${where} – 24/7 emergency | Pawenn`,
+      metaTitle: (where: string) => `Emergency vet ${where} – open 24/7 | Pawenn`,
       metaDescription: (n: number, where: string) =>
         `${n} vet ${n === 1 ? "clinic" : "clinics"} ${where} open nonstop, 24 hours a day, 7 days a week: address, phone and directions.`,
     },
@@ -416,7 +416,7 @@ export const en = {
       chip: "Home visits",
       h1: (where: string) => `Vets who come to your home ${where}`,
       lead: (n: number, total: number) => `${n} of ${total} vet clinics offer home visits.`,
-      metaTitle: (where: string) => `Vet home visits ${where} | Pawenn`,
+      metaTitle: (where: string) => `Mobile vet & home visits ${where} | Pawenn`,
       metaDescription: (n: number, where: string) =>
         `${n} vet ${n === 1 ? "clinic" : "clinics"} ${where} with home visits: phone, hours and what they offer.`,
     },

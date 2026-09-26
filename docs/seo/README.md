@@ -184,9 +184,12 @@
   множественном числе («Compare 10 grooming salons in Bratislava…»), а
   не название раздела («Browse 10 grooming» — было грамматически
   неверно). Код: `PLURAL` в `lib/categories.ts`.
-- **Словацкие title** пока совпадают с названиями разделов (плюс
-  `| Pawenn`). Формулировку поменяем после
-  `docs/seo/keywords/sk.md` (`tasks/antigravity-keywords-sk.md`).
+- **Словацкие title — по исследованию запросов** (`docs/seo/keywords/sk.md`,
+  применено 2026-09-26): «Strihanie psov a psie salóny», «Zverimex a
+  chovateľské potreby», «Veterinárna pohotovosť nonstop», «Exotický
+  veterinár», «Kastrácia fenky», «Strihanie pazúrov» и т.д. Это шаблон
+  для каждого словацкого города; слаги не менялись. Английские title
+  признаков — «Emergency vet … open 24/7», «Mobile vet & home visits».
 - **H1 пока не меняли:** он остаётся коротким («Grooming in
   Bratislava»), потому что это элемент дизайна. Можно вернуться к нему,
   если позиции не вырастут.

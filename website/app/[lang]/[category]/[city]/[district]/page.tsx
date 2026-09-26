@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
     const where = inCity(locale, city);
     const label = categoryLabel(category, locale);
     const services = (await getMarketPrices(category, city.slug)).size;
-    const title = tp.overviewMetaTitle(label, where);
+    const title = tp.overviewMetaTitle(categorySeoTitle(category, locale), where);
     const description = tp.overviewMetaDescription(label, where, services);
     return {
       alternates: localeAlternates(locale, Object.fromEntries(locales.map((l) => [l, pricesPath(l, category, city.slug)]))),
